@@ -1,0 +1,23 @@
+{
+  "development": {
+    "username": "myjoy_dev",
+    "password": "myjoy_passw0rd#1",
+    "database": "my_joy",
+    "host": "myjoydev.chxposkfgx6l.us-west-1.rds.amazonaws.com",
+    "dialect": "mysql"
+  },
+  "test": {
+    "username": "myjoy_dev",
+    "password": "myjoy_passw0rd#1",
+    "database": "my_joy",
+    "host": "myjoydev.chxposkfgx6l.us-west-1.rds.amazonaws.com",
+    "dialect": "mysql"
+  },
+  "production": {
+    "username": "myjoy_dev",
+    "password": "myjoy_passw0rd#1",
+    "database": "my_joy",
+    "host": "myjoydev.chxposkfgx6l.us-west-1.rds.amazonaws.com",
+    "dialect": "mysql"
+  }
+}

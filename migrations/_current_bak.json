@@ -1,0 +1,117 @@
+{
+    "tables": {
+        "Questions": {
+            "tableName": "Questions",
+            "schema": {
+                "id": {
+                    "allowNull": false,
+                    "primaryKey": true,
+                    "autoIncrement": true,
+                    "seqType": "Sequelize.INTEGER"
+                },
+                "description": {
+                    "seqType": "Sequelize.STRING"
+                },
+                "setId": {
+                    "seqType": "Sequelize.INTEGER"
+                },
+                "createdAt": {
+                    "allowNull": false,
+                    "seqType": "Sequelize.DATE"
+                },
+                "updatedAt": {
+                    "allowNull": false,
+                    "seqType": "Sequelize.DATE"
+                }
+            },
+            "indexes": []
+        },
+        "Responses": {
+            "tableName": "Responses",
+            "schema": {
+                "id": {
+                    "allowNull": false,
+                    "primaryKey": true,
+                    "autoIncrement": true,
+                    "seqType": "Sequelize.INTEGER"
+                },
+                "userId": {
+                    "seqType": "Sequelize.INTEGER"
+                },
+                "questionId": {
+                    "seqType": "Sequelize.INTEGER"
+                },
+                "score": {
+                    "seqType": "Sequelize.INTEGER"
+                },
+                "createdAt": {
+                    "allowNull": false,
+                    "seqType": "Sequelize.DATE"
+                },
+                "updatedAt": {
+                    "allowNull": false,
+                    "seqType": "Sequelize.DATE"
+                }
+            },
+            "indexes": []
+        },
+        "Users": {
+            "tableName": "Users",
+            "schema": {
+                "id": {
+                    "allowNull": false,
+                    "primaryKey": true,
+                    "autoIncrement": true,
+                    "seqType": "Sequelize.INTEGER"
+                },
+                "name": {
+                    "seqType": "Sequelize.STRING"
+                },
+                "type": {
+                    "defaultValue": {
+                        "value": "user"
+                    },
+                    "seqType": "Sequelize.ENUM('user', 'admin', 'vendor')"
+                },
+                "email": {
+                    "seqType": "Sequelize.STRING"
+                },
+                "fid": {
+                    "seqType": "Sequelize.INTEGER"
+                },
+                "password": {
+                    "seqType": "Sequelize.STRING"
+                },
+                "zipcode": {
+                    "seqType": "Sequelize.STRING"
+                },
+                "gender": {
+                    "seqType": "Sequelize.STRING"
+                },
+                "age": {
+                    "seqType": "Sequelize.INTEGER"
+                },
+                "phone": {
+                    "seqType": "Sequelize.STRING"
+                },
+                "createdAt": {
+                    "seqType": "Sequelize.DATE"
+                },
+                "updatedAt": {
+                    "seqType": "Sequelize.DATE"
+                },
+                "device_id": {
+                    "seqType": "Sequelize.STRING"
+                },
+                "dob": {
+                    "seqType": "Sequelize.DATE"
+                },
+                "profile_image": {
+                    "seqType": "Sequelize.STRING"
+                }
+            },
+            "indexes": []
+        }
+    },
+    "revision": 2
+}

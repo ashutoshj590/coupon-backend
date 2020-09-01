@@ -1,0 +1,1 @@
+mysql -u root -ppassw0rd my_joy < 2017_11_01_insert_questions_question.sql

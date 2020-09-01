@@ -1,0 +1,3 @@
+sudo apidoc  -f ".js" -i ../myjoyscorebackend/ -o public/apidoc/ -e node_modules/ -e public
+
+

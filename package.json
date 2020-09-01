@@ -1,0 +1,63 @@
+{
+  "name": "Coupon-app",
+  "version": "1.0.0",
+  "description": "My coupon app",
+  "main": "server.js",
+  "dependencies": {
+    "aws-sdk": "^2.170.0",
+    "bcrypt": "^5.0.0",
+    "body-parser": "^1.15.0",
+    "cluster": "^0.7.7",
+    "connect": "^3.7.0",
+    "connect-redis": "^3.4.2",
+    "connect-session-sequelize": "^7.0.1",
+    "cookie-parser": "^1.4.1",
+    "cors": "^2.8.5",
+    "cross-env": "^5.1.1",
+    "dotenv": "^8.2.0",
+    "express": "^4.13.4",
+    "express-handlebars": "^3.0.0",
+    "express-session": "^1.17.1",
+    "fb": "^1.1.1",
+    "fs": "^0.0.2",
+    "handlebars": "^4.0.6",
+    "ini": "^1.3.4",
+    "jsonwebtoken": "^8.5.1",
+    "le_node": "^1.8.0",
+    "moment": "^2.19.4",
+    "multer": "^1.1.0",
+    "mysql": "^2.13.0",
+    "mysql2": "^1.5.1",
+    "neo4j": "^2.0.0-RC2",
+    "node-deployment": "^1.0.1",
+    "path": "^0.12.7",
+    "q": "^1.4.1",
+    "redis": "^2.8.0",
+    "sequelize": "^4.28.1",
+    "sequelize-auto-migrations": "git+https://github.com/thedeceptio/sequelize-auto-migrations.git",
+    "sqlite3": "^5.0.0",
+    "wkx": "^0.4.2"
+  },
+  "devDependencies": {
+    "chai": "^3.5.0",
+    "chai-http": "^2.0.1",
+    "mocha": "^2.5.3",
+    "nodemon": "^2.0.4",
+    "sequelize-cli": "^6.2.0",
+    "standard": "^14.3.4"
+  },
+  "scripts": {
+    "test": "mocha --timeout 5000",
+    "start": "nodemon server.js"
+  },
+  "repository": {
+    "type": "",
+    "url": ""
+  },
+  "keywords": [
+    "couponApp",
+    "MyCouponApp"
+  ],
+  "author": "Ashutosh Joshi",
+  "license": "ISC"
+}

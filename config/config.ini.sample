@@ -1,0 +1,21 @@
+[srv_details]
+env="prod"
+[database]
+hostname='127.0.0.1'
+db_name='my_joy'
+db_user=''
+db_pass=''
+[aws]
+accessKeyId=
+secretAccessKey=
+[secrets]
+salt='some_secret_key_used_to_encrypt_stuff'
+[redis]
+host='127.0.0.1'
+port='6379'
+auth='redis-passwd-frm-redis-conf'
+[gcm]
+apikey='google_cloud_messaging_api_key_for_notifications'
+[pinned_post]
+pinned=true
+post_id=<post id>

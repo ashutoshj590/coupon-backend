@@ -1,0 +1,30 @@
+#create a model as below
+
+sequelize model:create --name User --attributes "email:string, password:string, type:string, device_type:string, fcm_token:string, status:boolean"
+sequelize model:create --name Registration --attributes "user_id:integer,address:string,city:string,state:string,zipcode:string,business_name:string,tagline:string,website:string,phone_no:string,business_license_no:string,description:string"
+sequelize model:create --name Category --attributes "name:string, thumb_url:string, status:boolean"
+sequelize model:create --name SubCategory --attributes "category_id:integer, name:string, img_url:string, status:integer, is_deleted:boolean"
+
+
+
+
+
+
+
+sequelize model:create --name User --attributes "name:string, type:string, email:string, password:string"
+sequelize model:create --name Question --attributes "description:string, setId:integer"
+sequelize model:create --name Response --attributes "userId:integer, questionId:integer, score:integer"
+sequelize model:create --name Post --attributes "type:string, content:string, user_id:integer, comment_count:integer, up_votes:integer, down_votes:integer"
+sequelize model:create --name UserFb --attributes "token:string, likes:string, friend_count:integer"
+sequelize model:create --name Participants --attributes "user_id:integer, conversation_id:integer"
+sequelize model:create --name Photo --attributes "bucket_name:string, file_name:string"
+sequelize model:create --name MessageRecipient --attributes "sender_id:integer, conversation_id:integer, participant_id:integer, message_id:integer, is_read:boolean"
+sequelize model:create --name Comments --attributes "post_id:bigint, user_id:bigint, comment:bigint"
+sequelize model:create --name Conversation --attributes "created_by:bigint, name:string, deletedAt:date, group:boolean"
+sequelize model:create --name Messages --attributes "content:string, type:string, expiresAt:date, parent_message_id:bigint, sender_id:bigint"
+sequelize model:create --name TimeLine --attributes "post_id:bigint, user_id:bigint, type:string, sub_type:string"
+sequelize model:create --name UserPhoto --attributes "user_id:bigint, photo_id:bigint, type:string, post_id:bigint"
+sequelize db:migrate
+
+npx -----------
+
