@@ -22,6 +22,7 @@ router.post('/change-password', [jsonParser, util.hasJsonParam(["new_password"])
         }, function (err) {
             if(err.errors !== undefined && err.errors[0] !== undefined ){
                 var response = util.getResponseObject(consts.RESPONSE_ERROR, err.errors[0].message);
+                console.log("err");
                 res.send(response);
             }else{
                 var response = util.getResponseObject(consts.RESPONSE_ERROR, err);
