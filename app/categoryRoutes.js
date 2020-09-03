@@ -88,6 +88,7 @@ router.post('/add-sub-category', [jsonParser, util.hasJsonParam(["category_id","
 router.post('/get-sub-category',[jsonParser, util.hasJsonParam(["category_id"])], function (req, res) {
     categoryService.getSubcategory(req.body.category_id).then(function (subCategorylist) {
             var response = util.getResponseObject(consts.RESPONSE_SUCCESS);
+            response['category_id'] = req.body.category_id;
             response['subCategories'] = subCategorylist;
             res.send(response);
         }, function (err) {
