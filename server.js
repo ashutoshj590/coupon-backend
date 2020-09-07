@@ -15,6 +15,8 @@ var config = util.parsedConfig;
 var redisUtil = require('./lib/redis.js');
 
 
+
+
 app.use(function(req, res, next) {
     res.header("Access-Control-Allow-Origin", "http://localhost:4200"); // update to match the domain you will make the request from
     res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
@@ -97,7 +99,7 @@ app.use(session({
  * Authenticate each request, except login and sign-up
  * hard coded password for API doc
  */
-/*app.use(function (req, res, next) {
+app.use(function (req, res, next) {
     var reqPath = req.path;
     if (util.checkSession(req) || consts.EXEMPTED_ROUTES.indexOf(reqPath) !== -1) {
         next();
@@ -105,7 +107,7 @@ app.use(session({
     else {
         res.send(util.getResponseObject(consts.RESPONSE_SESSION_EXPIRED, "Session Expired. Please login again."));
     }
-}); */
+});
 
 
 //app.use('/api/documentation', express.static(__dirname + '/public/apidoc'));
@@ -153,7 +155,7 @@ function authenticateToken(req, res, next) {
         req.user = user
         next()
     })
-} */
+} */ 
 
 
 

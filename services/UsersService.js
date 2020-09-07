@@ -16,6 +16,7 @@ let constants = require('../lib/consts');
 var bcrypt = require('bcrypt');
 
 
+
 /*
  * Find a user by email. If does not exist, then create one.
  * todo: validations for mandatory fields.
@@ -66,7 +67,8 @@ module.exports.login = (user, session) => {
                     throw new httpError(httpStatusCodes.UNAUTHORIZED, { response: 'Password incorrect !' });
                 })
                 .then(() => {
-                   return util.refreshSession(session, user, sessionTime);
+                 // return util.refreshSession(session, user, sessionTime);
+                
                  
                 })
                 .then(() => {
