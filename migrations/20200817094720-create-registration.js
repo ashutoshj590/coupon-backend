@@ -23,6 +23,12 @@ module.exports = {
       zipcode: {
         type: Sequelize.STRING
       },
+      opening_time: {
+        type: Sequelize.STRING
+      },
+      closing_time: {
+        type: Sequelize.STRING
+      },
       business_name: {
         type: Sequelize.STRING
       },

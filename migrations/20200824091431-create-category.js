@@ -17,6 +17,9 @@ module.exports = {
       status: {
         type: Sequelize.BOOLEAN
       },
+      is_deleted: {
+        type: Sequelize.INTEGER
+      },
       createdAt: {
         allowNull: false,
         type: Sequelize.DATE
