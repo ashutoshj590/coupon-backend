@@ -62,9 +62,29 @@ router.get('/logout', jsonParser, function (req, res) {
 }); */
 
 
-/* API for New Registration for Merchant.............*/
-router.post('/register-merchant', [jsonParser, util.hasJsonParam(["address","city","state","zipcode","business_name","tagline","website","phone_no","business_license_no","discription"])], function (req, res) {
-    userService.createMerchantDetail(req.session.user_id,req.body.address,req.body.city,req.body.state,req.body.zipcode,req.body.business_name,req.body.tagline,req.body.website,req.body.phone_no,req.body.business_license_no,req.body.discription).then(function (detail) {
+/**
+ * @api {post} /user/register-merchant
+ * @apiDescription To register a new user or to authenticate an existing user. This user will be a super admin to the App.
+ * @apiName authenticate
+ * @apiGroup User
+ * @apiVersion 1.0.0
+ *
+ * @apiParam {String} email         Email address, required while signing up/loggin in via email and password.
+ * @apiParam {String} password      Required Password.
+ * @apiParam {String="user","admin"} type          Required Type.
+ *
+ * @apiSuccess {String} status  success.
+ * @apiSuccess {Number} response_code 200.
+ * @apiSuccess {String} response_message Empty or error message.
+ * @apiSuccess {String} [add_store] <code>true</code> when login by vendor.
+ *
+ * @apiUse SuccessResponse
+ * @apiUse Error
+ * @apiUse MissingReqParam
+ * @apiUse EntityNotFound
+ */
+router.post('/register-merchant', [jsonParser, util.hasJsonParam(["address","city","state","zipcode","opening_time","closing_time","business_name","tagline","website","phone_no","business_license_no","discription"])], function (req, res) {
+    userService.createMerchantDetail(req.session.user_id,req.body.address,req.body.city,req.body.state,req.body.zipcode,req.body.opening_time,req.body.closing_time,req.body.business_name,req.body.tagline,req.body.website,req.body.phone_no,req.body.business_license_no,req.body.discription).then(function (detail) {
             var response = util.getResponseObject(consts.RESPONSE_SUCCESS);
             response.detail = detail;
             res.send(response);

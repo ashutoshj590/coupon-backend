@@ -20,7 +20,10 @@ module.exports = (sequelize, DataTypes) => {
       type :DataTypes.ENUM,
       values: ['admin','merchant','consumer']
       },
-    device_type: DataTypes.STRING,
+      device_type: {
+        type :DataTypes.ENUM,
+        values: ['android','apple']
+        },
     fcm_token: DataTypes.STRING,
     status: DataTypes.BOOLEAN
   }, {

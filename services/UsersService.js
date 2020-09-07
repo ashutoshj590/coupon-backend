@@ -100,7 +100,7 @@ var findUsers = exports.findUsers = function(userId){
 /*
 *   Function for create Merchant Details for Registration..................
 */
-exports.createMerchantDetail = function(userId, address, city, state, zipcode, businessName, tagline, website, phoneNo, businessLNo, discription){
+exports.createMerchantDetail = function(userId, address, city, state, zipcode, openingTime, closingTime, businessName, tagline, website, phoneNo, businessLNo, discription){
     var deferred = Q.defer();
     models.Registration.create({
         user_id: userId,
@@ -108,6 +108,8 @@ exports.createMerchantDetail = function(userId, address, city, state, zipcode, b
         city: city,
         state: state,
         zipcode: zipcode,
+        opening_time: openingTime,
+        closing_time: closingTime,
         business_name: businessName,
         tagline: tagline,
         website: website,

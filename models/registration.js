@@ -24,7 +24,13 @@ module.exports = (sequelize, DataTypes) => {
     website: DataTypes.STRING,
     phone_no: DataTypes.STRING,
     business_license_no: DataTypes.STRING,
-    description: DataTypes.STRING
+    description: DataTypes.STRING,
+    opening_time: {
+      type: DataTypes.STRING
+    },
+    closing_time: {
+      type: DataTypes.STRING
+    }  
   }, {
     sequelize,
     modelName: 'Registration',

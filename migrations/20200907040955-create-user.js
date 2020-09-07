@@ -18,7 +18,7 @@ module.exports = {
         type: Sequelize.ENUM('admin','merchant','consumer')
       },
       device_type: {
-        type: Sequelize.STRING
+        type: Sequelize.ENUM('android','apple')
       },
       fcm_token: {
         type: Sequelize.STRING

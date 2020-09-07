@@ -105,7 +105,7 @@ app.use(session({
     else {
         res.send(util.getResponseObject(consts.RESPONSE_SESSION_EXPIRED, "Session Expired. Please login again."));
     }
-});*/
+}); */
 
 
 //app.use('/api/documentation', express.static(__dirname + '/public/apidoc'));
