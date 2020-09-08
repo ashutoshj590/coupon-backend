@@ -99,7 +99,7 @@ app.use(session({
  * Authenticate each request, except login and sign-up
  * hard coded password for API doc
  */
-/*app.use(function (req, res, next) {
+app.use(function (req, res, next) {
     var reqPath = req.path;
     if (util.checkSession(req) || consts.EXEMPTED_ROUTES.indexOf(reqPath) !== -1) {
         next();
@@ -107,7 +107,7 @@ app.use(session({
     else {
         res.send(util.getResponseObject(consts.RESPONSE_SESSION_EXPIRED, "Session Expired. Please login again."));
     }
-}); */
+}); 
 
 
 //app.use('/api/documentation', express.static(__dirname + '/public/apidoc'));
