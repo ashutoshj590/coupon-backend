@@ -83,8 +83,8 @@ router.get('/logout', jsonParser, function (req, res) {
  * @apiUse MissingReqParam
  * @apiUse EntityNotFound
  */
-router.post('/register-merchant', [jsonParser, util.hasJsonParam(["address","city","state","zipcode","opening_time","closing_time","business_name","tagline","website","phone_no","business_license_no","discription"])], function (req, res) {
-    userService.createMerchantDetail(req.session.user_id,req.body.address,req.body.city,req.body.state,req.body.zipcode,req.body.opening_time,req.body.closing_time,req.body.business_name,req.body.tagline,req.body.website,req.body.phone_no,req.body.business_license_no,req.body.discription).then(function (detail) {
+router.post('/register-merchant', [jsonParser, util.hasJsonParam(["user_id","address","city","state","zipcode","opening_time","closing_time","business_name","tagline","website","phone_no","business_license_no","discription"])], function (req, res) {
+    userService.createMerchantDetail(req.body.user_id,req.body.address,req.body.city,req.body.state,req.body.zipcode,req.body.opening_time,req.body.closing_time,req.body.business_name,req.body.tagline,req.body.website,req.body.phone_no,req.body.business_license_no,req.body.discription).then(function (detail) {
             var response = util.getResponseObject(consts.RESPONSE_SUCCESS);
             response.detail = detail;
             res.send(response);
