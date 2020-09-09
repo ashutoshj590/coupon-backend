@@ -52,7 +52,13 @@ router.post('/login', [util.hasJsonParam(["email", "password", "type", "device_t
             var response = util.getResponseObject(consts.RESPONSE_SUCCESS);
            // const accessToken = jwt.sign(userObject, process.env.ACCESS_TOKEN_SECRET)
           //  response['access_token'] = accessToken;
-            res.send(response);
+          var sessionDetail = {};
+          sessionDetail.user_id = req.session.user_id;
+          sessionDetail.email = req.session.email;
+          sessionDetail.type = req.session.type;
+          sessionDetail.device_type = req.session.device_type;
+          response['user_Detail'] = sessionDetail;
+          res.send(response);
         }, function (err) {
             if(err.errors !== undefined && err.errors[0] !== undefined ){
                 var response = util.getResponseObject(consts.RESPONSE_ERROR, err.errors[0].message);
