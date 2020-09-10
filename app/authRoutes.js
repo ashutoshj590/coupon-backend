@@ -5,6 +5,8 @@ var util = require('../lib/Utils.js');
 var sessionTime = 1 * 60 * 60 * 1000;       //1 hour session
 var consts = require('../lib/consts.js');
 var session = require('express-session');
+var passport = require('passport');
+var jwt = require('jsonwebtoken');
 
 
 
@@ -57,6 +59,7 @@ router.post('/login', [util.hasJsonParam(["email", "password", "type", "device_t
           sessionDetail.email = req.session.email;
           sessionDetail.type = req.session.type;
           sessionDetail.device_type = req.session.device_type;
+       //   sessionDetail.token = 
           response['user_Detail'] = sessionDetail;
           res.send(response);
         }, function (err) {

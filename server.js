@@ -17,9 +17,11 @@ var redisUtil = require('./lib/redis.js');
 
 
 
+
+
 app.use(function(req, res, next) {
-    res.header("Access-Control-Allow-Origin", "http://localhost:4200"); // update to match the domain you will make the request from
-    res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+    res.header("Access-Control-Allow-Origin", "https://www.mccpapp.com"); // http://localhost:4200
+    res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept"); 
     next();
   });
 /*
@@ -87,7 +89,7 @@ sequelize
 app.use(session({
     secret: config.secrets.salt,    //Session will be encrypted using this value.
     // create new redis store.
-    store: new redisStore({host: config.redis.host, port: config.redis.port, client: client, ttl: consts.SESSION_TIME}),
+    store: new redisStore({host: config.redis.host, port: config.redis.port, client: client, ttl: consts.SESSION_TIME}), //
     saveUninitialized: false,       //session will not be saved in first response itself (without values)
     resave: false,                  //won't be stored in session store if session is not modified
     rolling: true,                   //expiration is reset on every response
@@ -117,45 +119,6 @@ app.use("/user", require('./app/userRoutes'));
 app.use("/category", require('./app/categoryRoutes.js'));
 
 
-/*const post = [
-    {
-       username: "ashutosh",
-       titel: "dsfdsf" 
-
-    },
-    {
-        username: "asdf",
-        titel: "bnm" 
- 
-     }
-]
-
-
-app.get('/post', authenticateToken, (req, res) => {
-    res.json(post.filter(post => post.username === req.user.name));
-});
-
-app.post('/login', (req, res) => {
-    //Authenticate user
-   const username = req.body.username
-   const user = { name:username } 
-   
-   const accessToken = jwt.sign(user, process.env.ACCESS_TOKEN_SECRET)
-   res.json({ accessToken: accessToken })
-
-});
-
-function authenticateToken(req, res, next) {
-    const authHeader = req.headers['authorization']
-    const token  = authHeader && authHeader.split('')[1]
-    if (token == null) return res.sendStatus(401)
-
-    jwt.verify(token,  process.env.ACCESS_TOKEN_SECRET, (err, user) => {
-        if(err) return res.sendStatus(403)
-        req.user = user
-        next()
-    })
-} */ 
 
 
 
