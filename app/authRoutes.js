@@ -59,7 +59,7 @@ router.post('/login', [util.hasJsonParam(["email", "password", "type", "device_t
           sessionDetail.email = req.session.email;
           sessionDetail.type = req.session.type;
           sessionDetail.device_type = req.session.device_type;
-       //   sessionDetail.token = 
+          sessionDetail.token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c"
           response['user_Detail'] = sessionDetail;
           res.send(response);
         }, function (err) {
