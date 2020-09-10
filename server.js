@@ -118,7 +118,7 @@ app.use("/auth", require('./app/authRoutes'));
 app.use("/user", require('./app/userRoutes'));
 app.use("/category", require('./app/categoryRoutes.js'));
 
-
+/*fdgdfgfdgdfgfdgf*/
 
 
 
