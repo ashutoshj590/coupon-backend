@@ -13,13 +13,8 @@ var flash = require('connect-flash');
 var consts = require('./lib/consts.js');//
 var config = util.parsedConfig;
 var redisUtil = require('./lib/redis.js');
-var cors = require('cors')
-
-const https = require('https');
-const fs = require('fs');
 
 
-app.use(cors())
 // set up express
 app.use(morgan('dev'));
 app.use(bodyParser.json());
@@ -27,10 +22,6 @@ app.use(bodyParser.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 app.set('view engine', 'ejs');
-const httpOptions = {
-    key: fs.readFileSync('key.pem'),
-    cert: fs.readFileSync('cert.pem')
-  };
 
 
 app.use(function(req, res, next) {
@@ -147,26 +138,14 @@ app.use("/category", require('./app/categoryRoutes.js'));
 
 
 
-var server = https.createServer(httpOptions, app)
-    .listen(8080, function(){
-        var host = server.address().address;
-        var port = server.address().port;
-
-        console.log("Example app listening at http://%s:%s", host, port)
-
-
-    });
-
-
-
-/*var server = app.listen(8080, function () {
+var server = app.listen(8080, function () {
 
     var host = server.address().address;
     var port = server.address().port;
 
     console.log("Example app listening at http://%s:%s", host, port)
 
-}); */
+});
 //module.exports = app;
 
 
