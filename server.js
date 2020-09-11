@@ -27,10 +27,10 @@ app.use(bodyParser.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 app.set('view engine', 'ejs');
-/*const httpOptions = {
+const httpOptions = {
     key: fs.readFileSync('key.pem'),
     cert: fs.readFileSync('cert.pem')
-  }; */
+  };
 
 
 app.use(function(req, res, next) {
@@ -147,7 +147,7 @@ app.use("/category", require('./app/categoryRoutes.js'));
 
 
 
-/* var server = https.createServer(httpOptions, app)
+var server = https.createServer(httpOptions, app)
     .listen(8080, function(){
         var host = server.address().address;
         var port = server.address().port;
@@ -155,18 +155,18 @@ app.use("/category", require('./app/categoryRoutes.js'));
         console.log("Example app listening at http://%s:%s", host, port)
 
 
-    }); */
+    });
 
 
 
-var server = app.listen(8080, function () {
+/*var server = app.listen(8080, function () {
 
     var host = server.address().address;
     var port = server.address().port;
 
     console.log("Example app listening at http://%s:%s", host, port)
 
-}); 
+}); */
 //module.exports = app;
 
 
