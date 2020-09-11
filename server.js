@@ -15,8 +15,8 @@ var config = util.parsedConfig;
 var redisUtil = require('./lib/redis.js');
 var cors = require('cors')
 
-/*const https = require('https');
-const fs = require('fs'); */
+const https = require('https');
+const fs = require('fs');
 
 
 app.use(cors())
