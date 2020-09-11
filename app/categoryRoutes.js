@@ -17,10 +17,10 @@ router.post('/add-category', [jsonParser, util.hasJsonParam(["name"])], function
             res.send(response);
         }, function (err) {
             if(err.errors !== undefined && err.errors[0] !== undefined ){
-                var response = util.getResponseObject(consts.RESPONSE_ERROR, err.errors[0].message);
+                var response = util.getResponseObject(consts.RESPONSE_ERROR, err.response);
                 res.send(response);
             }else{
-                var response = util.getResponseObject(consts.RESPONSE_ERROR, err);
+                var response = util.getResponseObject(consts.RESPONSE_ERROR, err.response);
             }
             res.send(response);
         }
@@ -36,10 +36,10 @@ router.post('/get-all-category',jsonParser, function (req, res) {
             res.send(response);
         }, function (err) {
             if(err.errors !== undefined && err.errors[0] !== undefined ){
-                var response = util.getResponseObject(consts.RESPONSE_ERROR, err.errors[0].message);
+                var response = util.getResponseObject(consts.RESPONSE_ERROR, err.response);
                 res.send(response);
             }else{
-                var response = util.getResponseObject(consts.RESPONSE_ERROR, err);
+                var response = util.getResponseObject(consts.RESPONSE_ERROR, err.response);
             }
             res.send(response);
         }
@@ -54,10 +54,10 @@ categoryService.changeStatustoCategory(req.body.category_id).then(function (stat
             res.send(response);
         }, function (err) {
             if(err.errors !== undefined && err.errors[0] !== undefined ){
-                var response = util.getResponseObject(consts.RESPONSE_ERROR, err.errors[0].message);
+                var response = util.getResponseObject(consts.RESPONSE_ERROR, err.response);
                 res.send(response);
             }else{
-                var response = util.getResponseObject(consts.RESPONSE_ERROR, err);
+                var response = util.getResponseObject(consts.RESPONSE_ERROR, err.response);
             }
             res.send(response);
         }
@@ -73,10 +73,10 @@ router.post('/add-sub-category', [jsonParser, util.hasJsonParam(["category_id","
             res.send(response);
         }, function (err) {
             if(err.errors !== undefined && err.errors[0] !== undefined ){
-                var response = util.getResponseObject(consts.RESPONSE_ERROR, err.errors[0].message);
+                var response = util.getResponseObject(consts.RESPONSE_ERROR, err.response);
                 res.send(response);
             }else{
-                var response = util.getResponseObject(consts.RESPONSE_ERROR, err);
+                var response = util.getResponseObject(consts.RESPONSE_ERROR, err.response);
             }
             res.send(response);
         }
@@ -93,10 +93,10 @@ router.post('/get-sub-category',[jsonParser, util.hasJsonParam(["category_id"])]
             res.send(response);
         }, function (err) {
             if(err.errors !== undefined && err.errors[0] !== undefined ){
-                var response = util.getResponseObject(consts.RESPONSE_ERROR, err.errors[0].message);
+                var response = util.getResponseObject(consts.RESPONSE_ERROR, err.response);
                 res.send(response);
             }else{
-                var response = util.getResponseObject(consts.RESPONSE_ERROR, err);
+                var response = util.getResponseObject(consts.RESPONSE_ERROR, err.response);
             }
             res.send(response);
         }
@@ -111,10 +111,10 @@ categoryService.changeStatustoSubCategory(req.body.sub_category_id).then(functio
             res.send(response);
         }, function (err) {
             if(err.errors !== undefined && err.errors[0] !== undefined ){
-                var response = util.getResponseObject(consts.RESPONSE_ERROR, err.errors[0].message);
+                var response = util.getResponseObject(consts.RESPONSE_ERROR, err.response);
                 res.send(response);
             }else{
-                var response = util.getResponseObject(consts.RESPONSE_ERROR, err);
+                var response = util.getResponseObject(consts.RESPONSE_ERROR, err.response);
             }
             res.send(response);
         }

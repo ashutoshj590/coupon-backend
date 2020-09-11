@@ -70,10 +70,10 @@ router.post('/register-merchant', [jsonParser, util.hasJsonParam(["user_id","add
             res.send(response);
         }, function (err) {
             if(err.errors !== undefined && err.errors[0] !== undefined ){
-                var response = util.getResponseObject(consts.RESPONSE_ERROR, err.errors[0].message);
+                var response = util.getResponseObject(consts.RESPONSE_ERROR, err.response);
                 res.send(response);
             }else{
-                var response = util.getResponseObject(consts.RESPONSE_ERROR, err);
+                var response = util.getResponseObject(consts.RESPONSE_ERROR, err.response);
             }
             res.send(response);
         }

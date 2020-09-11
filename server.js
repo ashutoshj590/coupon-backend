@@ -1,25 +1,32 @@
 var express = require('express');
 var path = require('path');
 var app = express();
-
+var cookieParser = require('cookie-parser');
 var Sequelize = require('sequelize');
-
+var morgan = require('morgan');
 var bodyParser = require('body-parser');
-
+var passport = require('passport');
 var session = require('express-session');
 var redisStore = require('connect-redis')(session);
 var util = require('./lib/Utils.js');
-
+var flash = require('connect-flash');
 var consts = require('./lib/consts.js');//
 var config = util.parsedConfig;
 var redisUtil = require('./lib/redis.js');
-
-const https = require('https');
-const fs = require('fs');
-
 var cors = require('cors')
-app.use(cors())
 
+/*const https = require('https');
+const fs = require('fs'); */
+
+
+app.use(cors())
+// set up express
+app.use(morgan('dev'));
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({ extended: false }));
+app.use(cookieParser());
+app.use(express.static(path.join(__dirname, 'public')));
+app.set('view engine', 'ejs');
 /*const httpOptions = {
     key: fs.readFileSync('key.pem'),
     cert: fs.readFileSync('cert.pem')
@@ -120,6 +127,18 @@ app.use(session({
 
 
 //app.use('/api/documentation', express.static(__dirname + '/public/apidoc'));
+
+// config passport
+app.use(session({
+	secret: 'vidyapathaisalwaysrunning',
+	resave: true,
+	saveUninitialized: true
+ } )); // session secret
+app.use(passport.initialize());
+app.use(passport.session()); // persistent login sessions
+app.use(flash()); // use connect-flash for flash messages stored in session
+
+const SERVER_SECRET = 'ohgodpleasenobug';
 
 app.use("/auth", require('./app/authRoutes'));
 app.use("/user", require('./app/userRoutes'));

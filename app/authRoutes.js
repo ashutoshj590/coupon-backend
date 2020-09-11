@@ -19,10 +19,10 @@ router.post('/sign-up', [util.hasJsonParam(["email", "password", "type", "device
         res.send(response);
     }, function (err) {
         if(err.errors !== undefined && err.errors[0] !== undefined ){
-            var response = util.getResponseObject(consts.RESPONSE_ERROR, err.errors[0].message);
+            var response = util.getResponseObject(consts.RESPONSE_ERROR, err.response);
             res.send(response);
         }else{
-            var response = util.getResponseObject(consts.RESPONSE_ERROR, err);
+            var response = util.getResponseObject(consts.RESPONSE_ERROR, err.response);
         }
         res.send(response);
     }
@@ -59,15 +59,15 @@ router.post('/login', [util.hasJsonParam(["email", "password", "type", "device_t
           sessionDetail.email = req.session.email;
           sessionDetail.type = req.session.type;
           sessionDetail.device_type = req.session.device_type;
-          sessionDetail.token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c"
+          sessionDetail.token = "work on progress...."
           response['user_Detail'] = sessionDetail;
           res.send(response);
         }, function (err) {
             if(err.errors !== undefined && err.errors[0] !== undefined ){
-                var response = util.getResponseObject(consts.RESPONSE_ERROR, err.errors[0].message);
+                var response = util.getResponseObject(consts.RESPONSE_ERROR, err.response);
                 res.send(response);
             }else{
-                var response = util.getResponseObject(consts.RESPONSE_ERROR, err);
+                var response = util.getResponseObject(consts.RESPONSE_ERROR, err.response);
             }
             res.send(response);
         }
