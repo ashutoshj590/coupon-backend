@@ -47,6 +47,12 @@ module.exports = {
       description: {
         type: Sequelize.STRING
       },
+      category_id: {
+        type: Sequelize.INTEGER
+      },
+      sub_category_id: {
+        type: Sequelize.INTEGER
+      },
       createdAt: {
         allowNull: false,
         type: Sequelize.DATE

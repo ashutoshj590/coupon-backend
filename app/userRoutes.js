@@ -63,17 +63,17 @@ router.get('/logout', jsonParser, function (req, res) {
 
 
 
-router.post('/register-merchant', [jsonParser, util.hasJsonParam(["user_id","address","city","state","zipcode","opening_time","closing_time","business_name","tagline","website","phone_no","business_license_no","discription"])], function (req, res) {
-    userService.createMerchantDetail(req.body.user_id,req.body.address,req.body.city,req.body.state,req.body.zipcode,req.body.opening_time,req.body.closing_time,req.body.business_name,req.body.tagline,req.body.website,req.body.phone_no,req.body.business_license_no,req.body.discription).then(function (detail) {
+router.post('/register-merchant', [jsonParser, util.hasJsonParam(["user_id","address","city","state","zipcode","opening_time","closing_time","business_name","tagline","website","phone_no","business_license_no","discription","category_id","sub_category_id"])], function (req, res) {
+    userService.createMerchantDetail(req.body.user_id,req.body.address,req.body.city,req.body.state,req.body.zipcode,req.body.opening_time,req.body.closing_time,req.body.business_name,req.body.tagline,req.body.website,req.body.phone_no,req.body.business_license_no,req.body.discription,req.body.category_id,req.body.sub_category_id).then(function (detail) {
             var response = util.getResponseObject(consts.RESPONSE_SUCCESS);
             response.detail = detail;
             res.send(response);
         }, function (err) {
             if(err.errors !== undefined && err.errors[0] !== undefined ){
-                var response = util.getResponseObject(consts.RESPONSE_ERROR, err.response);
+                var response = util.getResponseObject(consts.RESPONSE_ERROR, err.errors[0].message);
                 res.send(response);
             }else{
-                var response = util.getResponseObject(consts.RESPONSE_ERROR, err.response);
+                var response = util.getResponseObject(consts.RESPONSE_ERROR, err);
             }
             res.send(response);
         }

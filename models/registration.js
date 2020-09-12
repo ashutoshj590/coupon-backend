@@ -30,7 +30,14 @@ module.exports = (sequelize, DataTypes) => {
     },
     closing_time: {
       type: DataTypes.STRING
-    }  
+    },
+    category_id: {
+      type :DataTypes.INTEGER
+      },
+    sub_category_id: {
+        type :DataTypes.INTEGER
+        }
+  
   }, {
     sequelize,
     modelName: 'Registration',
