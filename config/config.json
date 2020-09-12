@@ -1,21 +1,21 @@
 {
   "development": {
     "username": "root",
-    "password": "ashu1234",
+    "password": "coupon123",
     "database": "coupon_app",
     "host": "localhost",
     "dialect": "mysql"
   },
   "test": {
     "username": "root",
-    "password": "ashu1234",
+    "password": "coupon123",
     "database": "coupon_app",
     "host": "localhost",
     "dialect": "mysql"
   },
   "production": {
     "username": "root",
-    "password": "ashu1234",
+    "password": "coupon123",
     "database": "coupon_app",
     "host": "localhost",
     "dialect": "mysql"
