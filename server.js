@@ -14,6 +14,9 @@ var consts = require('./lib/consts.js');//
 var config = util.parsedConfig;
 var redisUtil = require('./lib/redis.js');
 
+var https = require('https');
+var fs = require('fs');
+
 
 // set up express
 app.use(morgan('dev'));
@@ -136,16 +139,26 @@ app.use("/user", require('./app/userRoutes'));
 app.use("/category", require('./app/categoryRoutes.js'));
 
 
+var sslSever = https.createServer(
+   {
+       key: fs.readFileSync(path.join(__dirname, 'certs', 'mccPrivateKey.pem')),
+       cert: fs.readFileSync(path.join(__dirname, 'certs', 'mccapns.pem'))
+   } ,
+   app
+)
+
+sslSever.listen(8080, () => console.log("Secure server on port 8080"))
 
 
-var server = app.listen(8080, function () {
+
+/*var server = app.listen(8080, function () {
 
     var host = server.address().address;
     var port = server.address().port;
 
     console.log("Example app listening at http://%s:%s", host, port)
 
-});
+});*/
 //module.exports = app;
 
 

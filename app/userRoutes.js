@@ -81,6 +81,28 @@ router.post('/register-merchant', [jsonParser, util.hasJsonParam(["user_id","add
 });
 
 
+/* API for  upload images for merchant registration.............*/
+/*router.post('/uplaod-image', [jsonParser, util.hasJsonParam(["user_id","images"])], function (req, res) {
+   console.log("1");
+    userService.uploadImageToDatabase(req.body.user_id, req.body.images).then(function (images) {
+        console.log("10");
+            var response = util.getResponseObject(consts.RESPONSE_SUCCESS);
+            response.subCategories = subCategories;
+            res.send(response);
+        }, function (err) {
+            if(err.errors !== undefined && err.errors[0] !== undefined ){
+                var response = util.getResponseObject(consts.RESPONSE_ERROR, err.response);
+                res.send(response);
+            }else{
+                var response = util.getResponseObject(consts.RESPONSE_ERROR, err.response);
+            }
+            res.send(response);
+        }
+    );
+}); */
+
+
+
 
 
 

@@ -3,7 +3,6 @@ var util = require('../lib/Utils.js');
 //var redis = require('../lib/redis.js');
 var Q = require('q');
 var consts = require('../lib/consts.js');
-var aws = require('../lib/aws.js');
 var config = consts.parsedConfig;
 let userDOA = require('../doa/user');
 let commonFuncs = require('../utils/commonFuncs');
@@ -128,6 +127,10 @@ exports.createMerchantDetail = function(userId, address, city, state, zipcode, o
     });
     return deferred.promise;
 };
+
+
+
+
 
 
 
