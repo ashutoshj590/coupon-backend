@@ -139,26 +139,26 @@ app.use("/user", require('./app/userRoutes'));
 app.use("/category", require('./app/categoryRoutes.js'));
 
 
-var sslSever = https.createServer(
+/*var sslSever = https.createServer(
    {
-       key: fs.readFileSync(path.join(__dirname, 'certs', 'mccpapp-new.key')),
-       cert: fs.readFileSync(path.join(__dirname, 'certs', 'mccapns.pem'))
+       key: fs.readFileSync(path.join(__dirname, 'certs', 'mccpapp.key')),
+       cert: fs.readFileSync(path.join(__dirname, 'certs', 'entrust_2048_ca.cer'))
    } ,
    app
 )
 
-sslSever.listen(8080, () => console.log("Secure server on port 8080"))
+sslSever.listen(8080, () => console.log("Secure server on port 8080")) */
 
 
 
-/*var server = app.listen(8080, function () {
+var server = app.listen(8080, function () {
 
     var host = server.address().address;
     var port = server.address().port;
 
     console.log("Example app listening at http://%s:%s", host, port)
 
-});*/
+});
 //module.exports = app;
 
 
