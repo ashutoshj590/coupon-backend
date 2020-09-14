@@ -141,7 +141,7 @@ app.use("/category", require('./app/categoryRoutes.js'));
 
 var sslSever = https.createServer(
    {
-       key: fs.readFileSync(path.join(__dirname, 'certs', 'mccPrivateKey.pem')),
+       key: fs.readFileSync(path.join(__dirname, 'certs', 'mccpapp-new.key')),
        cert: fs.readFileSync(path.join(__dirname, 'certs', 'mccapns.pem'))
    } ,
    app
