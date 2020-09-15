@@ -28,7 +28,7 @@ app.set('view engine', 'ejs');
 
 
 app.use(function(req, res, next) {
-    res.header("Access-Control-Allow-Origin", "https://www.mccpapp.com"); // http://localhost:4200
+    res.header("Access-Control-Allow-Origin", "https://www.mccpapp.com"); // http://localhost:4200   //https://www.mccpapp.com
     res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept"); 
     next();
   });

@@ -13,6 +13,7 @@ let fbServices = require('./fbServices');
 let responseConstants = require('../constants/responseConst');
 let constants = require('../lib/consts');
 var bcrypt = require('bcrypt');
+const { response } = require('express');
 
 
 /*
@@ -126,6 +127,22 @@ exports.createMerchantDetail = function(userId, address, city, state, zipcode, o
         deferred.reject(err)
     });
     return deferred.promise;
+};
+
+
+exports.uploadImageToDatabase = function (user_id, imgObject) {
+   //var deferred = Q.defer();
+    for(var i=0; i< imgObject.length; i++){
+        console.log("loop for the check images are in ary or not..........////////");
+        console.log(imgObject[i]);
+        models.UploadImgs.create({
+            user_id: user_id,
+            image: imgObject[i]
+        })
+    }
+    console.log(imgObject);
+    return  imgObject;
+        
 };
 
 
