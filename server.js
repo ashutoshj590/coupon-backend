@@ -15,6 +15,13 @@ var config = util.parsedConfig;
 var redisUtil = require('./lib/redis.js');
 
 
+
+//var https = require('https');
+//var fs = require('fs');
+
+
+
+
 app.use(function(req, res, next) {
     res.header("Access-Control-Allow-Origin", "https://www.mccpapp.com"); // http://localhost:4200   //https://www.mccpapp.com
     res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept"); 
@@ -109,6 +116,8 @@ app.use(session({
 
 
 //app.use('/api/documentation', express.static(__dirname + '/public/apidoc'));
+
+
 
 
 app.use("/auth", require('./app/authRoutes'));
