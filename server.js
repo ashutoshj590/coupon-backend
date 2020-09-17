@@ -14,19 +14,6 @@ var consts = require('./lib/consts.js');//
 var config = util.parsedConfig;
 var redisUtil = require('./lib/redis.js');
 
-var https = require('https');
-var fs = require('fs');
-require('./config/passport')(passport);
-
-
-// set up express
-app.use(morgan('dev'));
-app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({ extended: false }));
-app.use(cookieParser());
-app.use(express.static(path.join(__dirname, 'public')));
-app.set('view engine', 'ejs');
-
 
 app.use(function(req, res, next) {
     res.header("Access-Control-Allow-Origin", "https://www.mccpapp.com"); // http://localhost:4200   //https://www.mccpapp.com

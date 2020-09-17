@@ -76,47 +76,8 @@ router.post('/login', [util.hasJsonParam(["email", "password", "type", "device_t
 }); 
 
 
-/*router.post('/login', function(req, res, next) {
-    passport.authenticate('local-login', function(err, user, info) {
-        if (err) { return next(err); }
-        // stop if it fails
-        if (!user) { return res.json({ message: 'Invalid email of Password' }); }
-  
-        req.logIn(user, function(err) {
-          // return if does not match
-          if (err) { return next(err); }
-  
-          // generate token if it succeeds
-          const db = {
-            updateOrCreate: function(user, cb){
-              cb(null, user);
-            }
-          };
-          db.updateOrCreate(req.user, function(err, user){
-            if(err) {return next(err);}
-            // store the updated information in req.user again
-            req.user = {
-              id: user.id,
-              email: user.email,
-              type: user.type,
-              device_type: user.device_type
-            };
-          });
-  
-          // create token
-          const jwt = require('jsonwebtoken');
-          req.token = jwt.sign( {id: req.user.id} , SERVER_SECRET, {expiresIn: 120} );
-          // lastly respond with json
-          return res.status(200).json({
-            user: req.user,
-            token: req.token
-          });
-        });
-      })(req, res, next);
-    }); */
 
-   
-
+  
 
 
 

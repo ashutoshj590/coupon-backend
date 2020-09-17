@@ -7,14 +7,6 @@ var consts = require('../lib/consts.js');
 var jsonParser = bodyParser.json({limit: '10mb'});
 var sessionTime = 1 * 60 *  60 * 1000;       //1 hour session
 
-var expressJwt = require('express-jwt');
-
-const SERVER_SECRET = 'vidyapathaisalwaysrunning';
-
-
-const authenticate = expressJwt({secret : SERVER_SECRET, algorithms: ['HS256'] });
-
-
 
 
 /* API for  Add new Category.............*/
@@ -37,7 +29,7 @@ router.post('/add-category', [jsonParser, util.hasJsonParam(["name"])], function
 
 
 /* API for get all category form database.............*/
-router.post('/get-all-category',authenticate,jsonParser, function (req, res) {
+router.post('/get-all-category',jsonParser, function (req, res) {
     categoryService.getAllcategory().then(function (categorylist) {
             var response = util.getResponseObject(consts.RESPONSE_SUCCESS);
             response['categories'] = categorylist;
