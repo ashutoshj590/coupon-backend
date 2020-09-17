@@ -49,7 +49,7 @@ router.post('/login', [util.hasJsonParam(["email", "password", "type"])], functi
 }); */
 
 
-/*router.post('/login', [util.hasJsonParam(["email", "password", "type", "device_type"])], function (req, res) { 
+router.post('/login', [util.hasJsonParam(["email", "password", "type", "device_type"])], function (req, res) { 
         var userObject = req.body;
         userService.login(userObject, req.session).then(function (response) {
             var response = util.getResponseObject(consts.RESPONSE_SUCCESS);
@@ -73,10 +73,10 @@ router.post('/login', [util.hasJsonParam(["email", "password", "type"])], functi
             res.send(response);
         }
     );
-}); */
+}); 
 
 
-router.post('/login', function(req, res, next) {
+/*router.post('/login', function(req, res, next) {
     passport.authenticate('local-login', function(err, user, info) {
         if (err) { return next(err); }
         // stop if it fails
@@ -113,14 +113,9 @@ router.post('/login', function(req, res, next) {
           });
         });
       })(req, res, next);
-    });
+    }); */
 
    
-
-
-
-
-
 
 
 
