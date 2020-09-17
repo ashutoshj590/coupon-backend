@@ -16,6 +16,7 @@ var redisUtil = require('./lib/redis.js');
 
 var https = require('https');
 var fs = require('fs');
+require('./config/passport')(passport);
 
 
 // set up express
@@ -126,13 +127,15 @@ app.use(session({
 app.use(session({
 	secret: 'vidyapathaisalwaysrunning',
 	resave: true,
-	saveUninitialized: true
+    saveUninitialized: true,
+    algorithms: ['RS256']
  } )); // session secret
 app.use(passport.initialize());
 app.use(passport.session()); // persistent login sessions
 app.use(flash()); // use connect-flash for flash messages stored in session
 
 const SERVER_SECRET = 'ohgodpleasenobug';
+
 
 app.use("/auth", require('./app/authRoutes'));
 app.use("/user", require('./app/userRoutes'));
@@ -142,12 +145,12 @@ app.use("/category", require('./app/categoryRoutes.js'));
 /*var sslSever = https.createServer(
    {
        key: fs.readFileSync(path.join(__dirname, 'certs', 'mccpapp.key')),
-       cert: fs.readFileSync(path.join(__dirname, 'certs', 'entrust_2048_ca.cer'))
+       cert: fs.readFileSync(path.join(__dirname, 'certs', 'mccapns.pem'))
    } ,
    app
 )
 
-sslSever.listen(8080, () => console.log("Secure server on port 8080")) */
+sslSever.listen(8080, () => console.log("Secure server on port 8080"))  */
 
 
 

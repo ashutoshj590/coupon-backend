@@ -133,7 +133,6 @@ exports.createMerchantDetail = function(userId, address, city, state, zipcode, o
 exports.uploadImageToDatabase = function (user_id, imgObject) {
    //var deferred = Q.defer();
     for(var i=0; i< imgObject.length; i++){
-        console.log("loop for the check images are in ary or not..........////////");
         console.log(imgObject[i]);
         models.UploadImgs.create({
             user_id: user_id,

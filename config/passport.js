@@ -30,28 +30,28 @@ module.exports = function(passport) {
     passport.use(
         'local-signup',
         new LocalStrategy({
-            usernameField : 'username',
+            usernameField : 'email',
             passwordField : 'password',
             passReqToCallback : true
         },
-        function(req, username, password, done) {
-            connection.query("SELECT * FROM users WHERE username = ?",[username], function(err, rows) {
+        function(req, email, password, done) {
+            connection.query("SELECT * FROM users WHERE email = ?",[email], function(err, rows) {
                 if (err)
                     return done(err);
                 if (rows.length) {
-                    return done(null, false, req.flash('signupMessage', 'That username is already taken.'));
+                    return done(null, false, req.flash('signupMessage', 'That email is already taken.'));
                 } else {
 
                     // if there is no user with that username then create the user
 
                     var newUserMysql = {
-                        username: username,
+                        email: email,
                         password: bcrypt.hashSync(password, bcrypt.genSaltSync(10))  // use the generateHash function in our user model
                     };
 
-                    var insertQuery = "INSERT INTO users ( username, password ) values (?,?)";
+                    var insertQuery = "INSERT INTO users ( email, password ) values (?,?)";
 
-                    connection.query(insertQuery,[newUserMysql.username, newUserMysql.password],function(err, rows) {
+                    connection.query(insertQuery,[newUserMysql.email, newUserMysql.password],function(err, rows) {
                         newUserMysql.id = rows.insertId;
 
                         return done(null, newUserMysql);
@@ -65,12 +65,12 @@ module.exports = function(passport) {
     passport.use(
         'local-login',
         new LocalStrategy({
-            usernameField : 'username',
+            usernameField : 'email',
             passwordField : 'password',
             passReqToCallback : true
         },
-        function(req, username, password, done) {
-            connection.query("SELECT * FROM users WHERE username = ?",[username], function(err, rows){
+        function(req, email, password, done) {
+            connection.query("SELECT * FROM Users WHERE email = ?",[email], function(err, rows){
                 if (err)
                     return done(err);
                 if (!rows.length) {
