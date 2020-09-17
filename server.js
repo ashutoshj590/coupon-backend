@@ -110,19 +110,6 @@ app.use(session({
 
 //app.use('/api/documentation', express.static(__dirname + '/public/apidoc'));
 
-// config passport
-app.use(session({
-	secret: 'vidyapathaisalwaysrunning',
-	resave: true,
-    saveUninitialized: true,
-    algorithms: ['RS256']
- } )); // session secret
-app.use(passport.initialize());
-app.use(passport.session()); // persistent login sessions
-app.use(flash()); // use connect-flash for flash messages stored in session
-
-const SERVER_SECRET = 'ohgodpleasenobug';
-
 
 app.use("/auth", require('./app/authRoutes'));
 app.use("/user", require('./app/userRoutes'));
