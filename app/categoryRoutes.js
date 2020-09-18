@@ -6,7 +6,7 @@ var util = require('../lib/Utils.js');
 var consts = require('../lib/consts.js');
 var jsonParser = bodyParser.json({limit: '10mb'});
 var sessionTime = 1 * 60 *  60 * 1000;       //1 hour session
-
+const jwt = require('jsonwebtoken');
 
 
 /* API for  Add new Category.............*/
@@ -29,22 +29,31 @@ router.post('/add-category', [jsonParser, util.hasJsonParam(["name"])], function
 
 
 /* API for get all category form database.............*/
-router.post('/get-all-category',jsonParser, function (req, res) {
-    categoryService.getAllcategory().then(function (categorylist) {
-            var response = util.getResponseObject(consts.RESPONSE_SUCCESS);
-            response['categories'] = categorylist;
-            res.send(response);
-        }, function (err) {
-            if(err.errors !== undefined && err.errors[0] !== undefined ){
-                var response = util.getResponseObject(consts.RESPONSE_ERROR, err.response);
-                res.send(response);
-            }else{
-                var response = util.getResponseObject(consts.RESPONSE_ERROR, err.response);
-            }
-            res.send(response);
+router.post('/get-all-category',util.verifyToken,jsonParser, function (req, res) {
+    jwt.verify(req.token, 'secretkey', (err, authData) => {
+        if(err) {
+            res.send("Please use valid token!");
+        } else {
+                categoryService.getAllcategory().then(function (categorylist) {
+                        var response = util.getResponseObject(consts.RESPONSE_SUCCESS);
+                        response['categories'] = categorylist;
+                        res.send(response);
+                    }, function (err) {
+                        if(err.errors !== undefined && err.errors[0] !== undefined ){
+                            var response = util.getResponseObject(consts.RESPONSE_ERROR, err.response);
+                            res.send(response);
+                        }else{
+                            var response = util.getResponseObject(consts.RESPONSE_ERROR, err.response);
+                        }
+                        res.send(response);
+                    }
+                );
         }
-    );
+ })
 });
+
+
+
 
 /* API for mark is_deleted to category ................*/
 

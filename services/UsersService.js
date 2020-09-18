@@ -66,8 +66,7 @@ module.exports.login = (user, session) => {
                     throw new httpError(httpStatusCodes.UNAUTHORIZED, { response: 'Password incorrect !' });
                 })
                 .then(() => {
-                  return util.refreshSession(session, user, sessionTime);
-                
+                  return util.refreshSession(session, user, sessionTime);      
                  
                 })
                 .then(() => {

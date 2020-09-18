@@ -5,10 +5,7 @@ var util = require('../lib/Utils.js');
 var sessionTime = 1 * 60 * 60 * 1000;       //1 hour session
 var consts = require('../lib/consts.js');
 var session = require('express-session');
-var passport = require('passport');
-
-
-const SERVER_SECRET = 'ohgodpleasenobug';
+const jwt = require('jsonwebtoken');
 
 
 /* API funcation for crearte new user sign up..................*/
@@ -52,17 +49,19 @@ router.post('/login', [util.hasJsonParam(["email", "password", "type"])], functi
 router.post('/login', [util.hasJsonParam(["email", "password", "type", "device_type"])], function (req, res) { 
         var userObject = req.body;
         userService.login(userObject, req.session).then(function (response) {
-            var response = util.getResponseObject(consts.RESPONSE_SUCCESS);
-           // const accessToken = jwt.sign(userObject, process.env.ACCESS_TOKEN_SECRET)
-          //  response['access_token'] = accessToken;
+          var response = util.getResponseObject(consts.RESPONSE_SUCCESS);
+          jwt.sign({userObject}, 'secretkey', { expiresIn: '1d'}, (err, token) => {
+           var tokenString = token;
           var sessionDetail = {};
           sessionDetail.user_id = req.session.user_id;
           sessionDetail.email = req.session.email;
           sessionDetail.type = req.session.type;
           sessionDetail.device_type = req.session.device_type;
-          sessionDetail.token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c"
+          sessionDetail.token = 'Bearer ' + tokenString;
           response['user_Detail'] = sessionDetail;
           res.send(response);
+        });
+
         }, function (err) {
             if(err.errors !== undefined && err.errors[0] !== undefined ){
                 var response = util.getResponseObject(consts.RESPONSE_ERROR, err.response);
