@@ -29,7 +29,7 @@ router.post('/add-category', [jsonParser, util.hasJsonParam(["name"])], function
 
 
 /* API for get all category form database.............*/
-router.post('/get-all-category',util.verifyToken,jsonParser, function (req, res) {
+/*router.post('/get-all-category',util.verifyToken,jsonParser, function (req, res) {
     jwt.verify(req.token, 'secretkey', (err, authData) => {
         if(err) {
             res.send("Please use valid token!");
@@ -50,6 +50,26 @@ router.post('/get-all-category',util.verifyToken,jsonParser, function (req, res)
                 );
         }
  })
+}); */
+
+/* API for get all category form database.............*/
+router.post('/get-all-category',util.verifyToken,jsonParser, function (req, res) {
+    categoryService.getAllcategory().then(function (categorylist) {
+            var response = util.getResponseObject(consts.RESPONSE_SUCCESS);
+            response['categories'] = categorylist;
+            res.send(response);
+        }, function (err) {
+            if(err.errors !== undefined && err.errors[0] !== undefined ){
+                var response = util.getResponseObject(consts.RESPONSE_ERROR, err.response);
+                res.send(response);
+            }else{
+                var response = util.getResponseObject(consts.RESPONSE_ERROR, err.response);
+            }
+            res.send(response);
+        }
+    );
+       
+
 });
 
 
