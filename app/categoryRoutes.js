@@ -53,7 +53,7 @@ router.post('/add-category', [jsonParser, util.hasJsonParam(["name"])], function
 }); */
 
 /* API for get all category form database.............*/
-router.post('/get-all-category',util.verifyToken,jsonParser, function (req, res) {
+router.post('/get-all-category',jsonParser, function (req, res) {  //util.verifyToken
     categoryService.getAllcategory().then(function (categorylist) {
             var response = util.getResponseObject(consts.RESPONSE_SUCCESS);
             response['categories'] = categorylist;
