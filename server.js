@@ -24,7 +24,7 @@ var fs = require('fs');
 
 app.use(function(req, res, next) {
     res.header("Access-Control-Allow-Origin", "https://www.mccpapp.com"); // http://localhost:4200   //https://www.mccpapp.com
-    res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept"); 
+    res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept, Authorization"); 
     next();
   });
 /*
@@ -134,7 +134,7 @@ var sslSever = https.createServer(
    app
 )
 
-sslSever.listen(8080, () => console.log("Secure server on port 8080")) 
+sslSever.listen(8080, () => console.log("Secure server on port 8080"))
 
 
 
