@@ -8,8 +8,8 @@
   },
   "test": {
     "username": "root",
-    "password": "coupon123",
-    "database": "coupon_app",
+    "password": "ashu1234",
+    "database": "coupon123",
     "host": "localhost",
     "dialect": "mysql"
   },

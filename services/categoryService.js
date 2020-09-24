@@ -102,7 +102,7 @@ exports.createSubCategory = function(category_id, name, imgUrl, status){
 /*
 * Fuction define for get sub category list from database.
 */
-exports.getSubcategory = function(categoryId){
+var getSubcategory = exports.getSubcategory = function(categoryId){
     var deferred = Q.defer();
     models.SubCategory.findAll({
         where: {
@@ -119,6 +119,52 @@ exports.getSubcategory = function(categoryId){
     );
     return deferred.promise;
 };
+
+exports.getAllcategoryData = function(){
+    var deferred = Q.defer();
+    var cond={"is_deleted":0};
+    models.Category.findAll({
+      where: cond
+    }).then(function (allCategories) {
+        allCategories.forEach(function(category, index){
+            category.dataValues['sub_cate_detail'] = [];
+            var category_id = category.dataValues.id;
+            console.log(category.dataValues.id);
+            getSubcategory(category_id).then(function (subCate) {
+                subCate.forEach(function(data, index){
+                console.log(data.dataValues);
+                })
+                   // console.log(data.dataValues);
+                  
+                    deferred.resolve(allCategories)
+
+            },function (err) {
+                deferred.reject(err);
+              });
+           
+       })
+    },function (err) {
+          deferred.reject(err);
+        });
+    
+    return deferred.promise;
+};
+
+
+
+
+
+/*filterAttributes.forEach(function(filterAttribute, index){
+    getFilterValuesCategoryField(filterAttribute, categoryId).then(function(filterOptions){
+        var filters = {};
+        filters.req_key = util.getFilterKeyForProductlist(filterAttribute);
+        filters['req_values'] = filterOptions;
+        filterList.push(filters);
+        if(filterAttributes.length-1 == index) {
+            deferred.resolve(filterList)
+        }
+    })
+}) */
 
 /*
 * Function for change status to Sub Category.

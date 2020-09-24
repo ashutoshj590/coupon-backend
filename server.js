@@ -123,6 +123,7 @@ app.use(session({
 app.use("/auth", require('./app/authRoutes'));
 app.use("/user", require('./app/userRoutes'));
 app.use("/category", require('./app/categoryRoutes.js'));
+app.use("/coupon", require('./app/couponRoutes.js'));
 
 
 var sslSever = https.createServer(

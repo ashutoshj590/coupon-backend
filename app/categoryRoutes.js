@@ -111,6 +111,9 @@ router.post('/get-sub-category',[jsonParser, util.hasJsonParam(["category_id"])]
     );
 });
 
+
+
+
 /* API for mark is_deleted to sub category ................*/
 
 router.post('/delete-sub-category',[jsonParser,util.hasJsonParam(["sub_category_id"])], function (req, res) { //, util.allowedUser(["admin"])
@@ -126,6 +129,24 @@ categoryService.changeStatustoSubCategory(req.body.sub_category_id).then(functio
             }
             res.send(response);
         }
+    );
+});
+
+
+router.post('/get-category-data',jsonParser, function (req, res) {
+    categoryService.getAllcategoryData().then(function (categorylist) {
+        var response = util.getResponseObject(consts.RESPONSE_SUCCESS);
+            response['categories'] = categorylist;
+            res.send(response);
+        }, function (err) {
+        if(err.errors !== undefined && err.errors[0] !== undefined ){
+        var response = util.getResponseObject(consts.RESPONSE_ERROR, err.response);
+        res.send(response);
+        }else{
+            var response = util.getResponseObject(consts.RESPONSE_ERROR, err.response);
+        }
+            res.send(response);
+         }
     );
 });
 
