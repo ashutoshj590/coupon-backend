@@ -39,3 +39,32 @@ exports.createCouponForMerchant = function(user_id,coupon_type,days,start_time,e
     });
     return deferred.promise;
 };
+
+/*
+*   Function for Update coupon .................
+*/
+exports.updateCouponForMerchant = function(coupon_id,coupon_type,days,start_time,end_time,expiry_date,flash_deal,description,restriction){
+    var deferred = Q.defer();
+    models.Coupons.update({
+        coupon_type: coupon_type,
+        days: days,
+        start_time: start_time,
+        end_time: end_time,
+        expiry_date: expiry_date,
+        flash_deal: flash_deal,
+        description: description,
+        restriction: restriction
+     } ,  {
+            where:{
+                id: coupon_id
+            }
+    }).then(function(couponUpdate) {
+        deferred.resolve(couponUpdate);
+    },function(err){
+        deferred.reject(err)
+    });
+    return deferred.promise;
+};
+
+
+
