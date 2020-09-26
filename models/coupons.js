@@ -26,7 +26,8 @@ module.exports = (sequelize, DataTypes) => {
     flash_deal: DataTypes.BOOLEAN,
     description: DataTypes.STRING,
     restriction: DataTypes.STRING,
-    is_deleted: DataTypes.BOOLEAN
+    is_deleted: DataTypes.BOOLEAN,
+    is_fav: DataTypes.BOOLEAN
   }, {
     sequelize,
     modelName: 'Coupons',

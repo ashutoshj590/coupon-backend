@@ -30,8 +30,9 @@ exports.createCouponForMerchant = function(user_id,coupon_type,days,start_time,e
         expiry_date: expiry_date,
         flash_deal: flash_deal,
         description: description,
-        restriction: restriction
-      
+        restriction: restriction,
+        is_deleted: 0,
+        is_fav: 0
     }).then(function(couponDetail) {
         deferred.resolve(couponDetail);
     },function(err){
@@ -43,7 +44,7 @@ exports.createCouponForMerchant = function(user_id,coupon_type,days,start_time,e
 /*
 *   Function for Update coupon .................
 */
-exports.updateCouponForMerchant = function(coupon_id,coupon_type,days,start_time,end_time,expiry_date,flash_deal,description,restriction){
+exports.updateCouponForMerchant = function(user_id,coupon_id,coupon_type,days,start_time,end_time,expiry_date,flash_deal,description,restriction){
     var deferred = Q.defer();
     models.Coupons.update({
         coupon_type: coupon_type,
@@ -56,7 +57,8 @@ exports.updateCouponForMerchant = function(coupon_id,coupon_type,days,start_time
         restriction: restriction
      } ,  {
             where:{
-                id: coupon_id
+                id: coupon_id,
+                user_id: user_id
             }
     }).then(function(couponUpdate) {
         deferred.resolve(couponUpdate);
@@ -65,6 +67,47 @@ exports.updateCouponForMerchant = function(coupon_id,coupon_type,days,start_time
     });
     return deferred.promise;
 };
+
+
+/*
+* Function for change status to coupon
+*/
+exports.changeStatustoCoupon = function(coupon_id){
+    var deferred = Q.defer();
+        models.Coupons.update({
+            is_deleted: 1
+        },{
+            where: {
+            id: coupon_id
+            }
+        }).then(function(statusUpdated){
+            deferred.resolve(statusUpdated);
+        },
+        function (err) {
+            deferred.reject(err);
+        }
+    );
+    return deferred.promise;
+
+};
+
+/*
+* Fuction define for get All coupon list from database.
+*/
+exports.getAllcoupon = function(){
+    var deferred = Q.defer();
+    var cond={"is_deleted":0};
+    models.Coupons.findAll({
+      where: cond
+    }).then(function (allCoupons) {
+            deferred.resolve(allCoupons);
+        },function (err) {
+          deferred.reject(err);
+        }
+    );
+    return deferred.promise;
+};
+
 
 
 
