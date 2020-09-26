@@ -13,7 +13,6 @@ let fbServices = require('./fbServices');
 let responseConstants = require('../constants/responseConst');
 let constants = require('../lib/consts');
 var bcrypt = require('bcrypt');
-const { response } = require('express');
 
 
 /*
@@ -81,22 +80,6 @@ module.exports.login = (user, session) => {
 
 
 
-/*
- * Basic DB call. Find store details of user.
- */
-var findUsers = exports.findUsers = function(userId){
-    var deferred = Q.defer();
-    models.Users.findAll({
-        where: {
-            user_id: userId,
-        }
-    }).then(function(allusers) {
-        deferred.resolve(allusers);
-    }, function(err){
-        deferred.reject(err)
-    });
-    return deferred.promise;
-};
 
 
 /*
@@ -121,12 +104,34 @@ exports.createMerchantDetail = function(userId, address, city, state, zipcode, o
         category_id: categoryId,
         sub_category_id: subCategoryId
     }).then(function(merchantDetail) {
-        deferred.resolve(merchantDetail);
+        updateIsRegister(userId).then(function(user){
+              deferred.resolve(merchantDetail);
+
+        }, function(err){
+            deferred.reject(err);
+        })
     },function(err){
         deferred.reject(err)
     });
     return deferred.promise;
 };
+
+
+
+
+var updateIsRegister = function(user_id){
+    var deferred = Q.defer();
+        models.User.update({
+            is_registered: 1
+        }, {
+            where: {id: user_id}
+        }).then(function (updated) {
+            deferred.resolve(updated);
+        }, function (err) {
+            deferred.reject(err)
+        });
+    return deferred.promise;
+}
 
 
 exports.uploadImageToDatabase = function (user_id, imgObject) {
@@ -142,6 +147,10 @@ exports.uploadImageToDatabase = function (user_id, imgObject) {
     return  imgObject;
         
 };
+
+
+
+
 
 
 

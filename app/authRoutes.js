@@ -57,6 +57,7 @@ router.post('/login', [util.hasJsonParam(["email", "password", "type", "device_t
           sessionDetail.email = req.session.email;
           sessionDetail.type = req.session.type;
           sessionDetail.device_type = req.session.device_type;
+          sessionDetail.is_registered = req.session.is_registered;
           sessionDetail.token = 'Bearer ' + tokenString;
           response['user_Detail'] = sessionDetail;
           res.send(response);

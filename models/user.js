@@ -25,7 +25,8 @@ module.exports = (sequelize, DataTypes) => {
         values: ['android','apple']
         },
     fcm_token: DataTypes.STRING,
-    status: DataTypes.BOOLEAN
+    status: DataTypes.BOOLEAN,
+    is_registered: DataTypes.BOOLEAN
   }, {
     sequelize,
     modelName: 'User',

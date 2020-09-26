@@ -6,30 +6,10 @@ var util = require('../lib/Utils.js');
 var consts = require('../lib/consts.js');
 var jsonParser = bodyParser.json({limit: '10mb'});
 var sessionTime = 1 * 60 *  60 * 1000;       //1 hour session
+var models = require('../models/index.js');
+const crypto = require('crypto');
 
 
-
-
-/**
- * @api {post} /user/change-password Change password
- * @apiDescription For user to provide change password for authentication.
- */
-router.post('/change-password', [jsonParser, util.hasJsonParam(["new_password"]), util.allowedUser(["user","admin","merchant"])], function (req, res) {
-    userService.changePasswordForUser(req.session.user_id,req.body.old_password,req.body.new_password,req.session.type).then(function (changePassword) {
-            var response = util.getResponseObject(consts.RESPONSE_SUCCESS);
-            response.changePassword = changePassword;
-            res.send(response);
-        }, function (err) {
-            if(err.errors !== undefined && err.errors[0] !== undefined ){
-                var response = util.getResponseObject(consts.RESPONSE_ERROR, err.errors[0].message);
-                res.send(response);
-            }else{
-                var response = util.getResponseObject(consts.RESPONSE_ERROR, err);
-            }
-            res.send(response);
-        }
-    );
-});
 
 /**
 * @api {get} /user/logout Logout
@@ -97,10 +77,32 @@ router.post('/uplaod-image', [jsonParser, util.hasJsonParam(["user_id","images"]
             }
             res.send(response);
         }
-       // }
-    //);
+      
         
 }); 
+
+
+/* API for forgot password..............*/
+router.post('/forgot-password', (req, res)=>{
+    crypto.randomBytes(32,(err,Buffer)=>{
+        if(err){
+            console.log(err);
+        }
+        const token = Buffer.toString("hex")
+        models.Users.findOne({email: req.body.email})
+        .then(user=>{
+            if(!user){
+                return res.status(422).json({error:"User dont exists with that email"})
+            }
+            user.resetToken = token
+            user.expireToken = Date.now() + 3600000
+            user.save().then((result)=>{
+                transporter.sendMail()
+            })
+        })
+
+    })
+})
 
 
 
