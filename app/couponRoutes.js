@@ -29,7 +29,7 @@ router.post('/create-coupon', [jsonParser, util.hasJsonParam(["user_id","coupon_
 
 
 
-router.post('/edit-coupon', [jsonParser, util.hasJsonParam(["coupon_id","coupon_type","days","start_time","end_time","expiry_date",])], function (req, res) {
+router.post('/edit-coupon', [jsonParser, util.hasJsonParam(["coupon_id"])], function (req, res) {
     couponService.updateCouponForMerchant(req.body.coupon_id,req.body.coupon_type,req.body.days,req.body.start_time,req.body.end_time,req.body.expiry_date,req.body.flash_deal,req.body.description,req.body.restriction).then(function (coupon) {
             var response = util.getResponseObject(consts.RESPONSE_SUCCESS);
             res.send(response);
