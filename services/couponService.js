@@ -19,7 +19,7 @@ let constants = require('../lib/consts');
 /*
 *   Function for create coupon .................
 */
-exports.createCouponForMerchant = function(user_id,coupon_type,days,start_time,end_time,expiry_date,flash_deal,description,restriction){
+exports.createCouponForMerchant = function(user_id,coupon_type,days,start_time,end_time,expiry_date,flash_deal,description,restriction, shortName){
     var deferred = Q.defer();
     models.Coupons.create({
         user_id: user_id,
@@ -32,7 +32,8 @@ exports.createCouponForMerchant = function(user_id,coupon_type,days,start_time,e
         description: description,
         restriction: restriction,
         is_deleted: 0,
-        is_fav: 0
+        is_fav: 0,
+        short_name: shortName
     }).then(function(couponDetail) {
         deferred.resolve(couponDetail);
     },function(err){
@@ -44,7 +45,7 @@ exports.createCouponForMerchant = function(user_id,coupon_type,days,start_time,e
 /*
 *   Function for Update coupon .................
 */
-exports.updateCouponForMerchant = function(user_id,coupon_id,coupon_type,days,start_time,end_time,expiry_date,flash_deal,description,restriction){
+exports.updateCouponForMerchant = function(user_id,coupon_id,coupon_type,days,start_time,end_time,expiry_date,flash_deal,description,restriction,shortName){
     var deferred = Q.defer();
     models.Coupons.update({
         coupon_type: coupon_type,
@@ -54,7 +55,8 @@ exports.updateCouponForMerchant = function(user_id,coupon_id,coupon_type,days,st
         expiry_date: expiry_date,
         flash_deal: flash_deal,
         description: description,
-        restriction: restriction
+        restriction: restriction,
+        short_name: shortName
      } ,  {
             where:{
                 id: coupon_id,
