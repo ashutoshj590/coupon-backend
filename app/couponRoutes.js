@@ -84,5 +84,43 @@ router.post('/get-all-coupons',jsonParser, function (req, res) {
 });
 
 
+/* API for mark is_fav to coupon ................*/
+
+router.post('/add-to-favorite',[jsonParser,util.hasJsonParam(["coupon_id"])], function (req, res) { 
+    couponService.changeStatusForFav(req.body.coupon_id).then(function (statusUpdated) {
+                var response = util.getResponseObject(consts.RESPONSE_SUCCESS);
+                res.send(response);
+            }, function (err) {
+                if(err.errors !== undefined && err.errors[0] !== undefined ){
+                    var response = util.getResponseObject(consts.RESPONSE_ERROR, err.response);
+                    res.send(response);
+                }else{
+                    var response = util.getResponseObject(consts.RESPONSE_ERROR, err.response);
+                }
+                res.send(response);
+            }
+        );
+    });
+
+
+
+    /* API for get all category form database.............*/
+router.post('/get-fav-coupons',jsonParser, function (req, res) {
+    couponService.getFavAllcoupon().then(function (couponList) {
+            var response = util.getResponseObject(consts.RESPONSE_SUCCESS);
+            response['coupon_list'] = couponList;
+            res.send(response);
+        }, function (err) {
+            if(err.errors !== undefined && err.errors[0] !== undefined ){
+                var response = util.getResponseObject(consts.RESPONSE_ERROR, err.response);
+                res.send(response);
+            }else{
+                var response = util.getResponseObject(consts.RESPONSE_ERROR, err.response);
+            }
+            res.send(response);
+        }
+    );
+});
+
 
 module.exports = router;

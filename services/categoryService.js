@@ -13,6 +13,7 @@ var sessionTime = 1 * 60 * 60 * 1000;
 let fbServices = require('./fbServices');
 let responseConstants = require('../constants/responseConst');
 let constants = require('../lib/consts');
+const { response } = require('express');
 
 
 
@@ -133,16 +134,17 @@ exports.getAllcategoryData = function(){
             getSubcategory(category_id).then(function (subCate) {
                 subCate.forEach(function(data, index){
                 console.log(data.dataValues);
+                category.dataValues['sub_cate_detail'] =data.dataValues;
+                    
                 })
-                   // console.log(data.dataValues);
-                  
-                    deferred.resolve(allCategories)
 
             },function (err) {
                 deferred.reject(err);
               });
            
        })
+       deferred.resolve(allCategories);
+
     },function (err) {
           deferred.reject(err);
         });
