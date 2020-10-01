@@ -108,6 +108,49 @@ router.post('/uplaod-image', [jsonParser, util.hasJsonParam(["user_id","images"]
 }); 
 
 
+/* API for mark is_deleted to coupon ................*/
+
+router.post('/delete-image',[jsonParser,util.hasJsonParam(["user_id","image_id"])], function (req, res) { 
+    userService.changeStatustoImg(req.body.user_id,req.body.image_id).then(function (statusUpdated) {
+                var response = util.getResponseObject(consts.RESPONSE_SUCCESS);
+                res.send(response);
+            }, function (err) {
+                if(err.errors !== undefined && err.errors[0] !== undefined ){
+                    var response = util.getResponseObject(consts.RESPONSE_ERROR, err.response);
+                    res.send(response);
+                }else{
+                    var response = util.getResponseObject(consts.RESPONSE_ERROR, err.response);
+                }
+                res.send(response);
+            }
+        );
+    });
+
+
+    router.post('/get-merchant-detail',[jsonParser,util.hasJsonParam(["user_id"])], function (req, res) { 
+        userService.getMerchantDetail(req.body.user_id).then(function (detail) {
+                    var response = util.getResponseObject(consts.RESPONSE_SUCCESS);
+                    response['merchant_detail'] = detail;
+                  userService.getAllImages(req.body.user_id).then(function(data){
+                      response.imageData = data;
+                    res.send(response);
+                }, function(err){
+                    var response = util.getResponseObject(consts.RESPONSE_ERROR, err);
+                    res.send(response);
+                }); 
+                }, function (err) {
+                    if(err.errors !== undefined && err.errors[0] !== undefined ){
+                        var response = util.getResponseObject(consts.RESPONSE_ERROR, err.response);
+                        res.send(response);
+                    }else{
+                        var response = util.getResponseObject(consts.RESPONSE_ERROR, err.response);
+                    }
+                    res.send(response);
+                }
+            );
+        });
+
+
 /* API for forgot password..............*/
 router.post('/forgot-password', (req, res)=>{
     crypto.randomBytes(32,(err,Buffer)=>{

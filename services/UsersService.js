@@ -179,6 +179,63 @@ exports.uploadImageToDatabase = function (user_id, imgObject) {
 };
 
 
+exports.changeStatustoImg = function(user_id, image_id){
+    var deferred = Q.defer();
+        models.UploadImgs.update({
+            is_deleted: 1
+        },{
+            where: {
+            id: image_id,
+            user_id: user_id
+            }
+        }).then(function(statusUpdated){
+            deferred.resolve(statusUpdated);
+        },
+        function (err) {
+            deferred.reject(err);
+        }
+    );
+    return deferred.promise;
+
+};
+
+
+exports.getMerchantDetail = function(user_id){
+    var deferred = Q.defer();
+    var replacements = {user_id : user_id};
+    var query = 'select Registrations.address,Registrations.city,Registrations.state,Registrations.zipcode,Registrations.business_name,Registrations.tagline,Registrations.website,Registrations.phone_no,Registrations.business_license_no,Registrations.description,Registrations.opening_time,Registrations.closing_time' +
+                ' from Registrations where Registrations.user_id=:user_id;'
+    models.sequelize.query(query,
+        { replacements: replacements, type: models.sequelize.QueryTypes.SELECT }
+    ).then(function(result) {
+            deferred.resolve(result);
+        }
+    );
+    return deferred.promise;
+};
+
+
+exports.getAllImages = function(user_id){
+    var deferred = Q.defer();
+    var cond={"is_deleted":0,
+                "user_id": user_id
+    };
+    models.UploadImgs.findAll({
+        attributes: [
+            'image'
+        ]
+    },{
+      where: cond
+    }).then(function (allImgs) {
+            deferred.resolve(allImgs);
+        },function (err) {
+          deferred.reject(err);
+        }
+    );
+    return deferred.promise;
+};
+
+
 
 
 

@@ -128,7 +128,7 @@ var getSubcategory = exports.getSubcategory = function(categoryId){
 exports.getAllcategoryData = function(){
     var deferred = Q.defer();
     var replacements = null;
-    var query = 'select SubCategories.id,SubCategories.name,SubCategories.img_url,Categories.id as category_id,Categories.name' +
+    var query = 'select SubCategories.id,SubCategories.name,SubCategories.img_url,Categories.id as category_id,Categories.name as' +
                 ' category_name from SubCategories LEFT JOIN Categories on SubCategories.category_id=Categories.id where SubCategories.is_deleted=0;'
     models.sequelize.query(query,
         { replacements: replacements, type: models.sequelize.QueryTypes.SELECT }
