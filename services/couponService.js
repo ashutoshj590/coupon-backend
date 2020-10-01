@@ -110,46 +110,8 @@ exports.getAllcoupon = function(){
     return deferred.promise;
 };
 
-/*
-* Function for change status to coupon
-*/
-exports.changeStatusForFav = function(coupon_id){
-    var deferred = Q.defer();
-        models.Coupons.update({
-            is_fav: 1
-        },{
-            where: {
-            id: coupon_id
-            }
-        }).then(function(statusUpdated){
-            deferred.resolve(statusUpdated);
-        },
-        function (err) {
-            deferred.reject(err);
-        }
-    );
-    return deferred.promise;
 
-};
 
-/*
-* Fuction define for get All coupon list from database.
-*/
-exports.getFavAllcoupon = function(){
-    var deferred = Q.defer();
-    var cond={"is_deleted":0,
-                "is_fav": 1
-    };
-    models.Coupons.findAll({
-      where: cond
-    }).then(function (allCoupons) {
-            deferred.resolve(allCoupons);
-        },function (err) {
-          deferred.reject(err);
-        }
-    );
-    return deferred.promise;
-};
 
 
 

@@ -134,9 +134,9 @@ categoryService.changeStatustoSubCategory(req.body.sub_category_id).then(functio
 
 
 router.post('/get-category-data',jsonParser, function (req, res) {
-    categoryService.getAllcategoryData().then(function (categorylist) {
+    categoryService.getAllcategoryData().then(function (subcategorylist) {
         var response = util.getResponseObject(consts.RESPONSE_SUCCESS);
-            response['categories'] = categorylist;
+            response['sub_category_data'] = subcategorylist;
             res.send(response);
         }, function (err) {
         if(err.errors !== undefined && err.errors[0] !== undefined ){

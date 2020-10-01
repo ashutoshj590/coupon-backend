@@ -14,6 +14,7 @@ let fbServices = require('./fbServices');
 let responseConstants = require('../constants/responseConst');
 let constants = require('../lib/consts');
 const { response } = require('express');
+var reporting = require('../models/reportingIndex.js');
 
 
 
@@ -121,37 +122,21 @@ var getSubcategory = exports.getSubcategory = function(categoryId){
     return deferred.promise;
 };
 
+
+
+
 exports.getAllcategoryData = function(){
     var deferred = Q.defer();
-    var cond={"is_deleted":0};
-    models.Category.findAll({
-      where: cond
-    }).then(function (allCategories) {
-        allCategories.forEach(function(category, index){
-            category.dataValues['sub_cate_detail'] = [];
-            var category_id = category.dataValues.id;
-            console.log(category.dataValues.id);
-            getSubcategory(category_id).then(function (subCate) {
-                subCate.forEach(function(data, index){
-                console.log(data.dataValues);
-                category.dataValues['sub_cate_detail'] =data.dataValues;
-                    
-                })
-
-            },function (err) {
-                deferred.reject(err);
-              });
-           
-       })
-       deferred.resolve(allCategories);
-
-    },function (err) {
-          deferred.reject(err);
-        });
-    
+    var replacements = null;
+    var query = "select SubCategories.id,SubCategories.name,SubCategories.img_url,Categories.id as category_id,Categories.name category_name from SubCategories LEFT JOIN Categories on SubCategories.category_id=Categories.id;"
+    models.sequelize.query(query,
+        { replacements: replacements, type: models.sequelize.QueryTypes.SELECT }
+    ).then(function(result) {
+            deferred.resolve(result);
+        }
+    );
     return deferred.promise;
 };
-
 
 
 

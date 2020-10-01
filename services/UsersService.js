@@ -85,7 +85,7 @@ module.exports.login = (user, session) => {
 /*
 *   Function for create Merchant Details for Registration..................
 */
-exports.createMerchantDetail = function(userId, address, city, state, zipcode, openingTime, closingTime, businessName, tagline, website, phoneNo, businessLNo, discription, categoryId, subCategoryId){
+exports.createMerchantDetail = function(userId, address, city, state, zipcode, openingTime, closingTime, businessName, tagline, website, phoneNo, businessLNo, discription, subCategoryId){
     var deferred = Q.defer();
     models.Registration.create({
         user_id: userId,
@@ -101,7 +101,6 @@ exports.createMerchantDetail = function(userId, address, city, state, zipcode, o
         phone_no: phoneNo,
         business_license_no: businessLNo,
         discription: discription,
-        category_id: categoryId,
         sub_category_id: subCategoryId
     }).then(function(merchantDetail) {
         updateIsRegister(userId).then(function(user){
@@ -110,6 +109,37 @@ exports.createMerchantDetail = function(userId, address, city, state, zipcode, o
         }, function(err){
             deferred.reject(err);
         })
+    },function(err){
+        deferred.reject(err)
+    });
+    return deferred.promise;
+};
+
+
+/*
+*   Function for create Merchant Details for Registration..................
+*/
+exports.updateMerchantDetail = function(userId, address, city, state, zipcode, openingTime, closingTime, businessName, tagline, website, phoneNo, businessLNo, discription, subCategoryId){
+    var deferred = Q.defer();
+    models.Registration.update({
+        address: address,
+        city: city,
+        state: state,
+        zipcode: zipcode,
+        opening_time: openingTime,
+        closing_time: closingTime,
+        business_name: businessName,
+        tagline: tagline,
+        website: website,
+        phone_no: phoneNo,
+        business_license_no: businessLNo,
+        discription: discription,
+        sub_category_id: subCategoryId
+    },
+     {
+        where: {user_id: userId}
+    }).then(function(merchantUpdated) {
+              deferred.resolve(merchantUpdated);
     },function(err){
         deferred.reject(err)
     });

@@ -8,6 +8,15 @@ var jsonParser = bodyParser.json({limit: '10mb'});
 var sessionTime = 1 * 60 *  60 * 1000;       //1 hour session
 var models = require('../models/index.js');
 const crypto = require('crypto');
+const nodemailer = require('nodemailer')
+const sendgridTransport = require('nodemailer-sendgrid-transport')
+
+const transporter = nodemailer.createTransport(sendgridTransport({
+    auth:{
+        api_key:"BD.couponApp-123"
+    }
+
+}))
 
 
 
@@ -43,10 +52,27 @@ router.get('/logout', jsonParser, function (req, res) {
 
 
 
-router.post('/register-merchant', [jsonParser, util.hasJsonParam(["user_id","address","city","state","zipcode","opening_time","closing_time","business_name","tagline","website","phone_no","business_license_no","discription","category_id","sub_category_id"])], function (req, res) {
-    userService.createMerchantDetail(req.body.user_id,req.body.address,req.body.city,req.body.state,req.body.zipcode,req.body.opening_time,req.body.closing_time,req.body.business_name,req.body.tagline,req.body.website,req.body.phone_no,req.body.business_license_no,req.body.discription,req.body.category_id,req.body.sub_category_id).then(function (detail) {
+router.post('/register-merchant', [jsonParser, util.hasJsonParam(["user_id","address","city","state","zipcode","opening_time","closing_time","business_name","tagline","website","phone_no","business_license_no","discription","sub_category_id"])], function (req, res) {
+    userService.createMerchantDetail(req.body.user_id,req.body.address,req.body.city,req.body.state,req.body.zipcode,req.body.opening_time,req.body.closing_time,req.body.business_name,req.body.tagline,req.body.website,req.body.phone_no,req.body.business_license_no,req.body.discription,req.body.sub_category_id).then(function (detail) {
             var response = util.getResponseObject(consts.RESPONSE_SUCCESS);
             response.detail = detail;
+            res.send(response);
+        }, function (err) {
+            if(err.errors !== undefined && err.errors[0] !== undefined ){
+                var response = util.getResponseObject(consts.RESPONSE_ERROR, err.errors[0].message);
+                res.send(response);
+            }else{
+                var response = util.getResponseObject(consts.RESPONSE_ERROR, err);
+            }
+            res.send(response);
+        }
+    );
+});
+
+
+router.post('/update-register-merchant', [jsonParser, util.hasJsonParam(["user_id","address","city","state","zipcode","opening_time","closing_time","business_name","tagline","website","phone_no","business_license_no","discription","sub_category_id"])], function (req, res) {
+    userService.updateMerchantDetail(req.body.user_id,req.body.address,req.body.city,req.body.state,req.body.zipcode,req.body.opening_time,req.body.closing_time,req.body.business_name,req.body.tagline,req.body.website,req.body.phone_no,req.body.business_license_no,req.body.discription,req.body.sub_category_id).then(function (detail) {
+            var response = util.getResponseObject(consts.RESPONSE_SUCCESS);
             res.send(response);
         }, function (err) {
             if(err.errors !== undefined && err.errors[0] !== undefined ){
@@ -97,7 +123,16 @@ router.post('/forgot-password', (req, res)=>{
             user.resetToken = token
             user.expireToken = Date.now() + 3600000
             user.save().then((result)=>{
-                transporter.sendMail()
+                transporter.sendMail({
+                    to:user.email,
+                    from:"no-reply@db.com",
+                    subject:"password reset",
+                    html:`
+                    <p>You requested for password reset</p>
+                    <h5>click in this <a href="http://localhost:8080/reset/${token}">link</a> to reset password</h5>
+                    `
+                })
+                res.json({message:"check your email"})
             })
         })
 

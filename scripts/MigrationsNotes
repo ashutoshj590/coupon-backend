@@ -6,6 +6,7 @@ sequelize model:create --name Category --attributes "name:string, thumb_url:stri
 sequelize model:create --name SubCategory --attributes "category_id:integer, name:string, img_url:string, status:integer, is_deleted:boolean"
 sequelize model:create --name UploadImgs --attributes "user_id:integer, image:string, is_deleted:boolean"
 sequelize model:create --name Coupons --attributes "user_id:integer, coupon_type:string, days:string, start_time:string, end_time:string, expiry_date:string, flash_deal:boolean, description:string, restriction:string, is_deleted:boolean"
+sequelize model:create --name UserSubCateMap --attributes "user_id:integer, sub_category_id:integer"
 
 
 
