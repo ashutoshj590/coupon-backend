@@ -130,9 +130,10 @@ router.post('/delete-image',[jsonParser,util.hasJsonParam(["user_id","image_id"]
     router.post('/get-merchant-detail',[jsonParser,util.hasJsonParam(["user_id"])], function (req, res) { 
         userService.getMerchantDetail(req.body.user_id).then(function (detail) {
                     var response = util.getResponseObject(consts.RESPONSE_SUCCESS);
-                    response.merchant_detail = detail;
-                  userService.getAllImages(req.body.user_id).then(function(data){
-                      response.imageData = data;
+                   response.merchant_detail = detail[0];
+                   
+                   userService.getAllImages(req.body.user_id).then(function(data){
+                    response.merchant_detail.imageData = data;
                     res.send(response);
                 }, function(err){
                     var response = util.getResponseObject(consts.RESPONSE_ERROR, err);
