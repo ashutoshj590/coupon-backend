@@ -170,7 +170,8 @@ exports.uploadImageToDatabase = function (user_id, imgObject) {
         console.log(imgObject[i]);
         models.UploadImgs.create({
             user_id: user_id,
-            image: imgObject[i]
+            image: imgObject[i],
+            is_deleted: 0
         })
     }
     console.log(imgObject);
@@ -217,15 +218,12 @@ exports.getMerchantDetail = function(user_id){
 
 exports.getAllImages = function(user_id){
     var deferred = Q.defer();
-    var cond={"is_deleted":0,
-                "user_id": user_id
-    };
     models.UploadImgs.findAll({
-        attributes: [
-            'image'
-        ]
-    },{
-      where: cond
+        attributes: ['image'], 
+        where: {
+            user_id: user_id,
+            is_deleted: 0
+        }
     }).then(function (allImgs) {
             deferred.resolve(allImgs);
         },function (err) {
