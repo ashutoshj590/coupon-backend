@@ -182,6 +182,25 @@ router.post('/get-merchant-by-category',[jsonParser,util.hasJsonParam(["sub_cate
     });
 
 
+    router.post('/get-coupons-by-id',[jsonParser,util.hasJsonParam(["user_id"])], function (req, res) { 
+        couponService.getAllcouponByUserId(req.body.user_id).then(function (detail) {
+                    var response = util.getResponseObject(consts.RESPONSE_SUCCESS);
+                   response.coupon_detail = detail;
+                   res.send(response);
+                
+                }, function (err) {
+                    if(err.errors !== undefined && err.errors[0] !== undefined ){
+                        var response = util.getResponseObject(consts.RESPONSE_ERROR, err.response);
+                        res.send(response);
+                    }else{
+                        var response = util.getResponseObject(consts.RESPONSE_ERROR, err.response);
+                    }
+                    res.send(response);
+                }
+            );
+        });
+    
+
 
 
 

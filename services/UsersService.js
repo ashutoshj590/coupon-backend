@@ -249,7 +249,7 @@ exports.changeStatustoImg = function(user_id, image_id){
 exports.getMerchantDetail = function(user_id){
     var deferred = Q.defer();
     var replacements = {user_id : user_id};
-    var query = 'select Registrations.id as user_id, Registrations.address,Registrations.city,Registrations.state,Registrations.zipcode,Registrations.business_name,Registrations.tagline,Registrations.website,Registrations.phone_no,Registrations.business_license_no,Registrations.description,Registrations.opening_time,Registrations.closing_time' +
+    var query = 'select Registrations.user_id as user_id, Registrations.address,Registrations.city,Registrations.state,Registrations.zipcode,Registrations.business_name,Registrations.tagline,Registrations.website,Registrations.phone_no,Registrations.business_license_no,Registrations.description,Registrations.opening_time,Registrations.closing_time' +
                 ' from Registrations where Registrations.user_id=:user_id;'
     models.sequelize.query(query,
         { replacements: replacements, type: models.sequelize.QueryTypes.SELECT }

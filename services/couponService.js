@@ -202,8 +202,9 @@ exports.getAllRequestForConsumer = function(consumer_id){
 exports.getMerchantDetailbySubCateId = function(sub_category_id){
     var deferred = Q.defer();
     var replacements = {sub_category_id : sub_category_id};
-    var query = 'select Registrations.id as user_id, Registrations.address,Registrations.city,Registrations.state,Registrations.zipcode,Registrations.business_name,Registrations.tagline,Registrations.website,Registrations.phone_no,Registrations.business_license_no,Registrations.description,Registrations.opening_time,Registrations.closing_time' +
-                ' from UserSubCateMaps LEFT JOIN Registrations ON Registrations.user_id=UserSubCateMaps.user_id where UserSubCateMaps.sub_category_id=:sub_category_id;'
+    var query = 'select Registrations.id as user_id, Registrations.address,Registrations.city,Registrations.state,Registrations.zipcode,Registrations.business_name,Registrations.tagline,Registrations.website,' +
+                ' Registrations.phone_no,Registrations.business_license_no,Registrations.description,Registrations.opening_time,Registrations.closing_time, UploadImgs.image' +
+                ' from UserSubCateMaps LEFT JOIN Registrations ON Registrations.user_id=UserSubCateMaps.user_id LEFT JOIN UploadImgs ON UploadImgs.user_id = UploadImgs.user_id where UserSubCateMaps.sub_category_id=:sub_category_id;'
     models.sequelize.query(query,
         { replacements: replacements, type: models.sequelize.QueryTypes.SELECT }
     ).then(function(result) {
@@ -217,7 +218,7 @@ exports.getMerchantDetailbySubCateId = function(sub_category_id){
 
 //"select * from UserSubCateMaps LEFT JOIN Registrations ON Registrations.user_id=UserSubCateMaps.user_id where UserSubCateMaps.sub_category_id=1;"
 
-var getAllcouponByUserId = function(user_id){
+exports.getAllcouponByUserId = function(user_id){
     var deferred = Q.defer();
     var cond={"is_deleted":0,
                 "user_id": user_id
