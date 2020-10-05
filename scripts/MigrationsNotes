@@ -7,6 +7,9 @@ sequelize model:create --name SubCategory --attributes "category_id:integer, nam
 sequelize model:create --name UploadImgs --attributes "user_id:integer, image:string, is_deleted:boolean"
 sequelize model:create --name Coupons --attributes "user_id:integer, coupon_type:string, days:string, start_time:string, end_time:string, expiry_date:string, flash_deal:boolean, description:string, restriction:string, is_deleted:boolean"
 sequelize model:create --name UserSubCateMap --attributes "user_id:integer, sub_category_id:integer"
+sequelize model:create --name UserFeedback --attributes "user_id:integer, feedback:string, is_deleted:boolean"
+sequelize model:create --name Requests --attributes "consumer_id:integer,merchant_id:integer,sub_category_id:integer,detail:string,date:string,time:string,is_deleted:boolean"
+sequelize model:create --name FavoriteList --attributes "consumer_id:integer,merchant_id:integer,is_fav:boolean"
 
 
 

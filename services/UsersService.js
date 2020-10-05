@@ -103,17 +103,41 @@ exports.createMerchantDetail = function(userId, address, city, state, zipcode, o
         discription: discription,
         sub_category_id: subCategoryId
     }).then(function(merchantDetail) {
+        var cateArray = merchantDetail.sub_category_id.split(",");
+        addSubCatetoMap(userId, cateArray).then(function(added){
         updateIsRegister(userId).then(function(user){
               deferred.resolve(merchantDetail);
 
         }, function(err){
             deferred.reject(err);
         })
+
+    }, function(err){
+        deferred.reject(err);
+    })
     },function(err){
         deferred.reject(err)
     });
     return deferred.promise;
 };
+
+
+/* function for add sub_Cate_id in maping table....*/
+var addSubCatetoMap = function(user_id,sub_category_id){
+    var deferred = Q.defer();
+    for(var i=0; i< sub_category_id.length; i++){
+        models.UserSubCateMap.create({
+            user_id: user_id,
+            sub_category_id: sub_category_id[i]
+       
+        }).then(function (added) {
+            deferred.resolve(added);
+        }, function (err) {
+            deferred.reject(err)
+        });
+    }
+    return deferred.promise;
+}
 
 
 /*
@@ -145,6 +169,27 @@ exports.updateMerchantDetail = function(userId, address, city, state, zipcode, o
     });
     return deferred.promise;
 };
+
+/* function for update sub_Cate_id in maping table....*/
+var updateSubCatetoMap = function(user_id,sub_category_id){
+    var deferred = Q.defer();
+    for(var i=0; i< sub_category_id.length; i++){
+        models.UserSubCateMap.update({
+            user_id: user_id,
+            sub_category_id: sub_category_id[i]
+         } ,{
+                where: {
+                user_id: user_id
+                }
+        }).then(function (added) {
+            deferred.resolve(added);
+        }, function (err) {
+            deferred.reject(err)
+        });
+    }
+    return deferred.promise;
+}
+
 
 
 
@@ -235,8 +280,20 @@ exports.getAllImages = function(user_id){
 
 
 
-
-
+/* function for add sub_Cate_id in maping table....*/
+exports.addUserFeedback = function(user_id,feedback){
+    var deferred = Q.defer();
+        models.UserFeedback.create({
+            user_id: user_id,
+            feedback: feedback
+       
+        }).then(function (added) {
+            deferred.resolve(added);
+        }, function (err) {
+            deferred.reject(err)
+        });
+    return deferred.promise;
+}
 
 
 

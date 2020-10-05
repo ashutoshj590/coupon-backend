@@ -183,6 +183,27 @@ router.post('/forgot-password', (req, res)=>{
     })
 })
 
+/* API for give feedback ................*/
+
+router.post('/give-feedback',[jsonParser,util.hasJsonParam(["user_id","feedback"])], function (req, res) { 
+    userService.addUserFeedback(req.body.user_id,req.body.feedback).then(function (feedback) {
+                var response = util.getResponseObject(consts.RESPONSE_SUCCESS);
+                res.send(response);
+            }, function (err) {
+                if(err.errors !== undefined && err.errors[0] !== undefined ){
+                    var response = util.getResponseObject(consts.RESPONSE_ERROR, err.response);
+                    res.send(response);
+                }else{
+                    var response = util.getResponseObject(consts.RESPONSE_ERROR, err.response);
+                }
+                res.send(response);
+            }
+        );
+    });
+
+
+
+
 
 
 

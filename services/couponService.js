@@ -111,9 +111,124 @@ exports.getAllcoupon = function(){
 };
 
 
+/*
+*   Function for create request .................
+*/
+exports.addRequestForMerchant = function(consumer_id, merchant_id, sub_category_id, detail, date, time){
+    var deferred = Q.defer();
+    models.Requests.create({
+        consumer_id: consumer_id,
+        merchant_id: merchant_id,
+        sub_category_id: sub_category_id,
+        detail: detail,
+        date: date,
+        time: time,
+        is_deleted: 0
+        
+    }).then(function(requestDetail) {
+        deferred.resolve(requestDetail);
+    },function(err){
+        deferred.reject(err)
+    });
+    return deferred.promise;
+};
 
 
 
+/*
+* Fuction define for get All request list from database for merchant
+*/
+exports.getAllRequestForMerchant = function(merchant_id){
+    var deferred = Q.defer();
+    var cond={"is_deleted":0,
+                "merchant_id": merchant_id
+     };
+    models.Requests.findAll({
+      where: cond
+    }).then(function (allRequest) {
+            deferred.resolve(allRequest);
+        },function (err) {
+          deferred.reject(err);
+        }
+    );
+    return deferred.promise;
+};
 
 
 
+/*
+* Function for change status to coupon
+*/
+exports.changeStatustoRequest = function(request_id){
+    var deferred = Q.defer();
+        models.Requests.update({
+            is_deleted: 1
+        },{
+            where: {
+            id: request_id
+            }
+        }).then(function(statusUpdated){
+            deferred.resolve(statusUpdated);
+        },
+        function (err) {
+            deferred.reject(err);
+        }
+    );
+    return deferred.promise;
+
+};
+
+
+/*
+* Fuction define for get All request list from database for consumer
+*/
+exports.getAllRequestForConsumer = function(consumer_id){
+    var deferred = Q.defer();
+    var cond={"is_deleted":0,
+                "consumer_id": consumer_id
+     };
+    models.Requests.findAll({
+      where: cond
+    }).then(function (allRequest) {
+            deferred.resolve(allRequest);
+        },function (err) {
+          deferred.reject(err);
+        }
+    );
+    return deferred.promise;
+};
+
+
+exports.getMerchantDetailbySubCateId = function(sub_category_id){
+    var deferred = Q.defer();
+    var replacements = {sub_category_id : sub_category_id};
+    var query = 'select Registrations.id as user_id, Registrations.address,Registrations.city,Registrations.state,Registrations.zipcode,Registrations.business_name,Registrations.tagline,Registrations.website,Registrations.phone_no,Registrations.business_license_no,Registrations.description,Registrations.opening_time,Registrations.closing_time' +
+                ' from UserSubCateMaps LEFT JOIN Registrations ON Registrations.user_id=UserSubCateMaps.user_id where UserSubCateMaps.sub_category_id=:sub_category_id;'
+    models.sequelize.query(query,
+        { replacements: replacements, type: models.sequelize.QueryTypes.SELECT }
+    ).then(function(result) {
+        deferred.resolve(result);
+
+        }
+    );
+    return deferred.promise;
+};
+
+
+//"select * from UserSubCateMaps LEFT JOIN Registrations ON Registrations.user_id=UserSubCateMaps.user_id where UserSubCateMaps.sub_category_id=1;"
+
+var getAllcouponByUserId = function(user_id){
+    var deferred = Q.defer();
+    var cond={"is_deleted":0,
+                "user_id": user_id
+};
+    models.Coupons.findAll({
+      where: cond
+    }).then(function (allCoupons) {
+            deferred.resolve(allCoupons);
+        },function (err) {
+          deferred.reject(err);
+        }
+    );
+    return deferred.promise;
+};

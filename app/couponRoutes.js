@@ -84,6 +84,107 @@ router.post('/get-all-coupons',jsonParser, function (req, res) {
 });
 
 
+/* API for use coupon ................*/
+
+router.post('/create-request',[jsonParser,util.hasJsonParam(["consumer_id","merchant_id","sub_category_id","detail","date","time"])], function (req, res) { 
+    couponService.addRequestForMerchant(req.body.consumer_id,req.body.merchant_id,req.body.sub_category_id,req.body.detail,req.body.date,req.body.time).then(function (created) {
+                var response = util.getResponseObject(consts.RESPONSE_SUCCESS);
+                response['request_detail'] = created;
+                res.send(response);
+            }, function (err) {
+                if(err.errors !== undefined && err.errors[0] !== undefined ){
+                    var response = util.getResponseObject(consts.RESPONSE_ERROR, err.response);
+                    res.send(response);
+                }else{
+                    var response = util.getResponseObject(consts.RESPONSE_ERROR, err.response);
+                }
+                res.send(response);
+            }
+        );
+    });
+
+
+    /* API for get request for merchant.............*/
+router.post('/get-request-merchant',[jsonParser,util.hasJsonParam(["merchant_id"])], function (req, res) {
+    couponService.getAllRequestForMerchant(req.body.merchant_id).then(function (list) {
+            var response = util.getResponseObject(consts.RESPONSE_SUCCESS);
+            response['request_list'] = list;
+            res.send(response);
+        }, function (err) {
+            if(err.errors !== undefined && err.errors[0] !== undefined ){
+                var response = util.getResponseObject(consts.RESPONSE_ERROR, err.response);
+                res.send(response);
+            }else{
+                var response = util.getResponseObject(consts.RESPONSE_ERROR, err.response);
+            }
+            res.send(response);
+        }
+    );
+});
+
+
+/* API for mark is_deleted to request ................*/
+
+router.post('/delete-request',[jsonParser,util.hasJsonParam(["request_id"])], function (req, res) { 
+    couponService.changeStatustoRequest(req.body.request_id).then(function (statusUpdated) {
+                var response = util.getResponseObject(consts.RESPONSE_SUCCESS);
+                res.send(response);
+            }, function (err) {
+                if(err.errors !== undefined && err.errors[0] !== undefined ){
+                    var response = util.getResponseObject(consts.RESPONSE_ERROR, err.response);
+                    res.send(response);
+                }else{
+                    var response = util.getResponseObject(consts.RESPONSE_ERROR, err.response);
+                }
+                res.send(response);
+            }
+        );
+    });
+
+
+
+
+    /* API for get request for consumer.............*/
+router.post('/get-request-consumer',[jsonParser,util.hasJsonParam(["consumer_id"])], function (req, res) {
+    couponService.getAllRequestForConsumer(req.body.consumer_id).then(function (list) {
+            var response = util.getResponseObject(consts.RESPONSE_SUCCESS);
+            response['request_list'] = list;
+            res.send(response);
+        }, function (err) {
+            if(err.errors !== undefined && err.errors[0] !== undefined ){
+                var response = util.getResponseObject(consts.RESPONSE_ERROR, err.response);
+                res.send(response);
+            }else{
+                var response = util.getResponseObject(consts.RESPONSE_ERROR, err.response);
+            }
+            res.send(response);
+        }
+    );
+});
+
+
+router.post('/get-merchant-by-category',[jsonParser,util.hasJsonParam(["sub_category_id"])], function (req, res) { 
+    couponService.getMerchantDetailbySubCateId(req.body.sub_category_id).then(function (detail) {
+                var response = util.getResponseObject(consts.RESPONSE_SUCCESS);
+               response.merchant_detail = detail;
+               res.send(response);
+            
+            }, function (err) {
+                if(err.errors !== undefined && err.errors[0] !== undefined ){
+                    var response = util.getResponseObject(consts.RESPONSE_ERROR, err.response);
+                    res.send(response);
+                }else{
+                    var response = util.getResponseObject(consts.RESPONSE_ERROR, err.response);
+                }
+                res.send(response);
+            }
+        );
+    });
+
+
+
+
+
 
 
 
