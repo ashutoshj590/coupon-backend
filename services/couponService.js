@@ -226,9 +226,7 @@ exports.getAllcouponByUserId = function(user_id){
     models.Coupons.findAll({
       where: cond
     }).then(function (allCoupons) {
-    for (var i = 0; i < allCoupons.length; i++) {
-            deferred.resolve(allCoupons);
-    }
+        deferred.resolve(allCoupons);
         },function (err) {
           deferred.reject(err);
         }
@@ -245,8 +243,8 @@ var findUsedCoupons = function(merchant_id, coupon_id){
     };
     models.UsedCoupons.findAll({
       where: cond
-    }).then(function (allCoupons) {
-            deferred.resolve(allCoupons);
+    }).then(function (result) {
+            deferred.resolve(result);
         },function (err) {
           deferred.reject(err);
         }

@@ -266,7 +266,7 @@ exports.getMerchantDetail = function(user_id){
 exports.getAllImages = function(user_id){
     var deferred = Q.defer();
     models.UploadImgs.findAll({
-        attributes: ['image'], 
+        attributes: ['id','image'], 
         where: {
             user_id: user_id,
             is_deleted: 0
