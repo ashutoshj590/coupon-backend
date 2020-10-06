@@ -9,7 +9,7 @@ sequelize model:create --name Coupons --attributes "user_id:integer, coupon_type
 sequelize model:create --name UserSubCateMap --attributes "user_id:integer, sub_category_id:integer"
 sequelize model:create --name UserFeedback --attributes "user_id:integer, feedback:string, is_deleted:boolean"
 sequelize model:create --name Requests --attributes "consumer_id:integer,merchant_id:integer,sub_category_id:integer,detail:string,date:string,time:string,is_deleted:boolean"
-sequelize model:create --name FavoriteList --attributes "consumer_id:integer,merchant_id:integer,is_fav:boolean"
+sequelize model:create --name UsedCoupons --attributes "consumer_id:integer,merchant_id:integer,coupon_id:integer,coupon_type:string"
 
 
 

@@ -226,10 +226,48 @@ exports.getAllcouponByUserId = function(user_id){
     models.Coupons.findAll({
       where: cond
     }).then(function (allCoupons) {
+    for (var i = 0; i < allCoupons.length; i++) {
+            deferred.resolve(allCoupons);
+    }
+        },function (err) {
+          deferred.reject(err);
+        }
+    );
+    return deferred.promise;
+};
+
+
+var findUsedCoupons = function(merchant_id, coupon_id){
+    var deferred = Q.defer();
+    var cond={
+                "merchant_id": merchant_id,
+                "coupon_id": coupon_id
+    };
+    models.UsedCoupons.findAll({
+      where: cond
+    }).then(function (allCoupons) {
             deferred.resolve(allCoupons);
         },function (err) {
           deferred.reject(err);
         }
     );
+    return deferred.promise;
+};
+
+
+
+exports.addUsedCoupontoDatabase = function(consumer_id, merchant_id, coupon_id, coupon_type){
+    var deferred = Q.defer();
+    models.UsedCoupons.create({
+        consumer_id: consumer_id,
+        merchant_id: merchant_id,
+        coupon_id: coupon_id,
+        coupon_type: coupon_type,
+        
+    }).then(function(couponUsed) {
+        deferred.resolve(couponUsed);
+    },function(err){
+        deferred.reject(err)
+    });
     return deferred.promise;
 };

@@ -31,13 +31,13 @@ module.exports = (sequelize, DataTypes) => {
     closing_time: {
       type: DataTypes.STRING
     },
-    category_id: {
-      type :DataTypes.INTEGER
-      },
     sub_category_id: {
         type :DataTypes.INTEGER
-        }
-  
+        },
+    notification_email: {
+      type :DataTypes.BOOLEAN
+      }
+
   }, {
     sequelize,
     modelName: 'Registration',

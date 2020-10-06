@@ -84,7 +84,7 @@ router.post('/get-all-coupons',jsonParser, function (req, res) {
 });
 
 
-/* API for use coupon ................*/
+/* API for  create request ................*/
 
 router.post('/create-request',[jsonParser,util.hasJsonParam(["consumer_id","merchant_id","sub_category_id","detail","date","time"])], function (req, res) { 
     couponService.addRequestForMerchant(req.body.consumer_id,req.body.merchant_id,req.body.sub_category_id,req.body.detail,req.body.date,req.body.time).then(function (created) {
@@ -200,6 +200,25 @@ router.post('/get-merchant-by-category',[jsonParser,util.hasJsonParam(["sub_cate
             );
         });
     
+
+
+
+router.post('/use-coupon',[jsonParser,util.hasJsonParam(["consumer_id","merchant_id","coupon_id","coupon_type"])], function (req, res) { 
+    couponService.addUsedCoupontoDatabase(req.body.consumer_id,req.body.merchant_id,req.body.coupon_id,req.body.coupon_type).then(function (used) {
+                var response = util.getResponseObject(consts.RESPONSE_SUCCESS);
+                res.send(response);
+            }, function (err) {
+                if(err.errors !== undefined && err.errors[0] !== undefined ){
+                    var response = util.getResponseObject(consts.RESPONSE_ERROR, err.response);
+                    res.send(response);
+                }else{
+                    var response = util.getResponseObject(consts.RESPONSE_ERROR, err.response);
+                }
+                res.send(response);
+            }
+        );
+    });
+
 
 
 
