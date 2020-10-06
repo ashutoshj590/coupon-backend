@@ -204,7 +204,7 @@ exports.getMerchantDetailbySubCateId = function(sub_category_id){
     var replacements = {sub_category_id : sub_category_id};
     var query = 'select Registrations.id as user_id, Registrations.address,Registrations.city,Registrations.state,Registrations.zipcode,Registrations.business_name,Registrations.tagline,Registrations.website,' +
                 ' Registrations.phone_no,Registrations.business_license_no,Registrations.description,Registrations.opening_time,Registrations.closing_time, UploadImgs.image' +
-                ' from UserSubCateMaps LEFT JOIN Registrations ON Registrations.user_id=UserSubCateMaps.user_id LEFT JOIN UploadImgs ON UploadImgs.user_id = UploadImgs.user_id where UserSubCateMaps.sub_category_id=:sub_category_id;'
+                ' from UserSubCateMaps LEFT JOIN Registrations ON Registrations.user_id=UserSubCateMaps.user_id LEFT JOIN (SELECT * FROM UploadImgs WHERE UploadImgs.user_id = UploadImgs.user_id LIMIT 1) UploadImgs ON UploadImgs.user_id=UserSubCateMaps.user_id WHERE UserSubCateMaps.sub_category_id=:sub_category_id;'
     models.sequelize.query(query,
         { replacements: replacements, type: models.sequelize.QueryTypes.SELECT }
     ).then(function(result) {
