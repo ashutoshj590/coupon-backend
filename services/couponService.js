@@ -269,3 +269,132 @@ exports.addUsedCoupontoDatabase = function(consumer_id, merchant_id, coupon_id, 
     });
     return deferred.promise;
 };
+
+
+exports.acceptRequestFunction = function(consumer_id, merchant_id, request_id){
+    var deferred = Q.defer();
+    models.AcceptRequest.create({
+        consumer_id: consumer_id,
+        merchant_id: merchant_id,
+        request_id: request_id
+        
+    }).then(function(requestAccpeted) {
+        deferred.resolve(requestAccpeted);
+    },function(err){
+        deferred.reject(err)
+    });
+    return deferred.promise;
+};
+
+
+
+exports.getAllCountsForMerchantCoupons = function(merchant_id){
+    var deferred = Q.defer();
+    var replacements = {merchant_id : merchant_id};
+
+    var query = 'select COUNT(*) as created from Coupons WHERE user_id=:merchant_id';
+
+    models.sequelize.query(query,
+        { replacements: replacements, type: models.sequelize.QueryTypes.SELECT }
+    ).then(function(createdCounts) {
+        var object = {};
+        countsForCommunity(merchant_id).then(function(commCounts) {
+            countsForCustom(merchant_id).then(function(cusCounts) {
+                countsForUsedCoupons(merchant_id).then(function(usedCounts) {
+                    countsForRequests(merchant_id).then(function(reqCounts) {
+                        object.created = createdCounts[0];
+                        object.community = commCounts[0];
+                        object.custom = cusCounts[0];
+                        object.used = usedCounts[0];
+                        object.requests = reqCounts[0];
+                        deferred.resolve(object);
+            },function(err){
+                deferred.reject(err)
+                });
+        },function(err){
+            deferred.reject(err)
+        });
+    },function(err){
+        deferred.reject(err)
+    });
+            },function(err){
+                deferred.reject(err)
+            });
+        }
+    );
+    return deferred.promise;
+};
+
+
+
+
+var countsForCommunity = function(merchant_id){
+    var deferred = Q.defer();
+    var replacements = {merchant_id : merchant_id};
+
+    var query = 'select COUNT(*) as community from Coupons WHERE user_id=:merchant_id and coupon_type="community"';
+
+    models.sequelize.query(query,
+        { replacements: replacements, type: models.sequelize.QueryTypes.SELECT }
+    ).then(function(coummnityCounts) {
+        deferred.resolve(coummnityCounts);
+
+        }
+    );
+    return deferred.promise;
+};
+
+
+
+
+var countsForCustom = function(merchant_id){
+    var deferred = Q.defer();
+    var replacements = {merchant_id : merchant_id};
+
+    var query = 'select COUNT(*) as custom from AcceptRequests WHERE merchant_id=:merchant_id';
+
+    models.sequelize.query(query,
+        { replacements: replacements, type: models.sequelize.QueryTypes.SELECT }
+    ).then(function(customCounts) {
+        deferred.resolve(customCounts);
+
+        }
+    );
+    return deferred.promise;
+};
+
+
+
+var countsForUsedCoupons = function(merchant_id){
+    var deferred = Q.defer();
+    var replacements = {merchant_id : merchant_id};
+
+    var query = 'select COUNT(*) as used from UsedCoupons WHERE merchant_id=:merchant_id';
+
+    models.sequelize.query(query,
+        { replacements: replacements, type: models.sequelize.QueryTypes.SELECT }
+    ).then(function(usedCounts) {
+        deferred.resolve(usedCounts);
+
+        }
+    );
+    return deferred.promise;
+};
+
+
+
+var countsForRequests = function(merchant_id){
+    var deferred = Q.defer();
+    var replacements = {merchant_id : merchant_id};
+
+    var query = 'select COUNT(*) as requests from Requests where merchant_id=:merchant_id';
+
+    models.sequelize.query(query,
+        { replacements: replacements, type: models.sequelize.QueryTypes.SELECT }
+    ).then(function(usedCounts) {
+        deferred.resolve(usedCounts);
+
+        }
+    );
+    return deferred.promise;
+};

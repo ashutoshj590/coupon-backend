@@ -221,6 +221,44 @@ router.post('/use-coupon',[jsonParser,util.hasJsonParam(["consumer_id","merchant
 
 
 
+router.post('/accept-request',[jsonParser,util.hasJsonParam(["consumer_id","merchant_id","request_id"])], function (req, res) { 
+    couponService.acceptRequestFunction(req.body.consumer_id,req.body.merchant_id,req.body.request_id).then(function (accept) {
+                var response = util.getResponseObject(consts.RESPONSE_SUCCESS);
+                res.send(response);
+            }, function (err) {
+                if(err.errors !== undefined && err.errors[0] !== undefined ){
+                    var response = util.getResponseObject(consts.RESPONSE_ERROR, err.response);
+                    res.send(response);
+                }else{
+                    var response = util.getResponseObject(consts.RESPONSE_ERROR, err.response);
+                }
+                res.send(response);
+            }
+        );
+    });
+
+    
+
+
+router.post('/merchant-reports',[jsonParser,util.hasJsonParam(["merchant_id"])], function (req, res) { 
+    couponService.getAllCountsForMerchantCoupons(req.body.merchant_id).then(function (result) {
+                var response = util.getResponseObject(consts.RESPONSE_SUCCESS);
+                response.Detail = result;
+                res.send(response);
+            }, function (err) {
+                if(err.errors !== undefined && err.errors[0] !== undefined ){
+                    var response = util.getResponseObject(consts.RESPONSE_ERROR, err.response);
+                    res.send(response);
+                }else{
+                    var response = util.getResponseObject(consts.RESPONSE_ERROR, err.response);
+                }
+                res.send(response);
+            }
+        );
+    });
+
+
+
 
 
 

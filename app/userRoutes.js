@@ -7,16 +7,7 @@ var consts = require('../lib/consts.js');
 var jsonParser = bodyParser.json({limit: '10mb'});
 var sessionTime = 1 * 60 *  60 * 1000;       //1 hour session
 var models = require('../models/index.js');
-const crypto = require('crypto');
-const nodemailer = require('nodemailer')
-const sendgridTransport = require('nodemailer-sendgrid-transport')
 
-const transporter = nodemailer.createTransport(sendgridTransport({
-    auth:{
-        api_key:"BD.couponApp-123"
-    }
-
-}))
 
 
 
@@ -166,36 +157,7 @@ router.post('/delete-image',[jsonParser,util.hasJsonParam(["user_id","image_id"]
         });
 
 
-/* API for forgot password..............*/
-router.post('/forgot-password', (req, res)=>{
-    crypto.randomBytes(32,(err,Buffer)=>{
-        if(err){
-            console.log(err);
-        }
-        const token = Buffer.toString("hex")
-        models.Users.findOne({email: req.body.email})
-        .then(user=>{
-            if(!user){
-                return res.status(422).json({error:"User dont exists with that email"})
-            }
-            user.resetToken = token
-            user.expireToken = Date.now() + 3600000
-            user.save().then((result)=>{
-                transporter.sendMail({
-                    to:user.email,
-                    from:"no-reply@db.com",
-                    subject:"password reset",
-                    html:`
-                    <p>You requested for password reset</p>
-                    <h5>click in this <a href="http://localhost:8080/reset/${token}">link</a> to reset password</h5>
-                    `
-                })
-                res.json({message:"check your email"})
-            })
-        })
 
-    })
-})
 
 /* API for give feedback ................*/
 
