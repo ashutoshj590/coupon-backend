@@ -17,15 +17,15 @@ module.exports = (sequelize, DataTypes) => {
     user_id: DataTypes.INTEGER,
     coupon_type: {
       type :DataTypes.ENUM,
-      values: ['flash','community']
+      values: ['flash','community','custom']
       },
     days: DataTypes.STRING,
     start_time: DataTypes.STRING,
     end_time: DataTypes.STRING,
     expiry_date: DataTypes.STRING,
     flash_deal: DataTypes.BOOLEAN,
-    description: DataTypes.STRING,
-    restriction: DataTypes.STRING,
+    description: DataTypes.TEXT,
+    restriction: DataTypes.TEXT,
     is_deleted: DataTypes.BOOLEAN,
     is_fav: DataTypes.BOOLEAN,
     short_name: DataTypes.STRING

@@ -15,7 +15,7 @@ module.exports = (sequelize, DataTypes) => {
   };
   UserFeedback.init({
     user_id: DataTypes.INTEGER,
-    feedback: DataTypes.STRING,
+    feedback: DataTypes.TEXT,
     is_deleted: DataTypes.BOOLEAN
   }, {
     sequelize,

@@ -17,7 +17,7 @@ module.exports = (sequelize, DataTypes) => {
     consumer_id: DataTypes.INTEGER,
     merchant_id: DataTypes.INTEGER,
     sub_category_id: DataTypes.INTEGER,
-    detail: DataTypes.STRING,
+    detail: DataTypes.TEXT,
     date: DataTypes.STRING,
     time: {
       type :DataTypes.ENUM,

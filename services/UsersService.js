@@ -85,7 +85,7 @@ module.exports.login = (user, session) => {
 /*
 *   Function for create Merchant Details for Registration..................
 */
-exports.createMerchantDetail = function(userId, address, city, state, zipcode, openingTime, closingTime, businessName, tagline, website, phoneNo, businessLNo, discription, subCategoryId, notification_email){
+exports.createMerchantDetail = function(userId, address, city, state, zipcode, openingTime, closingTime, businessName, tagline, website, phoneNo, businessLNo, description, subCategoryId, notification_email){
     var deferred = Q.defer();
     models.Registration.create({
         user_id: userId,
@@ -100,7 +100,7 @@ exports.createMerchantDetail = function(userId, address, city, state, zipcode, o
         website: website,
         phone_no: phoneNo,
         business_license_no: businessLNo,
-        discription: discription,
+        description: description,
         sub_category_id: subCategoryId,
         notification_email: notification_email
     }).then(function(merchantDetail) {
@@ -144,7 +144,7 @@ var addSubCatetoMap = function(user_id,sub_category_id){
 /*
 *   Function for create Merchant Details for Registration..................
 */
-exports.updateMerchantDetail = function(userId, address, city, state, zipcode, openingTime, closingTime, businessName, tagline, website, phoneNo, businessLNo, discription, subCategoryId, notification_email){
+exports.updateMerchantDetail = function(userId, address, city, state, zipcode, openingTime, closingTime, businessName, tagline, website, phoneNo, businessLNo, description, subCategoryId, notification_email){
     var deferred = Q.defer();
     models.Registration.update({
         address: address,
@@ -158,7 +158,7 @@ exports.updateMerchantDetail = function(userId, address, city, state, zipcode, o
         website: website,
         phone_no: phoneNo,
         business_license_no: businessLNo,
-        discription: discription,
+        description: description,
         sub_category_id: subCategoryId,
         notification_email: notification_email
     },
