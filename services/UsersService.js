@@ -227,25 +227,25 @@ exports.uploadImageToDatabase = function (user_id, imgObject) {
 };
 
 
-exports.changeStatustoImg = function(user_id, image_id){
+
+
+exports.deleteImageById = function(user_id, image_id){
     var deferred = Q.defer();
-        models.UploadImgs.update({
-            is_deleted: 1
-        },{
-            where: {
-            id: image_id,
-            user_id: user_id
-            }
-        }).then(function(statusUpdated){
-            deferred.resolve(statusUpdated);
-        },
-        function (err) {
-            deferred.reject(err);
+    var replacements = {user_id : user_id, image_id : image_id };
+
+    var query = 'delete from UploadImgs where user_id=:user_id and id=:image_id';
+
+    models.sequelize.query(query,
+        { replacements: replacements, type: models.sequelize.QueryTypes.DELETE }
+    ).then(function(deleted) {
+        deferred.resolve(deleted);
+
         }
     );
     return deferred.promise;
-
 };
+
+
 
 
 exports.getMerchantDetail = function(user_id){

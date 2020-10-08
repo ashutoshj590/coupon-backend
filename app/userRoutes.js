@@ -111,10 +111,13 @@ router.post('/uplaod-image', [jsonParser, util.hasJsonParam(["user_id","images"]
 }); 
 
 
+
+
+
 /* API for mark is_deleted to coupon ................*/
 
 router.post('/delete-image',[jsonParser,util.hasJsonParam(["user_id","image_id"])], function (req, res) { 
-    userService.changeStatustoImg(req.body.user_id,req.body.image_id).then(function (statusUpdated) {
+    userService.deleteImageById(req.body.user_id,req.body.image_id).then(function (result) {
                 var response = util.getResponseObject(consts.RESPONSE_SUCCESS);
                 res.send(response);
             }, function (err) {
