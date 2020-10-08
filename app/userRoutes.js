@@ -67,14 +67,14 @@ router.post('/register-merchant', [jsonParser, util.hasJsonParam(["user_id","add
 });
 
 
-router.post('/update-register-merchant', [jsonParser, util.hasJsonParam(["user_id","address","city","state","zipcode","opening_time","closing_time","business_name","tagline","website","phone_no","business_license_no","discription","sub_category_id"])], function (req, res) {
+router.post('/update-register-merchant', [jsonParser, util.hasJsonParam(["user_id","address","city","state","zipcode","opening_time","closing_time","business_name","tagline","website","phone_no","business_license_no","description","sub_category_id"])], function (req, res) {
     var isEmail;
     if(req.body.notification_email === null){
         isEmail = false;
     } else {
         isEmail = req.body.notification_email;
     }
-    userService.updateMerchantDetail(req.body.user_id,req.body.address,req.body.city,req.body.state,req.body.zipcode,req.body.opening_time,req.body.closing_time,req.body.business_name,req.body.tagline,req.body.website,req.body.phone_no,req.body.business_license_no,req.body.discription,req.body.sub_category_id,isEmail).then(function (detail) {
+    userService.updateMerchantDetail(req.body.user_id,req.body.address,req.body.city,req.body.state,req.body.zipcode,req.body.opening_time,req.body.closing_time,req.body.business_name,req.body.tagline,req.body.website,req.body.phone_no,req.body.business_license_no,req.body.description,req.body.sub_category_id,isEmail).then(function (detail) {
             var response = util.getResponseObject(consts.RESPONSE_SUCCESS);
             res.send(response);
         }, function (err) {
