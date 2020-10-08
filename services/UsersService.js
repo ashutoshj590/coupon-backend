@@ -165,30 +165,66 @@ exports.updateMerchantDetail = function(userId, address, city, state, zipcode, o
      {
         where: {user_id: userId}
     }).then(function(merchantUpdated) {
+        getSubCategoryIds(userId).then(function(ids) {
+            var cateArray = ids[0].dataValues.sub_category_id.split(",");
+            updateSubCatetoMap(userId, cateArray).then(function(update){
               deferred.resolve(merchantUpdated);
+            },function(err){
+                deferred.reject(err)
+            });
+        },function(err){
+            deferred.reject(err)
+        });
     },function(err){
         deferred.reject(err)
     });
     return deferred.promise;
 };
 
-/* function for update sub_Cate_id in maping table....*/
-var updateSubCatetoMap = function(user_id,sub_category_id){
+
+
+/*  function for updated get data for sub_category_id */
+var getSubCategoryIds = function(user_id){
     var deferred = Q.defer();
-    for(var i=0; i< sub_category_id.length; i++){
-        models.UserSubCateMap.update({
-            user_id: user_id,
-            sub_category_id: sub_category_id[i]
-         } ,{
+    models.Registration.findAll({
+        attributes: ['sub_category_id'], 
+        where: {
+            user_id: user_id
+        }
+    }).then(function (subCateIdData) {
+            deferred.resolve(subCateIdData);
+        },function (err) {
+          deferred.reject(err);
+        }
+    );
+    return deferred.promise;
+};
+
+
+
+
+/* function for update sub_Cate_id in maping table....*/
+var updateSubCatetoMap = function(user_id, sub_category_id){
+    var deferred = Q.defer();
+        models.UserSubCateMap.destroy({
                 where: {
                 user_id: user_id
                 }
-        }).then(function (added) {
-            deferred.resolve(added);
+        }).then(function (updated) {
+            for(var i=0; i< sub_category_id.length; i++){
+                models.UserSubCateMap.create({
+                    user_id: user_id,
+                    sub_category_id: sub_category_id[i]
+               
+                }).then(function (added) {
+                    deferred.resolve(added);
+                }, function (err) {
+                    deferred.reject(err)
+                });
+            }
         }, function (err) {
             deferred.reject(err)
         });
-    }
     return deferred.promise;
 }
 
@@ -296,6 +332,8 @@ exports.addUserFeedback = function(user_id,feedback){
         });
     return deferred.promise;
 }
+
+
 
 
 
