@@ -7,7 +7,6 @@ var consts = require('../lib/consts.js');
 var session = require('express-session');
 const jwt = require('jsonwebtoken');
 
-
 /* API funcation for crearte new user sign up..................*/
 
 router.post('/sign-up', [util.hasJsonParam(["email", "password", "type", "device_type"])], function (req, res) {

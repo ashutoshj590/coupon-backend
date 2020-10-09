@@ -49,9 +49,7 @@ module.exports.createNewUser = (user) => {
 
 module.exports.login = (user, session) => {
     let { email, password, type, token } = user;
- //   if (token) {
-   //     return handleFBLoginAndSignUp(token, session);
-  //  }
+    return userDOA.updateUserAsType(email, type).then((user) => {
     return userDOA.findUserByEmailAndType(email, type)
         .then((user) => {
             if (user == null) {
@@ -75,6 +73,7 @@ module.exports.login = (user, session) => {
                     return Promise.reject(err);
                 })
         });
+    });
 } 
 
 
