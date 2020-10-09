@@ -140,15 +140,15 @@ exports.addRequestForMerchant = function(consumer_id, merchant_id, sub_category_
 */
 exports.getAllRequestForMerchant = function(merchant_id){
     var deferred = Q.defer();
-    var cond={"is_deleted":0,
-                "merchant_id": merchant_id
-     };
-    models.Requests.findAll({
-      where: cond
-    }).then(function (allRequest) {
-            deferred.resolve(allRequest);
-        },function (err) {
-          deferred.reject(err);
+    var replacements = {merchant_id : merchant_id};
+    var query = 'select Requests.id as request_id,Requests.consumer_id,Requests.merchant_id,Requests.sub_category_id,Requests.detail,' +
+                'Requests.date,Requests.time,Users.email from Requests LEFT JOIN Users on Requests.consumer_id=Users.id where Requests.merchant_id=:merchant_id';
+    
+    models.sequelize.query(query,
+        { replacements: replacements, type: models.sequelize.QueryTypes.SELECT }
+    ).then(function(result) {
+        deferred.resolve(result);
+
         }
     );
     return deferred.promise;
