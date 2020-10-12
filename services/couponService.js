@@ -13,6 +13,7 @@ var sessionTime = 1 * 60 * 60 * 1000;
 let fbServices = require('./fbServices');
 let responseConstants = require('../constants/responseConst');
 let constants = require('../lib/consts');
+var uniqid = require('uniqid');
 
 
 
@@ -21,6 +22,8 @@ let constants = require('../lib/consts');
 */
 exports.createCouponForMerchant = function(user_id,coupon_type,days,start_time,end_time,expiry_date,flash_deal,description,restriction, shortName){
     var deferred = Q.defer();
+
+    var couponCode = uniqid('COUPON','CODE')
     models.Coupons.create({
         user_id: user_id,
         coupon_type: coupon_type,
@@ -33,7 +36,8 @@ exports.createCouponForMerchant = function(user_id,coupon_type,days,start_time,e
         restriction: restriction,
         is_deleted: 0,
         is_fav: 0,
-        short_name: shortName
+        short_name: shortName,
+        coupon_code: couponCode
     }).then(function(couponDetail) {
         deferred.resolve(couponDetail);
     },function(err){

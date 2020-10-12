@@ -8,6 +8,20 @@ var jsonParser = bodyParser.json({limit: '10mb'});
 var sessionTime = 1 * 60 *  60 * 1000;       //1 hour session
 var models = require('../models/index.js');
 
+var multer = require('multer');
+
+var storage = multer.diskStorage({
+    destination: function(req, file, cb) {
+        cb(null, 'public/images/uploaded_images/')
+    },
+    filename: function(req, file, cb) {
+        cb(null, file.originalname)
+    }
+})
+
+var upload = multer({storage: storage})
+
+
 
 
 
@@ -91,7 +105,7 @@ router.post('/update-register-merchant', [jsonParser, util.hasJsonParam(["user_i
 
 
 /* API for  upload images for merchant registration.............*/
-router.post('/uplaod-image', [jsonParser, util.hasJsonParam(["user_id","images"])], function (req, res) {
+/*router.post('/uplaod-image', [jsonParser, util.hasJsonParam(["user_id","images"])], function (req, res) {
     userService.uploadImageToDatabase(req.body.user_id, req.body.images);
             var response = util.getResponseObject(consts.RESPONSE_SUCCESS);
             response.user_id = req.body.user_id;
@@ -108,7 +122,13 @@ router.post('/uplaod-image', [jsonParser, util.hasJsonParam(["user_id","images"]
         }
       
         
-}); 
+}); */
+
+/* API for  upload images for merchant registration.............*/
+/*router.post('/uplaod-image',upload.array('merchant_image', 5), function(req, res, next){
+    var fileinfo = req.files;
+    res.send(fileinfo);
+}) */
 
 
 

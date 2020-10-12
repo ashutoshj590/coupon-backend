@@ -28,7 +28,8 @@ module.exports = (sequelize, DataTypes) => {
     restriction: DataTypes.TEXT,
     is_deleted: DataTypes.BOOLEAN,
     is_fav: DataTypes.BOOLEAN,
-    short_name: DataTypes.STRING
+    short_name: DataTypes.STRING,
+    coupon_code: DataTypes.STRING
   }, {
     sequelize,
     modelName: 'Coupons',

@@ -264,6 +264,8 @@ exports.uploadImageToDatabase = function (user_id, imgObject) {
 
 
 
+
+
 exports.deleteImageById = function(user_id, image_id){
     var deferred = Q.defer();
     var replacements = {user_id : user_id, image_id : image_id };
