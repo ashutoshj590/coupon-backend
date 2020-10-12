@@ -36,7 +36,9 @@ module.exports = (sequelize, DataTypes) => {
         },
     notification_email: {
       type :DataTypes.BOOLEAN
-      }
+      },
+      lat: DataTypes.INTEGER,
+      lang: DataTypes.INTEGER
 
   }, {
     sequelize,
