@@ -203,8 +203,8 @@ router.post('/get-merchant-by-category',[jsonParser,util.hasJsonParam(["sub_cate
 
 
 
-router.post('/use-coupon',[jsonParser,util.hasJsonParam(["consumer_id","merchant_id","coupon_id","coupon_type"])], function (req, res) { 
-    couponService.addUsedCoupontoDatabase(req.body.consumer_id,req.body.merchant_id,req.body.coupon_id,req.body.coupon_type).then(function (used) {
+router.post('/use-coupon',[jsonParser,util.hasJsonParam(["consumer_id","merchant_id","coupon_code","coupon_type"])], function (req, res) { 
+    couponService.addUsedCoupontoDatabase(req.body.consumer_id,req.body.merchant_id,req.body.coupon_code,req.body.coupon_type).then(function (used) {
                 var response = util.getResponseObject(consts.RESPONSE_SUCCESS);
                 res.send(response);
             }, function (err) {

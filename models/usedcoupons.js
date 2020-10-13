@@ -16,7 +16,6 @@ module.exports = (sequelize, DataTypes) => {
   UsedCoupons.init({
     consumer_id: DataTypes.INTEGER,
     merchant_id: DataTypes.INTEGER,
-    coupon_id: DataTypes.INTEGER,
     coupon_type: {
       type :DataTypes.ENUM,
       values: ['flash','community','custom']

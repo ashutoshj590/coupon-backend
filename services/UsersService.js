@@ -256,7 +256,7 @@ exports.uploadImageToDatabase = function (user_id, imgObject) {
         console.log(imgObject[i]);
         models.UploadImgs.create({
             user_id: user_id,
-            image: imgObject[i],
+            image: imgObject[i].path,
             is_deleted: 0
         })
     }

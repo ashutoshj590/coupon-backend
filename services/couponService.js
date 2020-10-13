@@ -258,12 +258,12 @@ var findUsedCoupons = function(merchant_id, coupon_id){
 
 
 
-exports.addUsedCoupontoDatabase = function(consumer_id, merchant_id, coupon_id, coupon_type){
+exports.addUsedCoupontoDatabase = function(consumer_id, merchant_id, coupon_code, coupon_type){
     var deferred = Q.defer();
     models.UsedCoupons.create({
         consumer_id: consumer_id,
         merchant_id: merchant_id,
-        coupon_id: coupon_id,
+        coupon_code: coupon_code,
         coupon_type: coupon_type,
         
     }).then(function(couponUsed) {
