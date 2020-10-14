@@ -17,6 +17,12 @@ module.exports.findUserByEmail = (email) => {
     });
 };
 
+module.exports.findUserByUserId = (userId) => {
+    return getUserByWhere({
+        id: userId
+    });
+};
+
 module.exports.createUser = (user) => {
     return User.create(user);
 }

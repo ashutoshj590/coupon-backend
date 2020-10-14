@@ -27,7 +27,6 @@ module.exports = (sequelize, DataTypes) => {
     description: DataTypes.TEXT,
     restriction: DataTypes.TEXT,
     is_deleted: DataTypes.BOOLEAN,
-    is_fav: DataTypes.BOOLEAN,
     short_name: DataTypes.STRING,
     coupon_code: DataTypes.STRING
   }, {

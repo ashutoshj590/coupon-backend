@@ -11,6 +11,7 @@ sequelize model:create --name UserFeedback --attributes "user_id:integer, feedba
 sequelize model:create --name Requests --attributes "consumer_id:integer,merchant_id:integer,sub_category_id:integer,detail:string,date:string,time:string,is_deleted:boolean"
 sequelize model:create --name UsedCoupons --attributes "consumer_id:integer,merchant_id:integer,coupon_id:integer,coupon_type:string"
 sequelize model:create --name AcceptRequest --attributes "consumer_id:integer,merchant_id:integer,request_id:integer"
+sequelize model:create --name FavCoupons --attributes "consumer_id:integer,merchant_id:integer,coupon_id:integer,is_fav:boolean"
 
 
 

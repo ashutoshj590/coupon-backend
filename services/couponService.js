@@ -35,7 +35,6 @@ exports.createCouponForMerchant = function(user_id,coupon_type,days,start_time,e
         description: description,
         restriction: restriction,
         is_deleted: 0,
-        is_fav: 0,
         short_name: shortName,
         coupon_code: couponCode
     }).then(function(couponDetail) {
@@ -398,6 +397,63 @@ var countsForRequests = function(merchant_id){
     ).then(function(usedCounts) {
         deferred.resolve(usedCounts);
 
+        }
+    );
+    return deferred.promise;
+};
+
+
+exports.addToFavourite = function(consumer_id, merchant_id, coupon_id){
+    var deferred = Q.defer();
+    models.FavCoupons.create({
+        consumer_id: consumer_id,
+        merchant_id: merchant_id,
+        coupon_id: coupon_id,
+        is_fav: 1
+        
+    }).then(function(requestAccpeted) {
+        deferred.resolve(requestAccpeted);
+    },function(err){
+        deferred.reject(err)
+    });
+    return deferred.promise;
+};
+
+
+exports.changeStatusForUnFav = function(consumer_id, coupon_id){
+    var deferred = Q.defer();
+        models.FavCoupons.update({
+            is_fav: 0
+        },{
+            where: {
+                consumer_id: consumer_id,
+                coupon_id: coupon_id
+            }
+        }).then(function(statusUpdated){
+            deferred.resolve(statusUpdated);
+        },
+        function (err) {
+            deferred.reject(err);
+        }
+    );
+    return deferred.promise;
+
+};
+
+
+exports.getAllFavouriteCoupons = function(consumer_id){
+    var deferred = Q.defer();
+    var replacements = {consumer_id : consumer_id};
+
+    var query = 'SELECT * from Coupons LEFT JOIN FavCoupons on Coupons.id=FavCoupons.coupon_id WHERE FavCoupons.is_fav=1 ' +
+                'and FavCoupons.consumer_id=:consumer_id';
+
+    models.sequelize.query(query,
+        { replacements: replacements, type: models.sequelize.QueryTypes.SELECT }
+    ).then(function (allCoupons) {
+        deferred.resolve(allCoupons);
+        },function (err) {
+          deferred.reject(err);
         }
     );
     return deferred.promise;

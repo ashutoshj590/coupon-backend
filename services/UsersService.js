@@ -13,6 +13,7 @@ let fbServices = require('./fbServices');
 let responseConstants = require('../constants/responseConst');
 let constants = require('../lib/consts');
 var bcrypt = require('bcrypt');
+const { response } = require('express');
 
 
 /*
@@ -86,6 +87,12 @@ module.exports.login = (user, session) => {
 */
 exports.createMerchantDetail = function(userId, address, city, state, zipcode, openingTime, closingTime, businessName, tagline, website, phoneNo, businessLNo, description, subCategoryId, notification_email, lat, lang){
     var deferred = Q.defer();
+    foudUserById(userId).then(function(user){
+       if (user != null || undefined){
+           if(user.dataValues.user_id === userId) {
+        deferred.reject("user already registered !")
+           }  
+       } else {
     models.Registration.create({
         user_id: userId,
         address: address,
@@ -117,9 +124,14 @@ exports.createMerchantDetail = function(userId, address, city, state, zipcode, o
     }, function(err){
         deferred.reject(err);
     })
+
     },function(err){
         deferred.reject(err)
     });
+}
+},function(err){
+    deferred.reject(err)
+});
     return deferred.promise;
 };
 
@@ -140,6 +152,23 @@ var addSubCatetoMap = function(user_id,sub_category_id){
     }
     return deferred.promise;
 }
+
+/*  function for updated get data for sub_category_id */
+var foudUserById = function(user_id){
+    var deferred = Q.defer();
+    models.Registration.findOne({
+        where: {
+            user_id: user_id
+        }
+    }).then(function (userfound) {
+            deferred.resolve(userfound);
+        },function (err) {
+          deferred.reject(err);
+        }
+    );
+    return deferred.promise;
+};
+
 
 
 /*
@@ -250,22 +279,20 @@ var updateIsRegister = function(user_id){
 }
 
 
+
 exports.uploadImageToDatabase = function (user_id, imgObject) {
-   //var deferred = Q.defer();
-    for(var i=0; i< imgObject.length; i++){
-        console.log(imgObject[i]);
-        models.UploadImgs.create({
-            user_id: user_id,
-            image: imgObject[i].path,
-            is_deleted: 0
-        })
-    }
-    console.log(imgObject);
-    return  imgObject;
-        
-};
-
-
+    //var deferred = Q.defer();
+     for(var i=0; i< imgObject.length; i++){
+         models.UploadImgs.create({
+             user_id: user_id,
+             image: imgObject[i].path,
+             is_deleted: 0
+         })
+     }
+     console.log(imgObject);
+     return  imgObject;
+         
+ };
 
 
 
