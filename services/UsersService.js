@@ -280,7 +280,7 @@ var updateIsRegister = function(user_id){
 
 
 
-exports.uploadImageToDatabase = function (user_id, imgObject) {
+/*exports.uploadImageToDatabase = function (user_id, imgObject) {
     //var deferred = Q.defer();
      for(var i=0; i< imgObject.length; i++){
          models.UploadImgs.create({
@@ -292,7 +292,24 @@ exports.uploadImageToDatabase = function (user_id, imgObject) {
      console.log(imgObject);
      return  imgObject;
          
- };
+ }; */
+
+ exports.uploadImageToDatabase = function (user_id, imgObject) {
+    var deferred = Q.defer();
+    imgObject.forEach(function (image, index) {
+        models.UploadImgs.create({
+            user_id: user_id,
+            image: image.path,
+            is_deleted: 0
+        }).then(function (data) {
+            deferred.resolve(data);
+        }, function (err) {
+            deferred.reject(err)
+        });
+ })
+    return deferred.promise;
+}
+
 
 
 

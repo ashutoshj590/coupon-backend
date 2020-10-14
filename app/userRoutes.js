@@ -106,10 +106,16 @@ router.post('/update-register-merchant', [jsonParser, util.hasJsonParam(["user_i
 
 /* API for  upload images for merchant registration.............*/
 router.post('/uplaod-image',upload.array('images', 5), function (req, res) {
-    userService.uploadImageToDatabase(req.body.user_id, req.files);
+            userService.uploadImageToDatabase(req.body.user_id, req.files).then(function (result) {
             var response = util.getResponseObject(consts.RESPONSE_SUCCESS);
-            res.send(response);
-        if (err) {
+            userService.getAllImages(req.body.user_id).then(function(data){
+                response.imageData = data;
+                res.send(response);
+            }, function(err){
+                var response = util.getResponseObject(consts.RESPONSE_ERROR, err);
+                res.send(response);
+            }); 
+        }, function (err) {
             if(err.errors !== undefined && err.errors[0] !== undefined ){
                 var response = util.getResponseObject(consts.RESPONSE_ERROR, err.response);
                 res.send(response);
@@ -118,8 +124,7 @@ router.post('/uplaod-image',upload.array('images', 5), function (req, res) {
             }
             res.send(response);
         }
-      
-        
+    );
 });
 
 /* API for  upload images for merchant registration.............*/
