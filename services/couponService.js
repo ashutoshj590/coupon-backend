@@ -544,3 +544,23 @@ var countsForUsed = function(consumer_id){
     );
     return deferred.promise;
 };
+
+
+exports.getAllUsedCoupons = function(consumer_id){
+    var deferred = Q.defer();
+    var replacements = {consumer_id : consumer_id};
+
+    var query = 'select Coupons.id as coupon_id,Coupons.user_id as merchant_id,Coupons.coupon_type,Coupons.days,Coupons.start_time,Coupons.end_time,' +
+                'Coupons.expiry_date,Coupons.description,Coupons.restriction,Coupons.short_name,Coupons.coupon_code' + 
+                ' from Coupons left join UsedCoupons on Coupons.coupon_code=UsedCoupons.coupon_code where UsedCoupons.consumer_id=:consumer_id';
+    
+
+    models.sequelize.query(query,
+        { replacements: replacements, type: models.sequelize.QueryTypes.SELECT }
+    ).then(function(usedCounts) {
+        deferred.resolve(usedCounts);
+
+        }
+    );
+    return deferred.promise;
+};
