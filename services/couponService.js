@@ -244,7 +244,7 @@ var findUsedCoupons = function(merchant_id, coupon_id){
                 "merchant_id": merchant_id,
                 "coupon_id": coupon_id
     };
-    models.UsedCoupons.findAll({
+    models.UsedCoupons.findOne({
       where: cond
     }).then(function (result) {
             deferred.resolve(result);
@@ -403,50 +403,94 @@ var countsForRequests = function(merchant_id){
 };
 
 
-exports.addToFavourite = function(consumer_id, merchant_id, coupon_id){
+
+/*  Function for favourite and unfavourite merchants .............. */
+exports.addToFavourite = function(consumer_id, merchant_id){
     var deferred = Q.defer();
-    models.FavCoupons.create({
-        consumer_id: consumer_id,
-        merchant_id: merchant_id,
-        coupon_id: coupon_id,
-        is_fav: 1
-        
-    }).then(function(requestAccpeted) {
-        deferred.resolve(requestAccpeted);
-    },function(err){
-        deferred.reject(err)
-    });
+    findFavMerchant(consumer_id, merchant_id).then(function(foundData) {
+        if (foundData != null || undefined){
+            if (foundData.dataValues.consumer_id == consumer_id && foundData.dataValues.merchant_id == merchant_id && foundData.dataValues.is_fav == 1) {
+                models.FavMerchants.update({
+                    is_fav: 0
+                },{
+                    where: {
+                        consumer_id: consumer_id,
+                        merchant_id: merchant_id
+                    }
+                }).then(function(added) {
+                    deferred.resolve(added);
+                },function(err){
+                    deferred.reject(err)
+                });
+            } else if (foundData.dataValues.consumer_id == consumer_id && foundData.dataValues.merchant_id == merchant_id && foundData.dataValues.is_fav == 0) {
+                models.FavMerchants.update({
+                    is_fav: 1
+                },{
+                    where: {
+                        consumer_id: consumer_id,
+                        merchant_id: merchant_id
+                    }
+                }).then(function(added) {
+                    deferred.resolve(added);
+                },function(err){
+                    deferred.reject(err)
+                });
+
+            }
+         } else { 
+            models.FavMerchants.create({
+                consumer_id: consumer_id,
+                merchant_id: merchant_id,
+                is_fav: 1
+                
+            }).then(function(added) {
+                deferred.resolve(added);
+            },function(err){
+                deferred.reject(err)
+            });
+        }
+},function(err){
+    deferred.reject(err)
+});
     return deferred.promise;
 };
 
 
-exports.changeStatusForUnFav = function(consumer_id, coupon_id){
+
+
+
+var findFavMerchant = function(consumer_id, merchant_id){
     var deferred = Q.defer();
-        models.FavCoupons.update({
-            is_fav: 0
-        },{
-            where: {
-                consumer_id: consumer_id,
-                coupon_id: coupon_id
-            }
-        }).then(function(statusUpdated){
-            deferred.resolve(statusUpdated);
-        },
-        function (err) {
-            deferred.reject(err);
+    var cond={
+                "consumer_id": consumer_id,
+                "merchant_id": merchant_id,
+               
+    };
+    models.FavMerchants.findOne({
+      where: cond
+    }).then(function (result) {
+            deferred.resolve(result);
+        },function (err) {
+          deferred.reject(err);
         }
     );
     return deferred.promise;
-
 };
 
 
-exports.getAllFavouriteCoupons = function(consumer_id){
+
+
+
+
+
+exports.getAllFavouriteMerchaants = function(consumer_id){
     var deferred = Q.defer();
     var replacements = {consumer_id : consumer_id};
 
-    var query = 'SELECT * from Coupons LEFT JOIN FavCoupons on Coupons.id=FavCoupons.coupon_id WHERE FavCoupons.is_fav=1 ' +
-                'and FavCoupons.consumer_id=:consumer_id';
+    var query = 'SELECT Registrations.user_id as user_id, Registrations.address,Registrations.city,Registrations.state,Registrations.zipcode,Registrations.business_name,Registrations.tagline,Registrations.website,' +
+                'Registrations.phone_no,Registrations.business_license_no,Registrations.description,Registrations.opening_time,Registrations.closing_time,Registrations.lat,Registrations.lang from Registrations' +
+                ' LEFT JOIN FavMerchants on Registrations.user_id=FavMerchants.merchant_id WHERE FavMerchants.is_fav=1 ' +
+                'and FavMerchants.consumer_id=:consumer_id';
 
     models.sequelize.query(query,
         { replacements: replacements, type: models.sequelize.QueryTypes.SELECT }
@@ -454,6 +498,48 @@ exports.getAllFavouriteCoupons = function(consumer_id){
         deferred.resolve(allCoupons);
         },function (err) {
           deferred.reject(err);
+        }
+    );
+    return deferred.promise;
+};
+
+
+
+
+exports.getAllCountsForConsumerCoupons = function(consumer_id){
+    var deferred = Q.defer();
+    var replacements = {consumer_id : consumer_id};
+
+    var query = 'select COUNT(*) as requested from Requests WHERE consumer_id=:consumer_id';
+
+    models.sequelize.query(query,
+        { replacements: replacements, type: models.sequelize.QueryTypes.SELECT }
+    ).then(function(requestedCounts) {
+        var object = {};
+        countsForUsed(consumer_id).then(function(Counts) {
+            object.requested = requestedCounts[0];
+            object.used = Counts[0];
+            deferred.resolve(object);
+            },function(err){
+                deferred.reject(err)
+            });
+        }
+    );
+    return deferred.promise;
+};
+
+
+var countsForUsed = function(consumer_id){
+    var deferred = Q.defer();
+    var replacements = {consumer_id : consumer_id};
+
+    var query = 'select COUNT(*) as used from AcceptRequests WHERE consumer_id=:consumer_id';
+
+    models.sequelize.query(query,
+        { replacements: replacements, type: models.sequelize.QueryTypes.SELECT }
+    ).then(function(usedCounts) {
+        deferred.resolve(usedCounts);
+
         }
     );
     return deferred.promise;

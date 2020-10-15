@@ -1,7 +1,7 @@
 'use strict';
 module.exports = {
   up: async (queryInterface, Sequelize) => {
-    await queryInterface.createTable('FavCoupons', {
+    await queryInterface.createTable('FavMerchants', {
       id: {
         allowNull: false,
         autoIncrement: true,
@@ -12,9 +12,6 @@ module.exports = {
         type: Sequelize.INTEGER
       },
       merchant_id: {
-        type: Sequelize.INTEGER
-      },
-      coupon_id: {
         type: Sequelize.INTEGER
       },
       is_fav: {
@@ -31,6 +28,6 @@ module.exports = {
     });
   },
   down: async (queryInterface, Sequelize) => {
-    await queryInterface.dropTable('FavCoupons');
+    await queryInterface.dropTable('FavMerchants');
   }
 };

@@ -258,9 +258,28 @@ router.post('/merchant-reports',[jsonParser,util.hasJsonParam(["merchant_id"])],
     });
 
 
+router.post('/consumer-reports',[jsonParser,util.hasJsonParam(["consumer_id"])], function (req, res) { 
+    couponService.getAllCountsForConsumerCoupons(req.body.consumer_id).then(function (result) {
+                var response = util.getResponseObject(consts.RESPONSE_SUCCESS);
+                response.Detail = result;
+                res.send(response);
+            }, function (err) {
+                if(err.errors !== undefined && err.errors[0] !== undefined ){
+                    var response = util.getResponseObject(consts.RESPONSE_ERROR, err.response);
+                    res.send(response);
+                }else{
+                    var response = util.getResponseObject(consts.RESPONSE_ERROR, err.response);
+                }
+                res.send(response);
+            }
+        );
+    });
 
-router.post('/add-to-favourite',[jsonParser,util.hasJsonParam(["consumer_id","merchant_id","coupon_id"])], function (req, res) { 
-    couponService.addToFavourite(req.body.consumer_id,req.body.merchant_id,req.body.coupon_id).then(function (added) {
+    
+
+
+router.post('/add-to-favourite',[jsonParser,util.hasJsonParam(["consumer_id","merchant_id"])], function (req, res) { 
+    couponService.addToFavourite(req.body.consumer_id,req.body.merchant_id).then(function (added) {
                 var response = util.getResponseObject(consts.RESPONSE_SUCCESS);
                 res.send(response);
             }, function (err) {
@@ -277,7 +296,7 @@ router.post('/add-to-favourite',[jsonParser,util.hasJsonParam(["consumer_id","me
 
 
 router.post('/get-favourite-list',[jsonParser,util.hasJsonParam(["consumer_id"])], function (req, res) { 
-    couponService.getAllFavouriteCoupons(req.body.consumer_id).then(function (detail) {
+    couponService.getAllFavouriteMerchaants(req.body.consumer_id).then(function (detail) {
                 var response = util.getResponseObject(consts.RESPONSE_SUCCESS);
                 response.coupon_detail = detail;
                 res.send(response);
@@ -292,7 +311,7 @@ router.post('/get-favourite-list',[jsonParser,util.hasJsonParam(["consumer_id"])
                 res.send(response);
             }
         );
-    });
+});
 
 
 
