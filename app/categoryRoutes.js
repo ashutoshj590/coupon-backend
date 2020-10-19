@@ -8,6 +8,19 @@ var jsonParser = bodyParser.json({limit: '10mb'});
 var sessionTime = 1 * 60 *  60 * 1000;       //1 hour session
 const jwt = require('jsonwebtoken');
 
+var multer = require('multer');
+
+var storage = multer.diskStorage({
+    destination: function(req, file, cb) {
+        cb(null, 'public/images/uploaded_images/')
+    },
+    filename: function(req, file, cb) {
+        cb(null, file.originalname)
+    }
+})
+
+var upload = multer({storage: storage})
+
 
 
 /* API for  Add new Category.............*/
@@ -74,8 +87,8 @@ categoryService.changeStatustoCategory(req.body.category_id).then(function (stat
 
 
 /* API for  Add new Sub Category.............*/
-router.post('/add-sub-category', [jsonParser, util.hasJsonParam(["category_id","name"])], function (req, res) {
-    categoryService.createSubCategory(req.body.category_id, req.body.name, req.body.img_url, req.body.status).then(function (subCategories) {
+router.post('/add-sub-category', upload.single('subcateimg'), function (req, res) {
+    categoryService.createSubCategory(req.body.category_id, req.body.name, req.file).then(function (subCategories) {
             var response = util.getResponseObject(consts.RESPONSE_SUCCESS);
             response.subCategories = subCategories;
             res.send(response);

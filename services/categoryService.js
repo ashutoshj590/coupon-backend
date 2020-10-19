@@ -83,13 +83,13 @@ exports.changeStatustoCategory = function(category_id){
 /*
 *   Function for Add new Sub Category..................
 */
-exports.createSubCategory = function(category_id, name, imgUrl, status){
+exports.createSubCategory = function(category_id, name, imgUrl){
     var deferred = Q.defer();
     models.SubCategory.create({
         category_id: category_id,
         name: name,
-        img_url: imgUrl,
-        status: status,
+        img_url: imgUrl.path,
+        status: 1,
         is_deleted: 0
 
     }).then(function(subCategory) {
