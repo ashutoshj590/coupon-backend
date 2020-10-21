@@ -14,6 +14,7 @@ let fbServices = require('./fbServices');
 let responseConstants = require('../constants/responseConst');
 let constants = require('../lib/consts');
 var uniqid = require('uniqid');
+var userService = require('../services/UsersService.js');
 
 
 
@@ -204,52 +205,41 @@ exports.getAllRequestForConsumer = function(consumer_id){
 
 exports.getMerchantDetailbySubCateId = function(sub_category_id){
     var deferred = Q.defer();
+    var data = [];
     var replacements = {sub_category_id : sub_category_id};
-    var query = 'select Registrations.user_id as user_id, Registrations.address,Registrations.city,Registrations.state,Registrations.zipcode,Registrations.business_name,Registrations.tagline,Registrations.website,' +
-                ' Registrations.phone_no,Registrations.business_license_no,Registrations.description,Registrations.opening_time,Registrations.closing_time,Registrations.lat,Registrations.lang' +
-                ' from UserSubCateMaps LEFT JOIN Registrations ON Registrations.user_id=UserSubCateMaps.user_id WHERE UserSubCateMaps.sub_category_id=:sub_category_id;'
+    var query = 'SELECT Registrations.*, MAX(UserSubCateMaps.createdAt) as sub_cat_created , GROUP_CONCAT(UploadImgs.image ORDER BY UploadImgs.image) AS images ' +
+                'FROM UserSubCateMaps LEFT JOIN Registrations ON Registrations.user_id = UserSubCateMaps.user_id LEFT JOIN UploadImgs ON UploadImgs.user_id = Registrations.user_id ' +
+                 'WHERE UserSubCateMaps.sub_category_id=:sub_category_id GROUP BY Registrations.id';
+
     models.sequelize.query(query,
         { replacements: replacements, type: models.sequelize.QueryTypes.SELECT }
-    ).then(function(result) {
-        deferred.resolve(result);
-
-        }
-    );
-    return deferred.promise;
-};
-
-
-//"select * from UserSubCateMaps LEFT JOIN Registrations ON Registrations.user_id=UserSubCateMaps.user_id where UserSubCateMaps.sub_category_id=1;"
-
-exports.getAllcouponByUserId = function(user_id){
-    var deferred = Q.defer();
-    var cond={"is_deleted":0,
-                "user_id": user_id
-};
-    models.Coupons.findAll({
-      where: cond
-    }).then(function (allCoupons) {
-        deferred.resolve(allCoupons);
-        },function (err) {
-          deferred.reject(err);
-        }
-    );
-    return deferred.promise;
-};
-
-
-var findUsedCoupons = function(merchant_id, coupon_id){
-    var deferred = Q.defer();
-    var cond={
-                "merchant_id": merchant_id,
-                "coupon_id": coupon_id
-    };
-    models.UsedCoupons.findOne({
-      where: cond
-    }).then(function (result) {
+        ).then(function(result) {
             deferred.resolve(result);
-        },function (err) {
-          deferred.reject(err);
+    
+            }
+        );
+        return deferred.promise;
+    };
+    
+
+
+
+
+
+exports.getAllcouponByUserId = function(merchant_id, consumer_id){
+    var deferred = Q.defer();
+    var replacements = {merchant_id : merchant_id, consumer_id : consumer_id};
+
+    var query = 'SELECT Coupons.id as coupon_id,Coupons.user_id as merchant_id,Coupons.coupon_type,Coupons.days,Coupons.start_time,Coupons.end_time,' +
+                'Coupons.expiry_date,Coupons.flash_deal,Coupons.description,Coupons.restriction,Coupons.short_name,Coupons.coupon_code FROM Coupons WHERE NOT EXISTS' +
+                ' ( SELECT * FROM UsedCoupons WHERE Coupons.coupon_code=UsedCoupons.coupon_code AND ' +
+                'UsedCoupons.consumer_id=:consumer_id ) AND Coupons.user_id=:merchant_id ORDER BY Coupons.coupon_code ASC';
+
+    models.sequelize.query(query,
+        { replacements: replacements, type: models.sequelize.QueryTypes.SELECT }
+    ).then(function(data) {
+        deferred.resolve(data);
+
         }
     );
     return deferred.promise;

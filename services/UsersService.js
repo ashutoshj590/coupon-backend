@@ -351,7 +351,7 @@ exports.getMerchantDetail = function(user_id){
 exports.getAllImages = function(user_id){
     var deferred = Q.defer();
     models.UploadImgs.findAll({
-        attributes: ['id','image'], 
+        attributes: ['id','image','user_id'], 
         where: {
             user_id: user_id,
             is_deleted: 0
@@ -382,6 +382,34 @@ exports.addUserFeedback = function(user_id,feedback){
     return deferred.promise;
 }
 
+
+exports.saveOTPForUser = function(user_id, type, email, user_type){
+    var deferred = Q.defer();
+    if(user_id === undefined){
+        findUserByEmailAndType(email, user_type).then(function(user){
+            if(user == null){
+                deferred.reject("No user found with given email id.");
+            }else {
+                saveOTPInRedis(user.id, type, email, function (result, err) {
+                    if (err)
+                        deferred.reject(err);
+                    else
+                        deferred.resolve(result);
+                })
+            }
+        }, function(err){
+            deferred.reject(err);
+        })
+    }else{
+        saveOTPInRedis(user_id, type, email, function(result, err){
+            if(err)
+                deferred.reject(err);
+            else
+                deferred.resolve(result);
+        })
+    }
+    return deferred.promise;
+};
 
 
 

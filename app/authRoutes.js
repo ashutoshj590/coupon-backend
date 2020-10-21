@@ -78,7 +78,25 @@ router.post('/login', [util.hasJsonParam(["email", "password", "type", "device_t
 }); 
 
 
-
+/*router.post('/forgot-password', [jsonParser, util.hasJsonParam(["email"])], function (req, res) {
+    if(email == undefined || null){
+        var response = util.getResponseObject(consts.RESPONSE_ERROR, "Missing email");
+        res.send(response);
+    }else {
+        userService.saveOTPForUser(consts.OTP_TYPE['forgot_password'], req.body.email).then(function (result) {
+            var response = util.getResponseObject(consts.RESPONSE_SUCCESS);
+            res.send(response);
+        }, function(err){
+            if (err.errors !== undefined && err.errors[0] !== undefined) {
+                var response = util.getResponseObject(consts.RESPONSE_ERROR, err.errors[0].message);
+                res.send(response);
+            } else {
+                var response = util.getResponseObject(consts.RESPONSE_ERROR, err);
+            }
+            res.send(response);
+        })
+    }
+}); */
   
 
 

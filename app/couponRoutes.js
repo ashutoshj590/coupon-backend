@@ -7,7 +7,6 @@ var consts = require('../lib/consts.js');
 var jsonParser = bodyParser.json({limit: '10mb'});
 var sessionTime = 1 * 60 *  60 * 1000;       //1 hour session
 const jwt = require('jsonwebtoken');
-var userService = require('../services/UsersService.js');
 
 
 
@@ -168,25 +167,8 @@ router.post('/get-request-consumer',[jsonParser,util.hasJsonParam(["consumer_id"
 router.post('/get-merchant-by-category',[jsonParser,util.hasJsonParam(["sub_category_id"])], function (req, res) { 
     couponService.getMerchantDetailbySubCateId(req.body.sub_category_id).then(function (detail) {
                 var response = util.getResponseObject(consts.RESPONSE_SUCCESS);
-                var imageData;
-              detail.forEach(function (ids, index) {
-                userService.getAllImages(ids.user_id).then(function(images) {
-                    images.forEach(function (image, index) {
-                        console.log("///////////");
-                        console.log(image.dataValues);
-                        imageData = image.dataValues;
-                    })
-                },function(err){
-                    deferred.reject(err)
-                    });
-
-                })
-                response.image_data = imageData
                 response.merchant_detail = detail;
-                response.merchant_counts = detail.length;
                 res.send(response);
-
-            
             }, function (err) {
                 if(err.errors !== undefined && err.errors[0] !== undefined ){
                     var response = util.getResponseObject(consts.RESPONSE_ERROR, err.response);
@@ -200,8 +182,8 @@ router.post('/get-merchant-by-category',[jsonParser,util.hasJsonParam(["sub_cate
     });
 
 
-    router.post('/get-coupons-by-id',[jsonParser,util.hasJsonParam(["user_id"])], function (req, res) { 
-        couponService.getAllcouponByUserId(req.body.user_id).then(function (detail) {
+    router.post('/get-coupons-by-id',[jsonParser,util.hasJsonParam(["merchant_id","consumer_id"])], function (req, res) { 
+        couponService.getAllcouponByUserId(req.body.merchant_id, req.body.consumer_id).then(function (detail) {
                     var response = util.getResponseObject(consts.RESPONSE_SUCCESS);
                    response.coupon_detail = detail;
                    res.send(response);

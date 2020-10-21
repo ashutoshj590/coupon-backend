@@ -133,7 +133,31 @@ exports.getAllcategoryData = function(){
     models.sequelize.query(query,
         { replacements: replacements, type: models.sequelize.QueryTypes.SELECT }
     ).then(function(result) {
-            deferred.resolve(result);
+        result.forEach(function(ids, index){
+            console.log(ids.id)
+            countsForMerchant(ids.id).then(function(countResult) {
+            console.log(countResult);
+                deferred.resolve(result);
+
+        },function(err){
+            deferred.reject(err)
+            });
+
+        })
+        }
+    );
+    return deferred.promise;
+};
+
+
+var countsForMerchant = function(sub_category_id){
+    var deferred = Q.defer();
+    var replacements = {sub_category_id : sub_category_id};
+    var query = 'select COUNT(*) as merchant_count from UserSubCateMaps where sub_category_id=:sub_category_id';
+    models.sequelize.query(query,
+        { replacements: replacements, type: models.sequelize.QueryTypes.SELECT }
+    ).then(function(counts) {
+            deferred.resolve(counts);
         }
     );
     return deferred.promise;
