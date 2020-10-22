@@ -6,6 +6,8 @@ var sessionTime = 1 * 60 * 60 * 1000;       //1 hour session
 var consts = require('../lib/consts.js');
 var session = require('express-session');
 const jwt = require('jsonwebtoken');
+var bodyParser = require('body-parser');
+var jsonParser = bodyParser.json({limit: '10mb'});
 
 /* API funcation for crearte new user sign up..................*/
 
@@ -78,12 +80,13 @@ router.post('/login', [util.hasJsonParam(["email", "password", "type", "device_t
 }); 
 
 
-/*router.post('/forgot-password', [jsonParser, util.hasJsonParam(["email"])], function (req, res) {
+router.post('/forgot-password', [jsonParser, util.hasJsonParam(["email","user_type"])], function (req, res) {
+    var email = req.body.email;
     if(email == undefined || null){
         var response = util.getResponseObject(consts.RESPONSE_ERROR, "Missing email");
         res.send(response);
     }else {
-        userService.saveOTPForUser(consts.OTP_TYPE['forgot_password'], req.body.email).then(function (result) {
+        userService.saveOTPForUser(consts.OTP_TYPE['forgot_password'], req.body.email, req.body.user_type).then(function (result) {
             var response = util.getResponseObject(consts.RESPONSE_SUCCESS);
             res.send(response);
         }, function(err){
@@ -96,7 +99,7 @@ router.post('/login', [util.hasJsonParam(["email", "password", "type", "device_t
             res.send(response);
         })
     }
-}); */
+});
   
 
 

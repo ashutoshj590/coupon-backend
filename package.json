@@ -4,7 +4,7 @@
   "description": "My coupon app",
   "main": "server.js",
   "dependencies": {
-    "aws-sdk": "^2.170.0",
+    "aws-sdk": "^2.775.0",
     "bcrypt": "^5.0.0",
     "body-parser": "^1.15.0",
     "cluster": "^0.7.7",

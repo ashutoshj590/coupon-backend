@@ -1,6 +1,6 @@
 var models = require('../models/index.js');
 var util = require('../lib/Utils.js');
-//var redis = require('../lib/redis.js');
+var redis = require('../lib/redis.js');
 var Q = require('q');
 var consts = require('../lib/consts.js');
 var config = consts.parsedConfig;
@@ -14,6 +14,7 @@ let responseConstants = require('../constants/responseConst');
 let constants = require('../lib/consts');
 var bcrypt = require('bcrypt');
 const { response } = require('express');
+var aws = require('../lib/aws.js');
 
 
 /*
@@ -383,14 +384,14 @@ exports.addUserFeedback = function(user_id,feedback){
 }
 
 
-exports.saveOTPForUser = function(user_id, type, email, user_type){
+
+exports.saveOTPForUser = function(type, email, user_type){
     var deferred = Q.defer();
-    if(user_id === undefined){
-        findUserByEmailAndType(email, user_type).then(function(user){
+    userDOA.findUserByEmailAndType(email,user_type).then(function(user){
             if(user == null){
                 deferred.reject("No user found with given email id.");
             }else {
-                saveOTPInRedis(user.id, type, email, function (result, err) {
+                saveOTPInRedis(type, email, function (result, err) {
                     if (err)
                         deferred.reject(err);
                     else
@@ -400,16 +401,26 @@ exports.saveOTPForUser = function(user_id, type, email, user_type){
         }, function(err){
             deferred.reject(err);
         })
-    }else{
-        saveOTPInRedis(user_id, type, email, function(result, err){
-            if(err)
-                deferred.reject(err);
-            else
-                deferred.resolve(result);
-        })
-    }
+   
     return deferred.promise;
 };
+
+
+
+var saveOTPInRedis = function(type, email, callback){
+    var key = type.key_name+"_";
+    var otp = Math.floor(100000 + Math.random() * 900000);
+    redis.setKeyVal(key, otp, type.ttl, function(){
+        var emailText = consts.VERIFY_EMAIL_TEXT.replace("VAR_OTP", otp+"");
+        aws.sendEmail(email, "coupon app OTP", 'verify_otp.html', {'OTP':otp}).then(function(result){
+            callback(result, null);
+        }, function(err){
+            util.logger("Unable to save OTP in redis for user: "+email,'err');
+            util.logger(err,'err');
+            callback(null, err);
+        });
+    })
+}
 
 
 
