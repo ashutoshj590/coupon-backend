@@ -16,7 +16,7 @@ var bcrypt = require('bcrypt');
 const { response } = require('express');
 var aws = require('../lib/aws.js');
 const nodemailer = require('nodemailer');
-
+require('dotenv').config();
 
 /*
  * Find a user by email. If does not exist, then create one.
@@ -391,8 +391,8 @@ exports.addUserFeedback = function(user_id,feedback){
 let transporter = nodemailer.createTransport({
     service: 'gmail',
     auth: {
-        user: 'bdappashu123@gmail.com',
-        pass: 'joshiashu4504'
+        user: process.env.EMAIL,
+        pass: process.env.PASSWORD
     }
 
 });
