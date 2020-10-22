@@ -37,7 +37,7 @@
     "mysql2": "^1.5.1",
     "neo4j": "^2.0.0-RC2",
     "node-deployment": "^1.0.1",
-    "nodemailer": "^6.4.12",
+    "nodemailer": "^6.4.14",
     "nodemailer-sendgrid-transport": "^0.2.0",
     "passport": "^0.4.1",
     "passport-http-bearer": "^1.0.1",

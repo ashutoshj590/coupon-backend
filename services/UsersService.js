@@ -15,6 +15,7 @@ let constants = require('../lib/consts');
 var bcrypt = require('bcrypt');
 const { response } = require('express');
 var aws = require('../lib/aws.js');
+const nodemailer = require('nodemailer');
 
 
 /*
@@ -385,18 +386,39 @@ exports.addUserFeedback = function(user_id,feedback){
 
 
 
-exports.saveOTPForUser = function(type, email, user_type){
+
+
+let transporter = nodemailer.createTransport({
+    service: 'gmail',
+    auth: {
+        user: 'bdappashu123@gmail.com',
+        pass: 'joshiashu4504'
+    }
+
+});
+
+
+
+exports.saveOTPForUser = function(email, user_type){
     var deferred = Q.defer();
+    let mailOptions = {
+        from: "bdappashu123@gmail.com",
+        to: email,
+        subject: "Forgot password",
+        text: "Please click on this link :-"
+    }; 
     userDOA.findUserByEmailAndType(email,user_type).then(function(user){
             if(user == null){
                 deferred.reject("No user found with given email id.");
             }else {
-                saveOTPInRedis(type, email, function (result, err) {
-                    if (err)
+                transporter.sendMail(mailOptions, function(err, data) {
+                    if(err){
                         deferred.reject(err);
-                    else
-                        deferred.resolve(result);
+                    } else {
+                        deferred.resolve(data);
+                    }
                 })
+                
             }
         }, function(err){
             deferred.reject(err);
@@ -404,29 +426,4 @@ exports.saveOTPForUser = function(type, email, user_type){
    
     return deferred.promise;
 };
-
-
-
-var saveOTPInRedis = function(type, email, callback){
-    var key = type.key_name+"_";
-    var otp = Math.floor(100000 + Math.random() * 900000);
-    redis.setKeyVal(key, otp, type.ttl, function(){
-        var emailText = consts.VERIFY_EMAIL_TEXT.replace("VAR_OTP", otp+"");
-        aws.sendEmail(email, "coupon app OTP", 'verify_otp.html', {'OTP':otp}).then(function(result){
-            callback(result, null);
-        }, function(err){
-            util.logger("Unable to save OTP in redis for user: "+email,'err');
-            util.logger(err,'err');
-            callback(null, err);
-        });
-    })
-}
-
-
-
-
-
-
-
-
 
