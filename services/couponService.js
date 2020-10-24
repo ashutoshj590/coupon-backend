@@ -21,10 +21,15 @@ var userService = require('../services/UsersService.js');
 /*
 *   Function for create coupon .................
 */
-exports.createCouponForMerchant = function(user_id,coupon_type,days,start_time,end_time,expiry_date,flash_deal,description,restriction, shortName){
+exports.createCouponForMerchant = function(user_id,coupon_type,days,start_time,end_time,expiry_date,flash_deal,description,restriction, shortName, consumerId){
     var deferred = Q.defer();
-
     var couponCode = uniqid('COUPON','CODE')
+    var consumerIdValue;
+    if (coupon_type == "custom"){
+        consumerIdValue = consumerId;
+    } else {
+        consumerIdValue =  null;
+    }
     models.Coupons.create({
         user_id: user_id,
         coupon_type: coupon_type,
@@ -37,7 +42,8 @@ exports.createCouponForMerchant = function(user_id,coupon_type,days,start_time,e
         restriction: restriction,
         is_deleted: 0,
         short_name: shortName,
-        coupon_code: couponCode
+        coupon_code: couponCode,
+        consumer_id: consumerIdValue
     }).then(function(couponDetail) {
         deferred.resolve(couponDetail);
     },function(err){
@@ -114,6 +120,25 @@ exports.getAllcoupon = function(){
     return deferred.promise;
 };
 
+
+/*
+* Fuction define for get All custom coupons for consumer
+*/
+exports.getAllCustomCuponsForConsumer = function(consumer_id){
+    var deferred = Q.defer();
+    var cond={"is_deleted":0,
+                "consumer_id":consumer_id
+    };
+    models.Coupons.findAll({
+      where: cond
+    }).then(function (allCustomCoupons) {
+            deferred.resolve(allCustomCoupons);
+        },function (err) {
+          deferred.reject(err);
+        }
+    );
+    return deferred.promise;
+};
 
 /*
 *   Function for create request .................

@@ -13,7 +13,7 @@ const jwt = require('jsonwebtoken');
 /* APi For create coupon..................*/
 
 router.post('/create-coupon', [jsonParser, util.hasJsonParam(["user_id","coupon_type","days","start_time","expiry_date",])], function (req, res) {
-    couponService.createCouponForMerchant(req.body.user_id,req.body.coupon_type,req.body.days,req.body.start_time,req.body.end_time,req.body.expiry_date,req.body.flash_deal,req.body.description,req.body.restriction,req.body.short_name).then(function (coupon) {
+    couponService.createCouponForMerchant(req.body.user_id,req.body.coupon_type,req.body.days,req.body.start_time,req.body.end_time,req.body.expiry_date,req.body.flash_deal,req.body.description,req.body.restriction,req.body.short_name,req.body.consumer_id).then(function (coupon) {
             var response = util.getResponseObject(consts.RESPONSE_SUCCESS);
             response.coupon_detail = coupon;
             res.send(response);
@@ -199,7 +199,26 @@ router.post('/get-merchant-by-category',[jsonParser,util.hasJsonParam(["sub_cate
                 }
             );
         });
-    
+
+
+
+router.post('/get-custom-coupons',[jsonParser,util.hasJsonParam(["consumer_id"])], function (req, res) { 
+    couponService.getAllCustomCuponsForConsumer(req.body.consumer_id).then(function (detail) {
+                var response = util.getResponseObject(consts.RESPONSE_SUCCESS);
+                response.coupon_detail = detail;
+                res.send(response);
+            
+            }, function (err) {
+                if(err.errors !== undefined && err.errors[0] !== undefined ){
+                    var response = util.getResponseObject(consts.RESPONSE_ERROR, err.response);
+                    res.send(response);
+                }else{
+                    var response = util.getResponseObject(consts.RESPONSE_ERROR, err.response);
+                }
+                res.send(response);
+            }
+        );
+});    
 
 
 
