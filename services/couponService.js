@@ -21,14 +21,17 @@ var userService = require('../services/UsersService.js');
 /*
 *   Function for create coupon .................
 */
-exports.createCouponForMerchant = function(user_id,coupon_type,days,start_time,end_time,expiry_date,flash_deal,description,restriction, shortName, consumerId){
+var createCouponForMerchant = exports.createCouponForMerchant = function(user_id,coupon_type,days,start_time,end_time,expiry_date,flash_deal,description,restriction, shortName, consumerId){
     var deferred = Q.defer();
     var couponCode = uniqid('COUPON','CODE')
     var consumerIdValue;
+    var pendingValue;
     if (coupon_type == "custom"){
         consumerIdValue = consumerId;
+        pendingValue = "pending";
     } else {
         consumerIdValue =  null;
+        pendingValue = null;
     }
     models.Coupons.create({
         user_id: user_id,
@@ -43,7 +46,8 @@ exports.createCouponForMerchant = function(user_id,coupon_type,days,start_time,e
         is_deleted: 0,
         short_name: shortName,
         coupon_code: couponCode,
-        consumer_id: consumerIdValue
+        consumer_id: consumerIdValue,
+        status: pendingValue
     }).then(function(couponDetail) {
         deferred.resolve(couponDetail);
     },function(err){
@@ -55,7 +59,7 @@ exports.createCouponForMerchant = function(user_id,coupon_type,days,start_time,e
 /*
 *   Function for Update coupon .................
 */
-exports.updateCouponForMerchant = function(user_id,coupon_id,coupon_type,days,start_time,end_time,expiry_date,flash_deal,description,restriction,shortName){
+var updateCouponForMerchant = exports.updateCouponForMerchant = function(user_id,coupon_id,coupon_type,days,start_time,end_time,expiry_date,flash_deal,description,restriction,shortName,consumerId,status){
     var deferred = Q.defer();
     models.Coupons.update({
         coupon_type: coupon_type,
@@ -66,7 +70,9 @@ exports.updateCouponForMerchant = function(user_id,coupon_id,coupon_type,days,st
         flash_deal: flash_deal,
         description: description,
         restriction: restriction,
-        short_name: shortName
+        short_name: shortName,
+        consumer_id: consumerId,
+        status: status
      } ,  {
             where:{
                 id: coupon_id,
@@ -155,11 +161,44 @@ exports.addRequestForMerchant = function(consumer_id, merchant_id, sub_category_
         is_deleted: 0
         
     }).then(function(requestDetail) {
-        deferred.resolve(requestDetail);
+        var obj = {};
+        createCouponForMerchant(merchant_id,"custom",null,null,null,null,null,null,null,null,consumer_id).then(function(result) {
+            console.log(result.id);
+            obj.detail = requestDetail;
+            obj.coupon_id = result.id;
+            addCouponIdtoRequest(requestDetail.id,result.id).then(function(update) {
+            deferred.resolve(obj);
+        },function(err){
+            deferred.reject(err)
+            });
+        },function(err){
+            deferred.reject(err)
+            });
     },function(err){
         deferred.reject(err)
     });
     return deferred.promise;
+};
+
+
+
+var addCouponIdtoRequest = function(request_id,coupon_id){
+    var deferred = Q.defer();
+        models.Requests.update({
+            coupon_id: coupon_id
+        },{
+            where: {
+            id: request_id
+            }
+        }).then(function(statusUpdated){
+            deferred.resolve(statusUpdated);
+        },
+        function (err) {
+            deferred.reject(err);
+        }
+    );
+    return deferred.promise;
+
 };
 
 
@@ -171,7 +210,7 @@ exports.getAllRequestForMerchant = function(merchant_id){
     var deferred = Q.defer();
     var replacements = {merchant_id : merchant_id};
     var query = 'select Requests.id as request_id,Requests.consumer_id,Requests.merchant_id,Requests.sub_category_id,Requests.detail,' +
-                'Requests.date,Requests.time,Users.email from Requests LEFT JOIN Users on Requests.consumer_id=Users.id where Requests.merchant_id=:merchant_id';
+                'Requests.date,Requests.time,Requests.coupon_id,Users.email from Requests LEFT JOIN Users on Requests.consumer_id=Users.id  where Requests.merchant_id=:merchant_id';
     
     models.sequelize.query(query,
         { replacements: replacements, type: models.sequelize.QueryTypes.SELECT }
@@ -308,15 +347,26 @@ exports.addUsedCoupontoDatabase = function(consumer_id, merchant_id, coupon_code
 };
 
 
-exports.acceptRequestFunction = function(consumer_id, merchant_id, request_id){
+exports.acceptRequestFunction = function(consumer_id, merchant_id, request_id, is_accepted, coupon_id){
     var deferred = Q.defer();
+    var action;
+    if (is_accepted == 1){
+        action = "accept";
+    } else if (is_accepted == 0){
+        action = "reject";
+    }
     models.AcceptRequest.create({
         consumer_id: consumer_id,
         merchant_id: merchant_id,
-        request_id: request_id
+        request_id: request_id,
+        is_accepted: is_accepted
         
     }).then(function(requestAccpeted) {
-        deferred.resolve(requestAccpeted);
+        updateCouponForMerchant(merchant_id,coupon_id,"custom",null,null,null,null,null,null,null,null,consumer_id,action).then(function(result) {
+            deferred.resolve(requestAccpeted);    
+        },function(err){
+            deferred.reject(err)
+            });
     },function(err){
         deferred.reject(err)
     });

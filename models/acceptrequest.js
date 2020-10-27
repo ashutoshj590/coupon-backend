@@ -16,7 +16,8 @@ module.exports = (sequelize, DataTypes) => {
   AcceptRequest.init({
     consumer_id: DataTypes.INTEGER,
     merchant_id: DataTypes.INTEGER,
-    request_id: DataTypes.INTEGER
+    request_id: DataTypes.INTEGER,
+    is_accepted: DataTypes.BOOLEAN
   }, {
     sequelize,
     modelName: 'AcceptRequest',

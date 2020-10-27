@@ -29,7 +29,11 @@ module.exports = (sequelize, DataTypes) => {
     is_deleted: DataTypes.BOOLEAN,
     short_name: DataTypes.STRING,
     coupon_code: DataTypes.STRING,
-    consumer_id: DataTypes.INTEGER
+    consumer_id: DataTypes.INTEGER,
+    status: {
+      type :DataTypes.ENUM,
+      values: ['accept','reject','pending']
+      }
   }, {
     sequelize,
     modelName: 'Coupons',

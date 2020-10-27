@@ -23,7 +23,8 @@ module.exports = (sequelize, DataTypes) => {
       type :DataTypes.ENUM,
       values: ['morning','afternoon','evening']
       },
-    is_deleted: DataTypes.BOOLEAN
+    is_deleted: DataTypes.BOOLEAN,
+    coupon_id: DataTypes.INTEGER
   }, {
     sequelize,
     modelName: 'Requests',
