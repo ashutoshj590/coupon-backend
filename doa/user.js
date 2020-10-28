@@ -49,12 +49,3 @@ module.exports.markOTPVerified = (user) => {
     return user.save();
 }
 
-module.exports.updateUserAsType = (email, type) => {
-    return User.update({
-        type: type
-    },  {
-        where:{
-            email: email
-        }
-     });
-}

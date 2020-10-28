@@ -47,7 +47,7 @@ router.post('/login', [util.hasJsonParam(["email", "password", "type"])], functi
 }); */
 
 
-router.post('/login', [util.hasJsonParam(["email", "password", "type", "device_type"])], function (req, res) { 
+router.post('/login', [util.hasJsonParam(["email", "password", "device_type"])], function (req, res) { 
         var userObject = req.body;
         userService.login(userObject, req.session).then(function (response) {
           var response = util.getResponseObject(consts.RESPONSE_SUCCESS);

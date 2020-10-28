@@ -13,13 +13,13 @@ var flash = require('connect-flash');
 var consts = require('./lib/consts.js');//
 var config = util.parsedConfig;
 var redisUtil = require('./lib/redis.js');
-
-
-
+var cors = require('cors');
+app.use(cors())
 var https = require('https');
 var fs = require('fs');
-
-
+var passport = require('passport');
+require('./services/passport-setup');
+var cookieSession = require('cookie-session')
 
 
 app.use(function(req, res, next) {
@@ -27,31 +27,44 @@ app.use(function(req, res, next) {
     res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept, Authorization"); 
     next();
   });
-/*
-* handlebars configuration
-* https://www.packtpub.com/books/content/using-handlebars-express
-*/
-
-var exphbs = require('express-handlebars');
-const { Session } = require('inspector');
-//app.engine('handlebars', exphbs({defaultLayout: 'main', extname: '.handlebars'}));
-//app.set('view engine', 'handlebars');
-
-app.engine('.hbs', exphbs({
-    defaultLayout: 'main', extname: '.hbs',
-    layoutsDir: __dirname + '/views/layouts/'
-}
-));
-app.use("/public", express.static(path.join(__dirname, 'public')));
-app.set('view engine', '.hbs');
 
 
-var options = {
-    dotfiles: 'ignore', etag: false,
-    extensions: ['htm', 'html'],
-    index: false
-};
+app.use(bodyParser.urlencoded({extended: false}))
+app.use(bodyParser.json())
 
+app.use(cookieSession({
+    name: 'coupon-session',
+    keys: ['key1', 'key2']
+  }))
+
+const IsLoggedIn = (req, res, next) => {
+    if (req.user) {
+        next();
+    } else {
+        res.sendStatus(401);
+    }
+} 
+  
+app.use(passport.initialize());
+app.use(passport.session());
+
+app.get('/', (req, res) => res.send('you are not looged in'))
+app.get('/failed', (req, res) => res.send('you failed to login'))
+app.get('/good', IsLoggedIn,(req, res) => res.send('welcome ashutosh !'))
+
+app.get('/google',passport.authenticate('google', { scope: ['profile','email'] }));
+
+app.get('/google/callback',passport.authenticate('google', { failureRedirect: '/failed' }),
+  function(req, res) {
+    // Successful authentication, redirect home.
+    res.redirect('/good');
+  });
+
+app.get('/logout0', (req, res) => {
+    req.session = null;
+    req.logout();
+    res.redirect('/');
+})  
 
 
 var sequelize = new Sequelize(config.database.db_name, config.database.db_user, config.database.db_pass, {

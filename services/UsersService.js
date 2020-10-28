@@ -51,9 +51,8 @@ module.exports.createNewUser = (user) => {
 }
 
 module.exports.login = (user, session) => {
-    let { email, password, type, token } = user;
-    return userDOA.updateUserAsType(email, type).then((user) => {
-    return userDOA.findUserByEmailAndType(email, type)
+    let { email, password } = user;
+    return userDOA.findUserByEmail(email)
         .then((user) => {
             if (user == null) {
                 throw new httpError(httpStatusCodes.UNAUTHORIZED, { response: 'Not able to find user' });
@@ -76,7 +75,6 @@ module.exports.login = (user, session) => {
                     return Promise.reject(err);
                 })
         });
-    });
 } 
 
 
@@ -117,7 +115,11 @@ exports.createMerchantDetail = function(userId, address, city, state, zipcode, o
         var cateArray = merchantDetail.sub_category_id.split(",");
         addSubCatetoMap(userId, cateArray).then(function(added){
         updateIsRegister(userId).then(function(user){
+            udpateMerchantType(userId).then(function(user){
               deferred.resolve(merchantDetail);
+            }, function(err){
+                deferred.reject(err);
+            })    
 
         }, function(err){
             deferred.reject(err);
@@ -154,6 +156,22 @@ var addSubCatetoMap = function(user_id,sub_category_id){
     }
     return deferred.promise;
 }
+
+/* function for udpate user type for merchant...*/
+var udpateMerchantType = function(user_id){
+    var deferred = Q.defer();
+    models.User.update({
+        type: "merchant,consumer"
+    }, {
+        where: {id: user_id}
+        }).then(function (added) {
+            deferred.resolve(added);
+        }, function (err) {
+            deferred.reject(err)
+        });
+    return deferred.promise;
+}
+
 
 /*  function for updated get data for sub_category_id */
 var foudUserById = function(user_id){

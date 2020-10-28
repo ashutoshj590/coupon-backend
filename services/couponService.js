@@ -210,7 +210,8 @@ exports.getAllRequestForMerchant = function(merchant_id){
     var deferred = Q.defer();
     var replacements = {merchant_id : merchant_id};
     var query = 'select Requests.id as request_id,Requests.consumer_id,Requests.merchant_id,Requests.sub_category_id,Requests.detail,' +
-                'Requests.date,Requests.time,Requests.coupon_id,Users.email from Requests LEFT JOIN Users on Requests.consumer_id=Users.id  where Requests.merchant_id=:merchant_id';
+                'Requests.date,Requests.time,Requests.coupon_id,Users.email from Requests LEFT JOIN Users ON Requests.consumer_id=Users.id' +
+                ' where Requests.merchant_id=:merchant_id and NOT EXISTS (select * from AcceptRequests where Requests.id=AcceptRequests.request_id)';
     
     models.sequelize.query(query,
         { replacements: replacements, type: models.sequelize.QueryTypes.SELECT }
@@ -269,7 +270,6 @@ exports.getAllRequestForConsumer = function(consumer_id){
 
 exports.getMerchantDetailbySubCateId = function(sub_category_id){
     var deferred = Q.defer();
-    var data = [];
     var replacements = {sub_category_id : sub_category_id};
     var query = 'SELECT Registrations.*, MAX(UserSubCateMaps.createdAt) as sub_cat_created , GROUP_CONCAT(UploadImgs.image ORDER BY UploadImgs.image) AS images ' +
                 'FROM UserSubCateMaps LEFT JOIN Registrations ON Registrations.user_id = UserSubCateMaps.user_id LEFT JOIN UploadImgs ON UploadImgs.user_id = Registrations.user_id ' +
@@ -372,6 +372,7 @@ exports.acceptRequestFunction = function(consumer_id, merchant_id, request_id, i
     });
     return deferred.promise;
 };
+
 
 
 
