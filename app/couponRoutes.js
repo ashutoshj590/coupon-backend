@@ -31,8 +31,8 @@ router.post('/create-coupon', [jsonParser, util.hasJsonParam(["user_id","coupon_
 
 
 /* APi For update coupon..................*/
-router.post('/edit-coupon', [jsonParser, util.hasJsonParam(["user_id","coupon_id"])], function (req, res) {
-    couponService.updateCouponForMerchant(req.body.user_id,req.body.coupon_id,req.body.coupon_type,req.body.days,req.body.start_time,req.body.end_time,req.body.expiry_date,req.body.flash_deal,req.body.description,req.body.restriction,req.body.short_name,req.body.consumer_id,req.body.status).then(function (coupon) {
+router.post('/accept-edit-coupon', [jsonParser, util.hasJsonParam(["consumer_id","request_id","user_id","coupon_id"])], function (req, res) {
+    couponService.updateCouponForMerchant(req.body.consumer_id,req.body.request_id,req.body.user_id,req.body.coupon_id,req.body.coupon_type,req.body.days,req.body.start_time,req.body.end_time,req.body.expiry_date,req.body.flash_deal,req.body.description,req.body.restriction,req.body.short_name,req.body.consumer_id,req.body.status).then(function (coupon) {
             var response = util.getResponseObject(consts.RESPONSE_SUCCESS);
             res.send(response);
         }, function (err) {
@@ -240,8 +240,8 @@ router.post('/use-coupon',[jsonParser,util.hasJsonParam(["consumer_id","merchant
 
 
 
-router.post('/accept-request',[jsonParser,util.hasJsonParam(["consumer_id","merchant_id","request_id","is_accepted","coupon_id"])], function (req, res) { 
-    couponService.acceptRequestFunction(req.body.consumer_id,req.body.merchant_id,req.body.request_id,req.body.is_accepted,req.body.coupon_id).then(function (accept) {
+router.post('/reject-request',[jsonParser,util.hasJsonParam(["consumer_id","merchant_id","request_id","coupon_id"])], function (req, res) { 
+    couponService.acceptRequestFunction(req.body.consumer_id, req.body.merchant_id, req.body.request_id, 0, req.body.coupon_id).then(function (accept) {
                 var response = util.getResponseObject(consts.RESPONSE_SUCCESS);
                 res.send(response);
             }, function (err) {

@@ -59,7 +59,7 @@ var createCouponForMerchant = exports.createCouponForMerchant = function(user_id
 /*
 *   Function for Update coupon .................
 */
-var updateCouponForMerchant = exports.updateCouponForMerchant = function(user_id,coupon_id,coupon_type,days,start_time,end_time,expiry_date,flash_deal,description,restriction,shortName,consumerId,status){
+var updateCouponForMerchant = exports.updateCouponForMerchant = function(consumer_id,request_id,user_id,coupon_id,coupon_type,days,start_time,end_time,expiry_date,flash_deal,description,restriction,shortName,consumerId,status){
     var deferred = Q.defer();
     models.Coupons.update({
         coupon_type: coupon_type,
@@ -79,7 +79,12 @@ var updateCouponForMerchant = exports.updateCouponForMerchant = function(user_id
                 user_id: user_id
             }
     }).then(function(couponUpdate) {
+        acceptRequestFunction(consumer_id, user_id, request_id, 1, coupon_id).then(function(accept) {
         deferred.resolve(couponUpdate);
+    
+        },function(err){
+            deferred.reject(err)
+            });
     },function(err){
         deferred.reject(err)
     });
@@ -271,10 +276,15 @@ exports.getAllRequestForConsumer = function(consumer_id){
 exports.getMerchantDetailbySubCateId = function(sub_category_id){
     var deferred = Q.defer();
     var replacements = {sub_category_id : sub_category_id};
-    var query = 'SELECT Registrations.*, MAX(UserSubCateMaps.createdAt) as sub_cat_created , GROUP_CONCAT(UploadImgs.image ORDER BY UploadImgs.image) AS images ' +
+  /*  var query = 'SELECT Registrations.*, MAX(UserSubCateMaps.createdAt) as sub_cat_created , GROUP_CONCAT(UploadImgs.image ORDER BY UploadImgs.image) AS images ' +
                 'FROM UserSubCateMaps LEFT JOIN Registrations ON Registrations.user_id = UserSubCateMaps.user_id LEFT JOIN UploadImgs ON UploadImgs.user_id = Registrations.user_id ' +
-                 'WHERE UserSubCateMaps.sub_category_id=:sub_category_id GROUP BY Registrations.id';
-
+                 'WHERE UserSubCateMaps.sub_category_id=:sub_category_id GROUP BY Registrations.id'; */
+  
+    var query = 'SELECT Registrations.*,MAX(FavMerchants.is_fav) as isFav, MAX(UserSubCateMaps.createdAt) as sub_cat_created , GROUP_CONCAT(UploadImgs.image ORDER BY UploadImgs.image) AS images' +
+                 ' FROM UserSubCateMaps LEFT JOIN Registrations ON Registrations.user_id = UserSubCateMaps.user_id LEFT JOIN UploadImgs ON UploadImgs.user_id = Registrations.user_id LEFT JOIN FavMerchants ON' +
+                 ' FavMerchants.merchant_id = UserSubCateMaps.user_id WHERE UserSubCateMaps.sub_category_id=:sub_category_id GROUP BY Registrations.id , FavMerchants.merchant_id';
+ 
+                
     models.sequelize.query(query,
         { replacements: replacements, type: models.sequelize.QueryTypes.SELECT }
         ).then(function(result) {
@@ -286,6 +296,7 @@ exports.getMerchantDetailbySubCateId = function(sub_category_id){
     };
 
 
+  
 
 exports.findFavMerchant = function(consumer_id,merchant_id){
     var deferred = Q.defer();
@@ -347,7 +358,7 @@ exports.addUsedCoupontoDatabase = function(consumer_id, merchant_id, coupon_code
 };
 
 
-exports.acceptRequestFunction = function(consumer_id, merchant_id, request_id, is_accepted, coupon_id){
+var acceptRequestFunction = exports.acceptRequestFunction = function(consumer_id, merchant_id, request_id, is_accepted, coupon_id){
     var deferred = Q.defer();
     var action;
     if (is_accepted == 1){
