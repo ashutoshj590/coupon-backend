@@ -79,12 +79,16 @@ var updateCouponForMerchant = exports.updateCouponForMerchant = function(consume
                 user_id: user_id
             }
     }).then(function(couponUpdate) {
+        if (coupon_type === "custom") {
         acceptRequestFunction(consumer_id, user_id, request_id, 1, coupon_id).then(function(accept) {
         deferred.resolve(couponUpdate);
     
         },function(err){
             deferred.reject(err)
             });
+        } else {
+            deferred.resolve(couponUpdate);
+        }
     },function(err){
         deferred.reject(err)
     });
