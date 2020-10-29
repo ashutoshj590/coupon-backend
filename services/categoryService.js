@@ -133,28 +133,12 @@ exports.getAllcategoryData = function(){
                
     models.sequelize.query(query,
         { replacements: replacements, type: models.sequelize.QueryTypes.SELECT }
-    ).then(function(result) {
-        var test = [];
-        result.forEach(function(ids, index){
-            console.log(ids.id)
-            countsForMerchant(ids.id).then(function(countResult) {
-                for (var i = 0; i < countResult.length; i++) {
-                    //console.log(countResult[i].merchant_count)
-                    test.push(countResult[i].merchant_count);
-                }
-                console.log(test);
-                deferred.resolve(test);
-        },function(err){
-            deferred.reject(err)
-            });
-            
-        })
-        }
-        
-    );
-    return deferred.promise;
-};
-
+        ).then(function(result) {
+                deferred.resolve(result);
+            }
+        );
+        return deferred.promise;
+    };
 
 var countsForMerchant = function(sub_category_id){
     var deferred = Q.defer();
