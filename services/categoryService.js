@@ -135,8 +135,8 @@ exports.getAllcategoryData = function(){
         { replacements: replacements, type: models.sequelize.QueryTypes.SELECT }
         ).then(function(result) {
                 deferred.resolve(result);
-            }
-        );
+            
+        });
         return deferred.promise;
     };
 

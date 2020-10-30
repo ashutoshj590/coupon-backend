@@ -1,20 +1,13 @@
 var models = require('../models/index.js');
 var util = require('../lib/Utils.js');
-var redis = require('../lib/redis.js');
 var Q = require('q');
-var consts = require('../lib/consts.js');
-var config = consts.parsedConfig;
 let userDOA = require('../doa/user');
 let commonFuncs = require('../utils/commonFuncs');
 let httpError = require('../errors/httpError');
 let httpStatusCodes = require('../constants/httpStatusCodes');
 var sessionTime = 1 * 60 * 60 * 1000;
-let fbServices = require('./fbServices');
-let responseConstants = require('../constants/responseConst');
 let constants = require('../lib/consts');
-var bcrypt = require('bcrypt');
 const { response } = require('express');
-var aws = require('../lib/aws.js');
 const nodemailer = require('nodemailer');
 require('dotenv').config();
 
@@ -26,6 +19,7 @@ require('dotenv').config();
 module.exports.createNewUser = (user) => {
     let { User } = models;
     let { email, type, password, token } = user;
+    user.type = "consumer";
     return userDOA.findUserByEmail(email)
         .then((foundUser) => {
             if (foundUser == null || foundUser == undefined) {

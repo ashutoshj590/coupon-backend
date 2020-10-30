@@ -59,7 +59,7 @@ var createCouponForMerchant = exports.createCouponForMerchant = function(user_id
 /*
 *   Function for Update coupon .................
 */
-var updateCouponForMerchant = exports.updateCouponForMerchant = function(consumer_id,request_id,user_id,coupon_id,coupon_type,days,start_time,end_time,expiry_date,flash_deal,description,restriction,shortName,consumerId,status){
+var updateCouponForMerchant = exports.updateCouponForMerchant = function(consumer_id,request_id,user_id,coupon_id,coupon_type,days,start_time,end_time,expiry_date,flash_deal,description,restriction,shortName,status){
     var deferred = Q.defer();
     models.Coupons.update({
         coupon_type: coupon_type,
@@ -71,16 +71,16 @@ var updateCouponForMerchant = exports.updateCouponForMerchant = function(consume
         description: description,
         restriction: restriction,
         short_name: shortName,
-        consumer_id: consumerId,
-        status: status
+        consumer_id: consumer_id,
+        status: status 
      } ,  {
             where:{
                 id: coupon_id,
                 user_id: user_id
             }
     }).then(function(couponUpdate) {
-        if (coupon_type === "custom") {
-        acceptRequestFunction(consumer_id, user_id, request_id, 1, coupon_id).then(function(accept) {
+        if (coupon_type === "custom" && status != "reject") {
+        acceptRequestFunction(consumer_id, user_id, request_id, 1).then(function(accept) {
         deferred.resolve(couponUpdate);
     
         },function(err){
@@ -362,7 +362,7 @@ exports.addUsedCoupontoDatabase = function(consumer_id, merchant_id, coupon_code
 };
 
 
-var acceptRequestFunction = exports.acceptRequestFunction = function(consumer_id, merchant_id, request_id, is_accepted, coupon_id){
+var acceptRequestFunction = exports.acceptRequestFunction = function(consumer_id, merchant_id, request_id, is_accepted){
     var deferred = Q.defer();
     var action;
     if (is_accepted == 1){
@@ -377,11 +377,7 @@ var acceptRequestFunction = exports.acceptRequestFunction = function(consumer_id
         is_accepted: is_accepted
         
     }).then(function(requestAccpeted) {
-        updateCouponForMerchant(merchant_id,coupon_id,"custom",null,null,null,null,null,null,null,null,consumer_id,action).then(function(result) {
-            deferred.resolve(requestAccpeted);    
-        },function(err){
-            deferred.reject(err)
-            });
+        deferred.resolve(requestAccpeted);    
     },function(err){
         deferred.reject(err)
     });
