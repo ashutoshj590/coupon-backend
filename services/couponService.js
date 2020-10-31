@@ -294,7 +294,7 @@ exports.getAllRequestForConsumer = function(consumer_id){
 };
 
 
-exports.getMerchantDetailbySubCateId = function(sub_category_id){
+exports.getMerchantDetailbySubCateId = function(sub_category_id, consumer_id){
     var deferred = Q.defer();
     var replacements = {sub_category_id : sub_category_id};
     
@@ -305,8 +305,23 @@ exports.getMerchantDetailbySubCateId = function(sub_category_id){
     models.sequelize.query(query,
         { replacements: replacements, type: models.sequelize.QueryTypes.SELECT }
         ).then(function(result) {
-            deferred.resolve(result);
-    
+            var data = [];
+            result.forEach(function(merchants, index){
+                merchants.is_fav = false;
+                findFavMerchant(consumer_id,merchants.user_id).then(function(foundData) {
+                    if (foundData != null || undefined){
+                        if (foundData.dataValues.consumer_id == consumer_id && foundData.dataValues.merchant_id == merchants.user_id && foundData.dataValues.is_fav == 1) {
+                            merchants.is_fav = true;
+                            data.push(merchants);
+                            deferred.resolve(result);
+
+                        }
+                    }
+            },function(err){
+                deferred.reject(err)
+            });
+            })
+            
             }
         );
         return deferred.promise;
@@ -315,7 +330,7 @@ exports.getMerchantDetailbySubCateId = function(sub_category_id){
 
   
 
-exports.findFavMerchant = function(consumer_id,merchant_id){
+var findFavMerchant = exports.findFavMerchant = function(consumer_id,merchant_id){
     var deferred = Q.defer();
     var cond={
                 "consumer_id": consumer_id,
