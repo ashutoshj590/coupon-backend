@@ -158,8 +158,7 @@ exports.getAllCustomCuponsForConsumer = function(consumer_id){
     var deferred = Q.defer();
     var replacements = {consumer_id : consumer_id};
 
-    var query = 'SELECT Coupons.id,Coupons.user_id,Coupons.coupon_type,Coupons.days,Coupons.start_time,Coupons.end_time,' +
-                'Coupons.expiry_date,Coupons.flash_deal,Coupons.description,Coupons.restriction,Coupons.short_name,Coupons.coupon_code FROM Coupons WHERE NOT EXISTS' +
+    var query = 'SELECT * FROM Coupons WHERE NOT EXISTS' +
                 ' ( SELECT * FROM UsedCoupons WHERE Coupons.coupon_code=UsedCoupons.coupon_code AND ' +
                 'UsedCoupons.consumer_id=:consumer_id ) AND Coupons.consumer_id=:consumer_id ORDER BY Coupons.coupon_code ASC';
 
