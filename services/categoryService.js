@@ -140,7 +140,7 @@ exports.getAllcategoryData = function(){
                 countsForMerchant(data.id).then(function(counts){
               // testData.push(counts)
                console.log(counts);
-                deferred.resolve(counts);
+                deferred.resolve(result);
             }, function(err){
                 deferred.reject(err);
             })
