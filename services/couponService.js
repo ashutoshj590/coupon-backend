@@ -156,15 +156,18 @@ exports.getAllcoupon = function(){
 */
 exports.getAllCustomCuponsForConsumer = function(consumer_id){
     var deferred = Q.defer();
-    var cond={"is_deleted":0,
-                "consumer_id":consumer_id
-    };
-    models.Coupons.findAll({
-      where: cond
-    }).then(function (allCustomCoupons) {
-            deferred.resolve(allCustomCoupons);
-        },function (err) {
-          deferred.reject(err);
+    var replacements = {consumer_id : consumer_id};
+
+    var query = 'SELECT Coupons.id,Coupons.user_id,Coupons.coupon_type,Coupons.days,Coupons.start_time,Coupons.end_time,' +
+                'Coupons.expiry_date,Coupons.flash_deal,Coupons.description,Coupons.restriction,Coupons.short_name,Coupons.coupon_code FROM Coupons WHERE NOT EXISTS' +
+                ' ( SELECT * FROM UsedCoupons WHERE Coupons.coupon_code=UsedCoupons.coupon_code AND ' +
+                'UsedCoupons.consumer_id=:consumer_id ) AND Coupons.consumer_id=:consumer_id ORDER BY Coupons.coupon_code ASC';
+
+    models.sequelize.query(query,
+        { replacements: replacements, type: models.sequelize.QueryTypes.SELECT }
+    ).then(function(data) {
+        deferred.resolve(data);
+
         }
     );
     return deferred.promise;
@@ -295,14 +298,10 @@ exports.getAllRequestForConsumer = function(consumer_id){
 exports.getMerchantDetailbySubCateId = function(sub_category_id){
     var deferred = Q.defer();
     var replacements = {sub_category_id : sub_category_id};
-  /*  var query = 'SELECT Registrations.*, MAX(UserSubCateMaps.createdAt) as sub_cat_created , GROUP_CONCAT(UploadImgs.image ORDER BY UploadImgs.image) AS images ' +
+    
+    var query = 'SELECT Registrations.*, MAX(UserSubCateMaps.createdAt) as sub_cat_created , GROUP_CONCAT(UploadImgs.image ORDER BY UploadImgs.image) AS images ' +
                 'FROM UserSubCateMaps LEFT JOIN Registrations ON Registrations.user_id = UserSubCateMaps.user_id LEFT JOIN UploadImgs ON UploadImgs.user_id = Registrations.user_id ' +
-                 'WHERE UserSubCateMaps.sub_category_id=:sub_category_id GROUP BY Registrations.id'; */
-  
-    var query = 'SELECT Registrations.*,MAX(FavMerchants.is_fav) as isFav, MAX(UserSubCateMaps.createdAt) as sub_cat_created , GROUP_CONCAT(UploadImgs.image ORDER BY UploadImgs.image) AS images' +
-                 ' FROM UserSubCateMaps LEFT JOIN Registrations ON Registrations.user_id = UserSubCateMaps.user_id LEFT JOIN UploadImgs ON UploadImgs.user_id = Registrations.user_id LEFT JOIN FavMerchants ON' +
-                 ' FavMerchants.merchant_id = UserSubCateMaps.user_id WHERE UserSubCateMaps.sub_category_id=:sub_category_id GROUP BY Registrations.id , FavMerchants.merchant_id';
- 
+                 'WHERE UserSubCateMaps.sub_category_id=:sub_category_id GROUP BY Registrations.id';
                 
     models.sequelize.query(query,
         { replacements: replacements, type: models.sequelize.QueryTypes.SELECT }
