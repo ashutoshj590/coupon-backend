@@ -134,8 +134,17 @@ exports.getAllcategoryData = function(){
     models.sequelize.query(query,
         { replacements: replacements, type: models.sequelize.QueryTypes.SELECT }
         ).then(function(result) {
-                deferred.resolve(result);
-            
+            var testData = [];
+            result.forEach(function(data, index){
+                console.log(data.id);
+                countsForMerchant(data.id).then(function(counts){
+              // testData.push(counts)
+               console.log(counts);
+                deferred.resolve(counts);
+            }, function(err){
+                deferred.reject(err);
+            })
+            })
         });
         return deferred.promise;
     };

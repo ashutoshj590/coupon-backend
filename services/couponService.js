@@ -123,13 +123,28 @@ exports.changeStatustoCoupon = function(coupon_id){
 */
 exports.getAllcoupon = function(){
     var deferred = Q.defer();
-    var cond={"is_deleted":0};
-    models.Coupons.findAll({
-      where: cond
-    }).then(function (allCoupons) {
-            deferred.resolve(allCoupons);
-        },function (err) {
-          deferred.reject(err);
+    var replacements = {};
+
+    var query = 'select Coupons.*,UsedCoupons.coupon_code as is_used from Coupons left join UsedCoupons on' +
+                ' Coupons.coupon_code=UsedCoupons.coupon_code where Coupons.is_deleted=0';
+    
+
+    models.sequelize.query(query,
+        { replacements: replacements, type: models.sequelize.QueryTypes.SELECT }
+    ).then(function(allcoupons) {
+        var data = [];
+        allcoupons.forEach(function(coupon, index){
+            if(coupon.is_used != null){
+                coupon.is_used = true;
+            } else if(coupon.is_used == null) {
+                coupon.is_used = false;
+            }
+            data.push(coupon);
+            
+        })
+        deferred.resolve(data);
+
+
         }
     );
     return deferred.promise;
