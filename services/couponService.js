@@ -304,8 +304,7 @@ exports.getMerchantDetailbySubCateId = function(sub_category_id, consumer_id){
                 
     models.sequelize.query(query,
         { replacements: replacements, type: models.sequelize.QueryTypes.SELECT }
-        ).then(function(result) {
-            
+        ).then(function(result) {    
             var data = [];
             result.forEach(function(merchants, index){
                 merchants.is_fav = false;
@@ -316,6 +315,10 @@ exports.getMerchantDetailbySubCateId = function(sub_category_id, consumer_id){
                             data.push(merchants);
                             deferred.resolve(result);
 
+                        } else if (foundData.dataValues.consumer_id == consumer_id && foundData.dataValues.merchant_id == merchants.user_id && foundData.dataValues.is_fav == 0){
+                            merchants.is_fav = false;
+                            data.push(merchants);
+                            deferred.resolve(result);
                         }
                     }
             },function(err){
