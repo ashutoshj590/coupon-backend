@@ -65,6 +65,23 @@ router.post('/edit-coupon', [jsonParser, util.hasJsonParam(["user_id","coupon_id
     );
 });
 
+/* APi For update  custom coupon..................*/
+router.post('/edit-custom-coupon', [jsonParser, util.hasJsonParam(["user_id","coupon_id"])], function (req, res) {
+    couponService.updateCustomCouponForMerchant(req.body.user_id,req.body.coupon_id,req.body.days,req.body.start_time,req.body.end_time,req.body.expiry_date,req.body.flash_deal,req.body.description,req.body.restriction,req.body.short_name).then(function (coupon) {
+            var response = util.getResponseObject(consts.RESPONSE_SUCCESS);
+            res.send(response);
+        }, function (err) {
+            if(err.errors !== undefined && err.errors[0] !== undefined ){
+                var response = util.getResponseObject(consts.RESPONSE_ERROR, err.errors[0].message);
+                res.send(response);
+            }else{
+                var response = util.getResponseObject(consts.RESPONSE_ERROR, err);
+            }
+            res.send(response);
+        }
+    );
+});
+
 
 /* API for mark is_deleted to coupon ................*/
 

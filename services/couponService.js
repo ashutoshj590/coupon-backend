@@ -96,6 +96,33 @@ var updateCouponForMerchant = exports.updateCouponForMerchant = function(consume
 };
 
 
+
+exports.updateCustomCouponForMerchant = function(user_id,coupon_id,days,start_time,end_time,expiry_date,flash_deal,description,restriction,shortName){
+    var deferred = Q.defer();
+    models.Coupons.update({
+        days: days,
+        start_time: start_time,
+        end_time: end_time,
+        expiry_date: expiry_date,
+        flash_deal: flash_deal,
+        description: description,
+        restriction: restriction,
+        short_name: shortName,
+     } ,  {
+            where:{
+                id: coupon_id,
+                user_id: user_id
+            }
+    }).then(function(couponUpdate) {
+        deferred.resolve(couponUpdate);
+    },function(err){
+        deferred.reject(err)
+
+    });
+    return deferred.promise;
+};
+
+
 /*
 * Function for change status to coupon
 */
@@ -309,21 +336,23 @@ exports.getMerchantDetailbySubCateId = function(sub_category_id, consumer_id){
             result.forEach(function(merchants, index){
                 merchants.is_fav = false;
                 findFavMerchant(consumer_id,merchants.user_id).then(function(foundData) {
-                    if (foundData != null || undefined){
-                        if (foundData.dataValues.consumer_id == consumer_id && foundData.dataValues.merchant_id == merchants.user_id && foundData.dataValues.is_fav == 1) {
+                    foundData.forEach(function(test, index){
+                    if (test != null || undefined){
+                        if (test.consumer_id == consumer_id && test.merchant_id == merchants.user_id) {
+                            if(test.is_fav == 1){
                             merchants.is_fav = true;
                             data.push(merchants);
+                            } else if (test.is_fav == 0){
+                                merchants.is_fav = false;
+                                data.push(merchants);
+                            }
 
                         } 
-                        if (foundData.dataValues.consumer_id == consumer_id && foundData.dataValues.merchant_id == merchants.user_id && foundData.dataValues.is_fav == 0) {
-                            merchants.is_fav = false;
-                            data.push(merchants);
-                        }
-                        deferred.resolve(result);
 
-                    } else {
-                        deferred.resolve(result);
-                    }
+                    } 
+                })
+                deferred.resolve(result);
+
             },function(err){
                 deferred.reject(err)
             });
@@ -343,7 +372,7 @@ var findFavMerchant = exports.findFavMerchant = function(consumer_id,merchant_id
                 "consumer_id": consumer_id,
                 "merchant_id": merchant_id
         };
-    models.FavMerchants.findOne({
+    models.FavMerchants.findAll({
         where: cond
     }).then(function (result) {
             deferred.resolve(result);
@@ -597,7 +626,7 @@ var findFavMerchant = function(consumer_id, merchant_id){
                 "merchant_id": merchant_id,
                
     };
-    models.FavMerchants.findOne({
+    models.FavMerchants.findAll({
       where: cond
     }).then(function (result) {
             deferred.resolve(result);
