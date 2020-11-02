@@ -315,8 +315,7 @@ exports.getMerchantDetailbySubCateId = function(sub_category_id, consumer_id){
                             data.push(merchants);
                             deferred.resolve(result);
 
-                        } 
-                        if (foundData.dataValues.consumer_id == consumer_id && foundData.dataValues.merchant_id == merchants.user_id && foundData.dataValues.is_fav == 0){
+                        } else if (foundData.dataValues.consumer_id == consumer_id && foundData.dataValues.merchant_id == merchants.user_id && foundData.dataValues.is_fav == 0){
                             merchants.is_fav = false;
                             data.push(merchants);
                             deferred.resolve(result);
