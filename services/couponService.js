@@ -311,12 +311,12 @@ exports.getMerchantDetailbySubCateId = function(sub_category_id, consumer_id){
                 findFavMerchant(consumer_id,merchants.user_id).then(function(foundData) {
                     if (foundData != null || undefined){
                         if (foundData.dataValues.consumer_id == consumer_id && foundData.dataValues.merchant_id == merchants.user_id && foundData.dataValues.is_fav == 1) {
-                            merchants.is_fav = true;
+                            merchants.is_fav = "one";
                             data.push(merchants);
                             deferred.resolve(result);
 
                         } else if (foundData.dataValues.consumer_id == consumer_id && foundData.dataValues.merchant_id == merchants.user_id && foundData.dataValues.is_fav == 0){
-                            merchants.is_fav = false;
+                            merchants.is_fav = "zero";
                             data.push(merchants);
                             deferred.resolve(result);
                         }
