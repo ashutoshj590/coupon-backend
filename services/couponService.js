@@ -569,7 +569,7 @@ exports.addToFavourite = function(consumer_id, merchant_id){
     var deferred = Q.defer();
     findFavMerchant(consumer_id, merchant_id).then(function(foundData) {
         if (foundData != null || undefined){
-            if (foundData.dataValues.consumer_id == consumer_id && foundData.dataValues.merchant_id == merchant_id && foundData.dataValues.is_fav == 1) {
+            if (foundData.consumer_id == consumer_id && foundData.merchant_id == merchant_id && foundData.is_fav == 1) {
                 models.FavMerchants.update({
                     is_fav: 0
                 },{
@@ -582,7 +582,7 @@ exports.addToFavourite = function(consumer_id, merchant_id){
                 },function(err){
                     deferred.reject(err)
                 });
-            } else if (foundData.dataValues.consumer_id == consumer_id && foundData.dataValues.merchant_id == merchant_id && foundData.dataValues.is_fav == 0) {
+            } else if (foundData.consumer_id == consumer_id && foundData.merchant_id == merchant_id && foundData.is_fav == 0) {
                 models.FavMerchants.update({
                     is_fav: 1
                 },{
@@ -626,7 +626,7 @@ var findFavMerchant = function(consumer_id, merchant_id){
                 "merchant_id": merchant_id,
                
     };
-    models.FavMerchants.findAll({
+    models.FavMerchants.findOne({
       where: cond
     }).then(function (result) {
             deferred.resolve(result);
