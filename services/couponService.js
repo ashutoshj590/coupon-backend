@@ -305,6 +305,7 @@ exports.getMerchantDetailbySubCateId = function(sub_category_id, consumer_id){
     models.sequelize.query(query,
         { replacements: replacements, type: models.sequelize.QueryTypes.SELECT }
         ).then(function(result) {
+            
             var data = [];
             result.forEach(function(merchants, index){
                 merchants.is_fav = false;

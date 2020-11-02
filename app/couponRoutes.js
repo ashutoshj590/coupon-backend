@@ -183,7 +183,7 @@ router.post('/get-request-consumer',[jsonParser,util.hasJsonParam(["consumer_id"
 
 
 router.post('/get-merchant-by-category',[jsonParser,util.hasJsonParam(["sub_category_id","consumer_id"])], function (req, res) { 
-    couponService.getMerchantDetailbySubCateId(req.body.sub_category_id, req.body.consumer_id).then(function (detail) {
+    couponService.getMerchantDetailbySubCateId(req.body.sub_category_id,req.body.consumer_id).then(function (detail) {
                 var response = util.getResponseObject(consts.RESPONSE_SUCCESS);
                 response.merchant_detail = detail;
                 res.send(response);

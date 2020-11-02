@@ -136,11 +136,12 @@ exports.getAllcategoryData = function(){
         ).then(function(result) {
             var testData = [];
             result.forEach(function(data, index){
-                console.log(data.id);
                 countsForMerchant(data.id).then(function(counts){
-              // testData.push(counts)
-               console.log(counts);
-                deferred.resolve(result);
+                   // console.log(counts[0].merchant_count);
+                  //  data.merchantCounts = counts[0].merchant_count;
+                 //   testData.push(data);
+                    deferred.resolve(result);
+
             }, function(err){
                 deferred.reject(err);
             })
@@ -148,6 +149,8 @@ exports.getAllcategoryData = function(){
         });
         return deferred.promise;
     };
+
+
 
 var countsForMerchant = function(sub_category_id){
     var deferred = Q.defer();
@@ -165,17 +168,6 @@ var countsForMerchant = function(sub_category_id){
 
 
 
-/*filterAttributes.forEach(function(filterAttribute, index){
-    getFilterValuesCategoryField(filterAttribute, categoryId).then(function(filterOptions){
-        var filters = {};
-        filters.req_key = util.getFilterKeyForProductlist(filterAttribute);
-        filters['req_values'] = filterOptions;
-        filterList.push(filters);
-        if(filterAttributes.length-1 == index) {
-            deferred.resolve(filterList)
-        }
-    })
-}) */
 
 /*
 * Function for change status to Sub Category.
