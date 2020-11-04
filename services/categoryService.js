@@ -1,20 +1,7 @@
 var models = require('../models/index.js');
-var util = require('../lib/Utils.js');
 //var redis = require('../lib/redis.js');
 var Q = require('q');
-var consts = require('../lib/consts.js');
-var aws = require('../lib/aws.js');
-var config = consts.parsedConfig;
-let userDOA = require('../doa/user');
-let commonFuncs = require('../utils/commonFuncs');
-let httpError = require('../errors/httpError');
-let httpStatusCodes = require('../constants/httpStatusCodes');
-var sessionTime = 1 * 60 * 60 * 1000;
-let fbServices = require('./fbServices');
-let responseConstants = require('../constants/responseConst');
-let constants = require('../lib/consts');
-const { response } = require('express');
-var reporting = require('../models/reportingIndex.js');
+var async = require('async');
 
 
 
@@ -134,18 +121,21 @@ exports.getAllcategoryData = function(){
     models.sequelize.query(query,
         { replacements: replacements, type: models.sequelize.QueryTypes.SELECT }
         ).then(function(result) {
-            var testData = [];
-            result.forEach(function(data, index){
+            var output = [];
+            async.eachSeries(result,function(data,callback){ 
                 countsForMerchant(data.id).then(function(counts){
-                   // console.log(counts[0].merchant_count);
-                  //  data.merchantCounts = counts[0].merchant_count;
-                 //   testData.push(data);
-                    deferred.resolve(result);
-
-            }, function(err){
-                deferred.reject(err);
-            })
-            })
+                    data.merchant_count = counts;
+                    output.push(data);
+                    callback();
+                }, function(err){
+                   deferred.reject(err);
+                })
+       
+           }, function(err, detail) {
+                 deferred.resolve(output);
+               
+           });
+            
         });
         return deferred.promise;
     };
@@ -165,6 +155,17 @@ var countsForMerchant = function(sub_category_id){
     return deferred.promise;
 };
 
+
+/*countsForMerchant(data.id).then(function(counts){
+    //   console.log(counts[0].merchant_count);
+       data.merchant_counts = counts[0].merchant_count;
+       testData.push(data);
+       console.log(result);
+       deferred.resolve(result);
+
+}, function(err){
+   deferred.reject(err);
+}) */
 
 
 

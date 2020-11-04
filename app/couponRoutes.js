@@ -7,6 +7,7 @@ var consts = require('../lib/consts.js');
 var jsonParser = bodyParser.json({limit: '10mb'});
 var sessionTime = 1 * 60 *  60 * 1000;       //1 hour session
 const jwt = require('jsonwebtoken');
+var async = require('async');
 
 
 
@@ -202,27 +203,31 @@ router.post('/get-request-consumer',[jsonParser,util.hasJsonParam(["consumer_id"
 router.post('/get-merchant-by-category',[jsonParser,util.hasJsonParam(["sub_category_id","consumer_id"])], function (req, res) { 
     couponService.getMerchantDetailbySubCateId(req.body.sub_category_id,req.body.consumer_id).then(function (detail) {
         var response = util.getResponseObject(consts.RESPONSE_SUCCESS);
-        var data = [];
-        detail.forEach(function(merchants, index){
-            merchants.is_fav = false;
-            couponService.findFavMerchant(req.body.consumer_id,merchants.user_id).then(function(foundData) {
-                console.log("value...." +   foundData.merchant_id);
-                if (foundData != null || undefined){
-                    if (foundData.consumer_id == req.body.consumer_id && foundData.merchant_id == merchants.user_id && foundData.is_fav == 1) {  
-                       console.log("how much time loop running...........")
-                        merchants.is_fav = true;  
-                       
-                    }
-
+        var output = [];
+        async.eachSeries(detail,function(data,callback){ 
+         data.is_fav = false;
+         couponService.findFavMerchant(req.body.consumer_id, data.user_id).then(function(foundData){
+            if (foundData != null || undefined){
+                if (foundData.consumer_id == req.body.consumer_id && foundData.merchant_id == data.user_id && foundData.is_fav == 1) {
+                    data.is_fav = true;
+                   
+                } else if (foundData.consumer_id == req.body.consumer_id && foundData.merchant_id == data.user_id && foundData.is_fav == 0) {
+                    data.is_fav = false;
+                   
                 }
-                data.push(merchants);
-                console.log(detail); 
-                 res.send(detail);
-                },function(err){
-                    res.send(err);
-                });
-            
-                })                  
+            }
+            output.push(data);
+            callback();
+       }, function(err){
+           deferred.reject(err);
+       })
+        
+
+    }, function(err, detail) {
+        response.merchant_detail = output;
+        res.send(response); 
+    });
+                      
             }, function (err) {
                 if(err.errors !== undefined && err.errors[0] !== undefined ){
                     var response = util.getResponseObject(consts.RESPONSE_ERROR, err.response);
@@ -234,6 +239,11 @@ router.post('/get-merchant-by-category',[jsonParser,util.hasJsonParam(["sub_cate
             }
         );
     });
+
+
+
+
+    
 
 
     router.post('/get-coupons-by-id',[jsonParser,util.hasJsonParam(["merchant_id","consumer_id"])], function (req, res) { 

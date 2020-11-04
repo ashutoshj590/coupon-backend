@@ -358,7 +358,7 @@ var findFavMerchant = exports.findFavMerchant = function(consumer_id,merchant_id
     return deferred.promise;
 };
 
-var findFavMerchantTest = function(consumer_id,merchant_id){
+/*var findFavMerchantTest = function(consumer_id,merchant_id){
     var cond={
                 "consumer_id": consumer_id,
                 "merchant_id": merchant_id
@@ -372,7 +372,7 @@ var findFavMerchantTest = function(consumer_id,merchant_id){
         }
     );
     
-};
+}; */
 
 
 
