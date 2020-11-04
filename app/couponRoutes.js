@@ -201,9 +201,28 @@ router.post('/get-request-consumer',[jsonParser,util.hasJsonParam(["consumer_id"
 
 router.post('/get-merchant-by-category',[jsonParser,util.hasJsonParam(["sub_category_id","consumer_id"])], function (req, res) { 
     couponService.getMerchantDetailbySubCateId(req.body.sub_category_id,req.body.consumer_id).then(function (detail) {
-                var response = util.getResponseObject(consts.RESPONSE_SUCCESS);
-                response.merchant_detail = detail;
-                res.send(response);
+        var response = util.getResponseObject(consts.RESPONSE_SUCCESS);
+        var data = [];
+        detail.forEach(function(merchants, index){
+            merchants.is_fav = false;
+            couponService.findFavMerchant(req.body.consumer_id,merchants.user_id).then(function(foundData) {
+                console.log("value...." +   foundData.merchant_id);
+                if (foundData != null || undefined){
+                    if (foundData.consumer_id == req.body.consumer_id && foundData.merchant_id == merchants.user_id && foundData.is_fav == 1) {  
+                       console.log("how much time loop running...........")
+                        merchants.is_fav = true;  
+                       
+                    }
+
+                }
+                data.push(merchants);
+                console.log(detail); 
+                 res.send(detail);
+                },function(err){
+                    res.send(err);
+                });
+            
+                })                  
             }, function (err) {
                 if(err.errors !== undefined && err.errors[0] !== undefined ){
                     var response = util.getResponseObject(consts.RESPONSE_ERROR, err.response);
@@ -257,8 +276,8 @@ router.post('/get-custom-coupons',[jsonParser,util.hasJsonParam(["consumer_id"])
 
 
 
-router.post('/use-coupon',[jsonParser,util.hasJsonParam(["consumer_id","merchant_id","coupon_code","coupon_type"])], function (req, res) { 
-    couponService.addUsedCoupontoDatabase(req.body.consumer_id,req.body.merchant_id,req.body.coupon_code,req.body.coupon_type).then(function (used) {
+router.post('/use-coupon',[jsonParser,util.hasJsonParam(["consumer_id","merchant_id","coupon_code","coupon_type","lat","lang"])], function (req, res) { 
+    couponService.addUsedCoupontoDatabase(req.body.consumer_id,req.body.merchant_id,req.body.coupon_code,req.body.coupon_type,req.body.lat,req.body.lang).then(function (used) {
                 var response = util.getResponseObject(consts.RESPONSE_SUCCESS);
                 res.send(response);
             }, function (err) {

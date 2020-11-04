@@ -322,7 +322,6 @@ exports.getAllRequestForConsumer = function(consumer_id){
 
 
 exports.getMerchantDetailbySubCateId = function(sub_category_id, consumer_id){
-  
     var deferred = Q.defer();
     var replacements = {sub_category_id : sub_category_id};
     
@@ -333,29 +332,7 @@ exports.getMerchantDetailbySubCateId = function(sub_category_id, consumer_id){
     models.sequelize.query(query,
         { replacements: replacements, type: models.sequelize.QueryTypes.SELECT }
         ).then(function(result) {    
-            var data = [];
-            result.forEach(function(merchants, index){
-                merchants.is_fav = false;
-                findFavMerchant(consumer_id,merchants.user_id).then(function(foundData) {
-                    console.log(merchants.user_id);
-                    if (foundData != null || undefined){
-                        if (foundData.consumer_id == consumer_id && foundData.merchant_id == merchants.user_id && foundData.is_fav == 1) {  
-                            merchants.is_fav = true;
-                            data.push(merchants);
-                             
-                        } else if (foundData.consumer_id == consumer_id && foundData.merchant_id == merchants.user_id && foundData.is_fav == 0) {
-                            merchants.is_fav = false;
-                            data.push(merchants);
-                        }  
-
-                    } 
-                   deferred.resolve(result);
-                
-            },function(err){
-                deferred.reject(err)
-            });
-            })
-            
+            deferred.resolve(result);     
             }
         );
         return deferred.promise;
@@ -381,6 +358,21 @@ var findFavMerchant = exports.findFavMerchant = function(consumer_id,merchant_id
     return deferred.promise;
 };
 
+var findFavMerchantTest = function(consumer_id,merchant_id){
+    var cond={
+                "consumer_id": consumer_id,
+                "merchant_id": merchant_id
+        };
+    models.FavMerchants.findOne({
+        where: cond
+    }).then(function (result) {
+           return result;
+        },function (err) {
+            return err;
+        }
+    );
+    
+};
 
 
 
@@ -406,13 +398,15 @@ exports.getAllcouponByUserId = function(merchant_id, consumer_id){
 
 
 
-exports.addUsedCoupontoDatabase = function(consumer_id, merchant_id, coupon_code, coupon_type){
+exports.addUsedCoupontoDatabase = function(consumer_id, merchant_id, coupon_code, coupon_type,lat,lang){
     var deferred = Q.defer();
     models.UsedCoupons.create({
         consumer_id: consumer_id,
         merchant_id: merchant_id,
         coupon_code: coupon_code,
         coupon_type: coupon_type,
+        lat: lat,
+        lang: lang
         
     }).then(function(couponUsed) {
         deferred.resolve(couponUsed);

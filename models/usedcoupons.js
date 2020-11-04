@@ -20,7 +20,10 @@ module.exports = (sequelize, DataTypes) => {
       type :DataTypes.ENUM,
       values: ['flash','community','custom']
       },
-      coupon_code: DataTypes.STRING
+      coupon_code: DataTypes.STRING,
+      lat: DataTypes.INTEGER,
+      lang: DataTypes.INTEGER
+
   }, {
     sequelize,
     modelName: 'UsedCoupons',
