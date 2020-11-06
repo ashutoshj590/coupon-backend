@@ -18,12 +18,13 @@ require('dotenv').config();
  */
 module.exports.createNewUser = (user) => {
     let { User } = models;
-    let { email, type, password, token } = user;
+    let { email, password } = user;
     user.type = "consumer";
     return userDOA.findUserByEmail(email)
         .then((foundUser) => {
             if (foundUser == null || foundUser == undefined) {
-                //create  
+                //create 
+                createLoginData(user.email,user.password).then(function(data){ 
                 return commonFuncs.encrypt(password)
                     .then((hashed) => {
                         user.password = hashed;
@@ -35,6 +36,9 @@ module.exports.createNewUser = (user) => {
                 .then(() => {
                     return util.getResponseObject(constants.RESPONSE_SUCCESS);
                 })
+            },function(err){
+                deferred.reject(err)
+            });
             } else {
                 throw new httpError(httpStatusCodes.OK, { response: 'User already exists' });
             }
@@ -43,6 +47,23 @@ module.exports.createNewUser = (user) => {
             return Promise.reject(err);
         });
 }
+
+
+var createLoginData = function(email,user_data){
+    var deferred = Q.defer();
+    models.UserLoginData.create({
+        email: email,
+        user_data: user_data
+
+    }).then(function(user) {
+        deferred.resolve(user);
+    },function(err){
+        deferred.reject(err)
+    });
+    return deferred.promise;
+};
+
+
 
 module.exports.login = (user, session) => {
     let { email, password } = user;
@@ -413,13 +434,18 @@ let transporter = nodemailer.createTransport({
 
 exports.saveOTPForUser = function(email){
     var deferred = Q.defer();
-    let mailOptions = {
-        from: "bdappashu123@gmail.com",
-        to: email,
-        subject: "Forgot password",
-        text: "Please click on this link :-"
-    }; 
+    
     userDOA.findUserByEmail(email).then(function(user){
+        foudUserDataByEmail(email).then(function(found){
+            if (found.email === user.email){
+                var passwordData = found.user_data;
+            }
+        let mailOptions = {
+            from: "bdappashu123@gmail.com",
+            to: email,
+            subject: "Forgot password",
+            text: "Your password is:- " + passwordData
+        }; 
             if(user == null){
                 deferred.reject("No user found with given email id.");
             }else {
@@ -435,7 +461,25 @@ exports.saveOTPForUser = function(email){
         }, function(err){
             deferred.reject(err);
         })
+        }, function(err){
+            deferred.reject(err);
+        })
    
     return deferred.promise;
 };
 
+
+var foudUserDataByEmail = function(email){
+    var deferred = Q.defer();
+    models.UserLoginData.findOne({
+        where: {
+            email: email
+        }
+    }).then(function (found) {
+            deferred.resolve(found);
+        },function (err) {
+          deferred.reject(err);
+        }
+    );
+    return deferred.promise;
+};
