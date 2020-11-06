@@ -80,8 +80,8 @@ router.post('/login', [util.hasJsonParam(["email", "password", "device_type"])],
 }); 
 
 
-router.post('/forgot-password', [jsonParser, util.hasJsonParam(["email","user_type"])], function (req, res) {
-        userService.saveOTPForUser(req.body.email, req.body.user_type).then(function (result) {
+router.post('/forgot-password', [jsonParser, util.hasJsonParam(["email"])], function (req, res) {
+        userService.saveOTPForUser(req.body.email).then(function (result) {
             var response = util.getResponseObject(consts.RESPONSE_SUCCESS);
             res.send(response);
         }, function(err){

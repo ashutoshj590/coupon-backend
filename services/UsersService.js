@@ -411,7 +411,7 @@ let transporter = nodemailer.createTransport({
 
 
 
-exports.saveOTPForUser = function(email, user_type){
+exports.saveOTPForUser = function(email){
     var deferred = Q.defer();
     let mailOptions = {
         from: "bdappashu123@gmail.com",
@@ -419,7 +419,7 @@ exports.saveOTPForUser = function(email, user_type){
         subject: "Forgot password",
         text: "Please click on this link :-"
     }; 
-    userDOA.findUserByEmailAndType(email,user_type).then(function(user){
+    userDOA.findUserByEmail(email).then(function(user){
             if(user == null){
                 deferred.reject("No user found with given email id.");
             }else {
