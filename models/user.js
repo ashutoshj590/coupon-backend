@@ -24,9 +24,12 @@ module.exports = (sequelize, DataTypes) => {
         type :DataTypes.ENUM,
         values: ['android','apple']
         },
-    fcm_token: DataTypes.STRING,
-    status: DataTypes.BOOLEAN,
-    is_registered: DataTypes.BOOLEAN
+    is_registered: DataTypes.BOOLEAN,
+    login_type: {
+      type :DataTypes.ENUM,
+      values: ['g','f']
+      },
+      fb_id: DataTypes.STRING
   }, {
     sequelize,
     modelName: 'User',

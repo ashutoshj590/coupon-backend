@@ -18,7 +18,6 @@ app.use(cors())
 var https = require('https');
 var fs = require('fs');
 var passport = require('passport');
-require('./services/passport-setup');
 var cookieSession = require('cookie-session')
 
 
@@ -50,26 +49,7 @@ const IsLoggedIn = (req, res, next) => {
     }
 } 
   
-app.use(passport.initialize());
-app.use(passport.session());
 
-app.get('/', (req, res) => res.send('you are not looged in'))
-app.get('/failed', (req, res) => res.send('you failed to login'))
-app.get('/good', IsLoggedIn,(req, res) => res.send('welcome ashutosh !'))
-
-app.get('/google',passport.authenticate('google', { scope: ['profile','email'] }));
-
-app.get('/google/callback',passport.authenticate('google', { failureRedirect: '/failed' }),
-  function(req, res) {
-    // Successful authentication, redirect home.
-    res.redirect('/good');
-  });
-
-app.get('/logout0', (req, res) => {
-    req.session = null;
-    req.logout();
-    res.redirect('/');
-})  
 
 
 var sequelize = new Sequelize(config.database.db_name, config.database.db_user, config.database.db_pass, {

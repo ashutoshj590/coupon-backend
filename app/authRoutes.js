@@ -7,6 +7,7 @@ var consts = require('../lib/consts.js');
 var session = require('express-session');
 const jwt = require('jsonwebtoken');
 var bodyParser = require('body-parser');
+const passport = require('passport');
 var jsonParser = bodyParser.json({limit: '10mb'});
 
 /* API funcation for crearte new user sign up..................*/
@@ -94,7 +95,9 @@ router.post('/forgot-password', [jsonParser, util.hasJsonParam(["email"])], func
             res.send(response);
         })
 });
-  
+
+
+
 
 
 
