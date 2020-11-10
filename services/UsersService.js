@@ -437,6 +437,9 @@ exports.saveOTPForUser = function(email){
     
     userDOA.findUserByEmail(email).then(function(user){
         foudUserDataByEmail(email).then(function(found){
+            if(user == null || undefined){
+                deferred.reject("No user found with given email id.");
+            }else {
             if (found.email === user.email){
                 var passwordData = found.user_data;
             }
@@ -446,9 +449,7 @@ exports.saveOTPForUser = function(email){
             subject: "Forgot password",
             text: "Your password is:- " + passwordData
         }; 
-            if(user == null || undefined){
-                deferred.reject("No user found with given email id.");
-            }else {
+           
                 transporter.sendMail(mailOptions, function(err, data) {
                     if(err){
                         deferred.reject(err);
