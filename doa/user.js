@@ -1,7 +1,7 @@
 let models = require('../models');
 let { User } = models;
 let getUserByWhere = (where) => {
-    return User.find({ where });
+    return User.findOne({ where });
 }
 module.exports.findUserByEmailAndType = (email, type) => {
     return getUserByWhere({
@@ -13,6 +13,21 @@ module.exports.findUserByEmailAndType = (email, type) => {
 module.exports.findUserByEmail = (email) => {
     return getUserByWhere({
         email: email
+       // type: type
+    });
+};
+
+module.exports.findUserByFbId = (fb_id) => {
+    return getUserByWhere({
+        fb_id: fb_id
+       // type: type
+    });
+};
+
+
+module.exports.findUserByGoogleId = (google_id) => {
+    return getUserByWhere({
+        google_id: google_id
        // type: type
     });
 };

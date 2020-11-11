@@ -51,7 +51,6 @@ const IsLoggedIn = (req, res, next) => {
   
 
 
-
 var sequelize = new Sequelize(config.database.db_name, config.database.db_user, config.database.db_pass, {
     host: config.database.hostname,
     dialect: 'mysql',

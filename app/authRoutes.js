@@ -99,6 +99,71 @@ router.post('/forgot-password', [jsonParser, util.hasJsonParam(["email"])], func
 
 
 
+router.post('/google-login', [util.hasJsonParam(["device_type","login_type","google_id"])], function (req, res) { 
+    var userObject = req.body;
+    userService.googleLogin(userObject).then(function (data) {
+      var response = util.getResponseObject(consts.RESPONSE_SUCCESS);
+      jwt.sign({userObject}, 'secretkey', { expiresIn: '1d'}, (err, token) => {
+       var tokenString = token;
+      var sessionDetail = {};
+      sessionDetail.user_id = data.id;
+      sessionDetail.type = data.type;
+      sessionDetail.device_type = data.device_type;
+      sessionDetail.is_registered = false;
+      if(data.is_registered === true){
+        sessionDetail.is_registered = true;
+      }
+      sessionDetail.token = 'Bearer ' + tokenString;
+      response['user_Detail'] = sessionDetail;
+      res.send(response);
+    });
+
+    }, function (err) {
+        if(err.errors !== undefined && err.errors[0] !== undefined ){
+            var response = util.getResponseObject(consts.RESPONSE_ERROR, err.response);
+            res.send(response);
+        }else{
+            var response = util.getResponseObject(consts.RESPONSE_ERROR, err.response);
+        }
+        res.send(response);
+    }
+);
+}); 
+
+
+router.post('/facebook-login', [util.hasJsonParam(["device_type","login_type","fb_id"])], function (req, res) { 
+    var userObject = req.body;
+    userService.facebookLogin(userObject).then(function (data) {
+      var response = util.getResponseObject(consts.RESPONSE_SUCCESS);
+      jwt.sign({userObject}, 'secretkey', { expiresIn: '1d'}, (err, token) => {
+       var tokenString = token;
+      var sessionDetail = {};
+      sessionDetail.user_id = data.id;
+      sessionDetail.type = data.type;
+      sessionDetail.device_type = data.device_type;
+      sessionDetail.is_registered = false;
+      if(data.is_registered === true){
+        sessionDetail.is_registered = true;
+      }
+      sessionDetail.token = 'Bearer ' + tokenString;
+      response['user_Detail'] = sessionDetail;
+      res.send(response);
+    });
+
+    }, function (err) {
+        if(err.errors !== undefined && err.errors[0] !== undefined ){
+            var response = util.getResponseObject(consts.RESPONSE_ERROR, err.response);
+            res.send(response);
+        }else{
+            var response = util.getResponseObject(consts.RESPONSE_ERROR, err.response);
+        }
+        res.send(response);
+    }
+);
+}); 
+
+
+
 
 
 module.exports = router;

@@ -29,7 +29,8 @@ module.exports = (sequelize, DataTypes) => {
       type :DataTypes.ENUM,
       values: ['g','f']
       },
-      fb_id: DataTypes.STRING
+      fb_id: DataTypes.STRING,
+      google_id: DataTypes.STRING
   }, {
     sequelize,
     modelName: 'User',

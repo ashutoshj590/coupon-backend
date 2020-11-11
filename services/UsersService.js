@@ -90,8 +90,79 @@ module.exports.login = (user, session) => {
                     return Promise.reject(err);
                 })
         });
-} 
+}
 
+
+
+module.exports.googleLogin = (user) => {
+    let { User } = models;
+    let { email, google_id } = user;
+    user.type = "consumer";
+    return userDOA.findUserByGoogleId(google_id)
+        .then((foundUser) => {
+            if (foundUser == null || foundUser == undefined) {
+                //create 
+                return userDOA.createUser(user)   
+                .then(() => {
+                    return userDOA.findUserByGoogleId(google_id)
+                    .then((user) => {
+                        return user;
+                   
+                    })
+                })
+       
+            } else {
+                return userDOA.findUserByGoogleId(google_id)
+                    .then((user) => {
+                        return user;
+                   
+                    })
+                    .catch((err) => {
+                        return Promise.reject(err);
+                    })
+                    
+            }
+        })
+        .catch((err) => {
+            return Promise.reject(err);
+        });
+}
+
+
+
+module.exports.facebookLogin = (user) => {
+    let { User } = models;
+    let { email, fb_id } = user;
+    user.type = "consumer";
+    return userDOA.findUserByFbId(fb_id)
+        .then((foundUser) => {
+            if (foundUser == null || foundUser == undefined) {
+                //create 
+                return userDOA.createUser(user)   
+                .then(() => {
+                    return userDOA.findUserByFbId(fb_id)
+                    .then((user) => {
+                        return user;
+                   
+                    })
+                })
+       
+            } else {
+                return userDOA.findUserByFbId(fb_id)
+                    .then((user) => {
+                        return user;
+                   
+                    })
+                    .catch((err) => {
+                        return Promise.reject(err);
+                    })
+                    
+            }
+        })
+        .catch((err) => {
+            return Promise.reject(err);
+        });
+}
 
 
 
