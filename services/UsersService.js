@@ -556,3 +556,41 @@ var foudUserDataByEmail = function(email){
     );
     return deferred.promise;
 };
+
+
+
+exports.getAllMerchant = function(){
+    var deferred = Q.defer();
+    var replacements = null;
+
+    var query =  'SELECT Registrations.*, MAX(UserSubCateMaps.createdAt) as sub_cat_created ,Users.email, GROUP_CONCAT(UploadImgs.image ORDER BY UploadImgs.image) AS images ' +
+                'FROM UserSubCateMaps LEFT JOIN Registrations ON Registrations.user_id = UserSubCateMaps.user_id LEFT JOIN UploadImgs ON UploadImgs.user_id = Registrations.user_id ' +
+                'LEFT JOIN Users ON Users.id = Registrations.user_id GROUP BY Registrations.id';
+
+
+    models.sequelize.query(query,
+        { replacements: replacements, type: models.sequelize.QueryTypes.SELECT }
+    ).then(function(data) {
+        deferred.resolve(data);
+
+        }
+    );
+    return deferred.promise;
+};
+
+
+exports.getAllConsumer = function(){
+    var deferred = Q.defer();
+    var replacements = null;
+
+    var query =  'SELECT * from Users where Users.type = "consumer"';
+
+    models.sequelize.query(query,
+        { replacements: replacements, type: models.sequelize.QueryTypes.SELECT }
+    ).then(function(data) {
+        deferred.resolve(data);
+
+        }
+    );
+    return deferred.promise;
+};

@@ -17,9 +17,8 @@ var cors = require('cors');
 app.use(cors())
 var https = require('https');
 var fs = require('fs');
-var passport = require('passport');
-var cookieSession = require('cookie-session')
-
+var admin = require("firebase-admin");
+var serviceAccount = require("./certs/coupon-app-293511-firebase-adminsdk-qig61-26c962f44d.json");
 
 app.use(function(req, res, next) {
     res.header("Access-Control-Allow-Origin", "https://www.mccpapp.com"); // http://localhost:4200   //https://www.mccpapp.com
@@ -36,19 +35,33 @@ app.use("/public", express.static(path.join(__dirname, 'public')));
 app.use(bodyParser.urlencoded({extended: false}))
 app.use(bodyParser.json())
 
-app.use(cookieSession({
-    name: 'coupon-session',
-    keys: ['key1', 'key2']
-  }))
-
-const IsLoggedIn = (req, res, next) => {
-    if (req.user) {
-        next();
-    } else {
-        res.sendStatus(401);
-    }
-} 
+/*admin.initializeApp({
+    credential: admin.credential.cert(serviceAccount),
+    databaseURL: "https://coupon-app-293511.firebaseio.com"
+  });
+ 
   
+var token = [''];  
+
+var payload = {
+    notification: {
+        title: "This is a notification",
+        body: "This is the body of the notification message"
+    }
+};
+
+var options = {
+    priority: "high",
+    timeToLive: 60 * 60 * 24
+};
+
+admin.messaging().sendToDevice(token, payload, options)
+.then(function(response){
+    console.log("Successfully sent message:", response);
+})
+.catch(function(error){
+    console.log("Error sending message:", error);
+}); */
 
 
 var sequelize = new Sequelize(config.database.db_name, config.database.db_user, config.database.db_pass, {
@@ -132,7 +145,7 @@ var sslSever = https.createServer(
    app
 )
 
-sslSever.listen(8080, () => console.log("Secure server on port 8080"))
+sslSever.listen(8080, () => console.log("Secure server on port 8080")) 
 
 
 

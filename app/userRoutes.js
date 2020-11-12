@@ -204,6 +204,41 @@ router.post('/give-feedback',[jsonParser,util.hasJsonParam(["user_id","feedback"
     });
 
 
+router.post('/get-all-merchant',jsonParser, function (req, res) {
+    userService.getAllMerchant().then(function (allmerchant) {
+        var response = util.getResponseObject(consts.RESPONSE_SUCCESS);
+            response['merchant_list'] = allmerchant;
+            res.send(response);
+        }, function (err) {
+        if(err.errors !== undefined && err.errors[0] !== undefined ){
+        var response = util.getResponseObject(consts.RESPONSE_ERROR, err.response);
+        res.send(response);
+        }else{
+            var response = util.getResponseObject(consts.RESPONSE_ERROR, err.response);
+        }
+            res.send(response);
+            }
+    );
+});
+
+
+router.post('/get-all-consumer',jsonParser, function (req, res) {
+    userService.getAllConsumer().then(function (allconsumer) {
+        var response = util.getResponseObject(consts.RESPONSE_SUCCESS);
+            response['consumer_list'] = allconsumer;
+            res.send(response);
+        }, function (err) {
+        if(err.errors !== undefined && err.errors[0] !== undefined ){
+        var response = util.getResponseObject(consts.RESPONSE_ERROR, err.response);
+        res.send(response);
+        }else{
+            var response = util.getResponseObject(consts.RESPONSE_ERROR, err.response);
+        }
+            res.send(response);
+            }
+    );
+});    
+
 
 
 

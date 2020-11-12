@@ -26,6 +26,7 @@
     "express-jwt": "^6.0.0",
     "express-session": "^1.17.1",
     "fb": "^1.1.1",
+    "firebase-admin": "^9.3.0",
     "fs": "0.0.2",
     "handlebars": "^4.0.6",
     "https": "^1.0.0",
