@@ -731,3 +731,41 @@ exports.getAllUsedCoupons = function(consumer_id){
     );
     return deferred.promise;
 };
+
+
+
+
+exports.getAllcouponByMerchantId = function(merchant_id){
+    var deferred = Q.defer();
+    var cond={
+                "user_id": merchant_id
+     };
+    models.Coupons.findAll({
+      where: cond
+    }).then(function (allCoupons) {
+            deferred.resolve(allCoupons);
+        },function (err) {
+          deferred.reject(err);
+        }
+    );
+    return deferred.promise;
+};
+
+
+
+
+exports.getAllcouponByConsumerId = function(consumer_id){
+    var deferred = Q.defer();
+    var cond={
+                "consumer_id": consumer_id
+     };
+    models.Coupons.findAll({
+      where: cond
+    }).then(function (allCoupons) {
+            deferred.resolve(allCoupons);
+        },function (err) {
+          deferred.reject(err);
+        }
+    );
+    return deferred.promise;
+};

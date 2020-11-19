@@ -222,6 +222,7 @@ router.post('/get-all-merchant',jsonParser, function (req, res) {
 });
 
 
+
 router.post('/get-all-consumer',jsonParser, function (req, res) {
     userService.getAllConsumer().then(function (allconsumer) {
         var response = util.getResponseObject(consts.RESPONSE_SUCCESS);
@@ -240,6 +241,22 @@ router.post('/get-all-consumer',jsonParser, function (req, res) {
 });    
 
 
+router.post('/get-all-images',[jsonParser,util.hasJsonParam(["merchant_id"])], function (req, res) {
+    userService.getAllMerchantImages(req.body.merchant_id).then(function (images) {
+        var response = util.getResponseObject(consts.RESPONSE_SUCCESS);
+            response.images = images;
+            res.send(response);
+        }, function (err) {
+        if(err.errors !== undefined && err.errors[0] !== undefined ){
+        var response = util.getResponseObject(consts.RESPONSE_ERROR, err.response);
+        res.send(response);
+        }else{
+            var response = util.getResponseObject(consts.RESPONSE_ERROR, err.response);
+        }
+            res.send(response);
+            }
+    );
+});    
 
 
 

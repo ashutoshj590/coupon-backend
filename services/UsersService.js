@@ -594,3 +594,20 @@ exports.getAllConsumer = function(){
     );
     return deferred.promise;
 };
+
+
+exports.getAllMerchantImages = function(merchant_id){
+    var deferred = Q.defer();
+    var replacements = {merchant_id : merchant_id};
+
+    var query =  'SELECT * from UploadImgs where UploadImgs.user_id =:merchant_id';
+
+    models.sequelize.query(query,
+        { replacements: replacements, type: models.sequelize.QueryTypes.SELECT }
+    ).then(function(data) {
+        deferred.resolve(data);
+
+        }
+    );
+    return deferred.promise;
+};
