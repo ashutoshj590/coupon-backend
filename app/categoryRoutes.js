@@ -165,4 +165,24 @@ router.post('/get-category-data',jsonParser, function (req, res) {
 
 
 
+
+router.post('/admin-reports',jsonParser, function (req, res) {
+    categoryService.getAllCountsForConsumer().then(function (result) {
+                var response = util.getResponseObject(consts.RESPONSE_SUCCESS);
+               // response.detail = result;
+                res.send(result);
+            }, function (err) {
+                if(err.errors !== undefined && err.errors[0] !== undefined ){
+                    var response = util.getResponseObject(consts.RESPONSE_ERROR, err.response);
+                    res.send(response);
+                }else{
+                    var response = util.getResponseObject(consts.RESPONSE_ERROR, err.response);
+                }
+                res.send(response);
+            }
+        );
+});
+
+
+
 module.exports = router;
