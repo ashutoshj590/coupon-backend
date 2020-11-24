@@ -104,6 +104,19 @@ router.post('/add-sub-category', upload.single('subcateimg'), function (req, res
     );
 });
 
+router.post('/file', upload.single('file'), (req, res, next) => {
+    const file = req.file;
+    console.log("//////=======//////")
+    console.log(file.filename);
+    if (!file) {
+        const error = new Error('No File')
+        error.httpStatusCode = 400
+        return next(error)
+    }
+    res.send(file);
+
+})
+
 
 /* API for get sub category form database.............*/
 router.post('/get-sub-category',[jsonParser, util.hasJsonParam(["category_id"])], function (req, res) {

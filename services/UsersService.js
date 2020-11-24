@@ -611,3 +611,59 @@ exports.getAllMerchantImages = function(merchant_id){
     );
     return deferred.promise;
 };
+
+
+exports.changeStatustoMerchant = function(merchant_id){
+    var deferred = Q.defer();
+    findMerchant(merchant_id).then(function(foundData) {
+            if (foundData.status == 1 || foundData.status == null) {
+                models.Registration.update({
+                    status: 0
+                },{
+                    where: {
+                        user_id: merchant_id
+                    }
+                }).then(function(added) {
+                    deferred.resolve(added);
+                },function(err){
+                    deferred.reject(err)
+                });
+            } else if (foundData.status == 0 || foundData.status == null) {
+                models.Registration.update({
+                    status: 1
+                },{
+                    where: {
+                        user_id: merchant_id
+                    }
+                }).then(function(added) {
+                    deferred.resolve(added);
+                },function(err){
+                    deferred.reject(err)
+                });
+
+            }
+         
+},function(err){
+    deferred.reject(err)
+});
+    return deferred.promise;
+};
+
+
+
+
+var findMerchant = function(merchant_id){
+    var deferred = Q.defer();
+    var cond={
+                "user_id": merchant_id
+        };
+    models.Registration.findOne({
+        where: cond
+    }).then(function (result) {
+            deferred.resolve(result);
+        },function (err) {
+            deferred.reject(err);
+        }
+    );
+    return deferred.promise;
+};

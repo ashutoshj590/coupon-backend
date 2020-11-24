@@ -38,9 +38,13 @@ module.exports = (sequelize, DataTypes) => {
       type :DataTypes.BOOLEAN
       },
       lat: DataTypes.INTEGER,
-      lang: DataTypes.INTEGER
+      lang: DataTypes.INTEGER,
+      status: {
+        type :DataTypes.BOOLEAN
+        }
 
-  }, {
+  },
+   {
     sequelize,
     modelName: 'Registration',
   });

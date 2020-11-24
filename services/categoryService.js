@@ -75,7 +75,7 @@ exports.createSubCategory = function(category_id, name, imgUrl){
     models.SubCategory.create({
         category_id: category_id,
         name: name,
-        img_url: imgUrl.path,
+        img_url: imgUrl.filename,
         status: 1,
         is_deleted: 0
 
@@ -205,7 +205,7 @@ exports.getAllCountsForConsumer = function(){
         { replacements: replacements, type: models.sequelize.QueryTypes.SELECT }
     ).then(function(createdCounts) {
         var object = {};
-        countsForMerchant().then(function(commCounts) {
+        countsForMerchantAdmin().then(function(commCounts) {
             countsForAllCoupons().then(function(cusCounts) {
                 countsForCustom().then(function(usedCounts) {
                     countsForAndroid().then(function(reqCounts) {
@@ -259,7 +259,7 @@ exports.getAllCountsForConsumer = function(){
 
 
 
-var countsForMerchant = function(){
+var countsForMerchantAdmin = function(){
     var deferred = Q.defer();
     var replacements = null;
     var query = "select COUNT(*) as merchant from Users WHERE type='merchant,consumer'";

@@ -256,7 +256,25 @@ router.post('/get-all-images',[jsonParser,util.hasJsonParam(["merchant_id"])], f
             res.send(response);
             }
     );
-});    
+});
+
+
+
+router.post('/status-update',[jsonParser,util.hasJsonParam(["merchant_id"])], function (req, res) { 
+    userService.changeStatustoMerchant(req.body.merchant_id).then(function (result) {
+                var response = util.getResponseObject(consts.RESPONSE_SUCCESS);
+                res.send(response);
+            }, function (err) {
+                if(err.errors !== undefined && err.errors[0] !== undefined ){
+                    var response = util.getResponseObject(consts.RESPONSE_ERROR, err.response);
+                    res.send(response);
+                }else{
+                    var response = util.getResponseObject(consts.RESPONSE_ERROR, err.response);
+                }
+                res.send(response);
+            }
+        );
+});
 
 
 

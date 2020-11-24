@@ -470,8 +470,36 @@ router.post('/get-used-coupons',[jsonParser,util.hasJsonParam(["consumer_id"])],
 router.post('/get-coupons-admin',[jsonParser,util.hasJsonParam(["merchant_id"])], function (req, res) { 
     couponService.getAllcouponByMerchantId(req.body.merchant_id).then(function (detail) {
                 var response = util.getResponseObject(consts.RESPONSE_SUCCESS);
-                response.coupon_detail = detail;
-                res.send(response);
+                var data = [];
+                detail.forEach(function(coupon, index){
+                    if (coupon.days == null){
+                        coupon.days = "NA";
+                    }
+                   if (coupon.start_time == null){
+                        coupon.start_time = "NA";
+                    }
+                   if (coupon.end_time == null){
+                        coupon.end_time = "NA";
+                    }
+                   if (coupon.expiry_date == null){
+                        coupon.expiry_date = "NA";
+                    }
+                   if (coupon.flash_deal == null){
+                        coupon.flash_deal = "NA";
+                    }
+                  if (coupon.description == null){
+                        coupon.description = "NA";
+                    }
+                   if (coupon.restriction == null){
+                        coupon.restriction = "NA";
+                    }
+                   if (coupon.short_name == null){
+                        coupon.short_name = "NA";
+                    }
+                    data.push(coupon);  
+                })
+                response.coupon_detail = data;
+                    res.send(response);      
             
             }, function (err) {
                 if(err.errors !== undefined && err.errors[0] !== undefined ){
@@ -490,8 +518,36 @@ router.post('/get-coupons-admin',[jsonParser,util.hasJsonParam(["merchant_id"])]
 router.post('/get-coupons-consumer',[jsonParser,util.hasJsonParam(["consumer_id"])], function (req, res) { 
     couponService.getAllcouponByConsumerId(req.body.consumer_id).then(function (detail) {
                 var response = util.getResponseObject(consts.RESPONSE_SUCCESS);
-                response.coupon_detail = detail;
-                res.send(response);
+                var data = [];
+                detail.forEach(function(coupon, index){
+                    if (coupon.days == null){
+                        coupon.days = "NA";
+                    }
+                   if (coupon.start_time == null){
+                        coupon.start_time = "NA";
+                    }
+                   if (coupon.end_time == null){
+                        coupon.end_time = "NA";
+                    }
+                   if (coupon.expiry_date == null){
+                        coupon.expiry_date = "NA";
+                    }
+                   if (coupon.flash_deal == null){
+                        coupon.flash_deal = "NA";
+                    }
+                  if (coupon.description == null){
+                        coupon.description = "NA";
+                    }
+                   if (coupon.restriction == null){
+                        coupon.restriction = "NA";
+                    }
+                   if (coupon.short_name == null){
+                        coupon.short_name = "NA";
+                    }
+                    data.push(coupon);  
+                })
+                response.coupon_detail = data;
+                    res.send(response);      
             
             }, function (err) {
                 if(err.errors !== undefined && err.errors[0] !== undefined ){
