@@ -257,12 +257,12 @@ router.post('/get-merchant-by-category',[jsonParser,util.hasJsonParam(["sub_cate
         var output = [];
         async.eachSeries(detail,function(data,callback){ 
          data.is_fav = false;
-         couponService.findFavMerchant(req.body.consumer_id, data.user_id).then(function(foundData){
+         couponService.findFavMerchant(consumerId, data.user_id).then(function(foundData){
             if (foundData != null || undefined){
-                if (foundData.consumer_id == req.body.consumer_id && foundData.merchant_id == data.user_id && foundData.is_fav == 1) {
+                if (foundData.consumer_id == consumerId && foundData.merchant_id == data.user_id && foundData.is_fav == 1) {
                     data.is_fav = true;
                    
-                } else if (foundData.consumer_id == req.body.consumer_id && foundData.merchant_id == data.user_id && foundData.is_fav == 0) {
+                } else if (foundData.consumer_id == consumerId && foundData.merchant_id == data.user_id && foundData.is_fav == 0) {
                     data.is_fav = false;
                    
                 }
