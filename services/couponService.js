@@ -336,7 +336,7 @@ exports.getMerchantDetailbySubCateId = function(sub_category_id, consumer_id, la
            result.coupon_detail = output;
            var output1 = [];
         result.forEach(function(obj, index) {
-            var unit =  "K";       //commented when value need in miles
+            var unit =  "M";       //commented when value need in miles
             var data = calculatedistance(lat1, lon1, obj.lat, obj.lang, unit);
            // obj.distance = data;
             if (data <= 10){ 
@@ -368,7 +368,7 @@ models.sequelize.query(query,
     ).then(function(result) {
         var output = [];
         result.forEach(function(obj, index) {
-            var unit =  "K";       //commented when value need in miles
+            var unit =  "M";       //commented when value need in miles
             var data = calculatedistance(lat1, lon1, obj.lat, obj.lang, unit);
            // obj.distance = data;
             if (data <= 10){ 
