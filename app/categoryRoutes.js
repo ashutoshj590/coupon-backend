@@ -15,7 +15,7 @@ var storage = multer.diskStorage({
         cb(null, 'public/images/uploaded_images/')
     },
     filename: function (req, file, cb) {
-        cb(null, file.fieldname)
+        cb(null, file.originalname)
     }
 })
 
