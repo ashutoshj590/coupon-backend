@@ -1,5 +1,6 @@
 var express = require('express');
 var router = express.Router();
+var app = express();
 var bodyParser = require('body-parser');
 var categoryService = require('../services/categoryService.js');
 var util = require('../lib/Utils.js');
@@ -7,20 +8,32 @@ var consts = require('../lib/consts.js');
 var jsonParser = bodyParser.json({limit: '10mb'});
 var sessionTime = 1 * 60 *  60 * 1000;       //1 hour session
 const jwt = require('jsonwebtoken');
-
 var multer = require('multer');
-
+var fileExtension = require('file-extension')
 var storage = multer.diskStorage({
     destination: function(req, file, cb) {
         cb(null, 'public/images/uploaded_images/')
     },
-    filename: function(req, file, cb) {
-        cb(null, file.originalname)
+    filename: function (req, file, cb) {
+        cb(null, file.fieldname + '-' + Date.now() + '.' + fileExtension(file.originalname))
     }
 })
 
-var upload = multer({storage: storage})
-
+var upload = multer({
+    storage: storage,
+    limits: {
+        // Setting Image Size Limit to 2MBs
+        fileSize: 2000000
+    },
+    fileFilter(req, file, cb) {
+        if (!file.originalname.match(/\.(jpg|jpeg|png)$/)) {
+            //Error 
+            cb(new Error('Please upload JPG and PNG images only!'))
+        }
+        //Success 
+        cb(undefined, true)
+    }
+})
 
 
 /* API for  Add new Category.............*/
@@ -104,9 +117,9 @@ router.post('/add-sub-category', upload.single('subcateimg'), function (req, res
     );
 });
 
-router.post('/file', upload.single('file'), (req, res, next) => {
+
+router.post('/file', upload.single('uploadedImage'), (req, res, next) => {
     const file = req.file;
-    console.log("//////=======//////")
     console.log(file.filename);
     if (!file) {
         const error = new Error('No File')
@@ -116,6 +129,8 @@ router.post('/file', upload.single('file'), (req, res, next) => {
     res.send(file);
 
 })
+
+
 
 
 /* API for get sub category form database.............*/

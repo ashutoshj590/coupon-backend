@@ -20,9 +20,11 @@ var fs = require('fs');
 var admin = require("firebase-admin");
 var serviceAccount = require("./certs/coupon-app-293511-firebase-adminsdk-qig61-26c962f44d.json");
 
+
 app.use(function(req, res, next) {
-    res.header("Access-Control-Allow-Origin", "https://www.mccpapp.com"); // http://localhost:4200   //https://www.mccpapp.com
-    res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept, Authorization"); 
+    res.setHeader("Access-Control-Allow-Origin", "*"); // http://localhost:4200   //https://www.mccpapp.com
+    res.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept, Authorization");
+    res.setHeader("Access-Control-Allow-Headers", 'POST, GET, PATCH, DELETE, OPTIONS');  
     next();
   });
  
@@ -32,9 +34,10 @@ app.use("/public", express.static(path.join(__dirname, 'public')));
 
 
 
+
 app.use(bodyParser.json({limit: '10mb', extended: true}))
 app.use(bodyParser.urlencoded({limit: '10mb', extended: true}))
-
+app.use(cookieParser());
 /*admin.initializeApp({
     credential: admin.credential.cert(serviceAccount),
     databaseURL: "https://coupon-app-293511.firebaseio.com"

@@ -1,7 +1,7 @@
 var models = require('../models/index.js');
 //var redis = require('../lib/redis.js');
 var Q = require('q');
-
+var async = require('async');
 var uniqid = require('uniqid');
 
 
@@ -309,7 +309,7 @@ exports.getAllRequestForConsumer = function(consumer_id){
 };
 
 
-exports.getMerchantDetailbySubCateId = function(sub_category_id){
+exports.getMerchantDetailbySubCateId = function(sub_category_id, consumer_id, lat1, lon1){
     var deferred = Q.defer();
     var replacements = {sub_category_id : sub_category_id};
     
@@ -319,8 +319,34 @@ exports.getMerchantDetailbySubCateId = function(sub_category_id){
                 
     models.sequelize.query(query,
         { replacements: replacements, type: models.sequelize.QueryTypes.SELECT }
-        ).then(function(result) {    
-            deferred.resolve(result);     
+        ).then(function(result) {
+            var output = [];    
+           // deferred.resolve(result);
+           async.eachSeries(result,function(data,callback){ 
+            getAllcouponByUserId(data.user_id, consumer_id).then(function(foundData){
+               data.couponDetail = foundData;
+               output.push(data);
+               callback();
+          }, function(err){
+              deferred.reject(err);
+          })
+           
+   
+       }, function(err, detail) {
+           result.coupon_detail = output;
+           var output1 = [];
+        result.forEach(function(obj, index) {
+            var unit =  "K";       //commented when value need in miles
+            var data = calculatedistance(lat1, lon1, obj.lat, obj.lang, unit);
+           // obj.distance = data;
+            if (data <= 10){ 
+            output1.push(obj);
+            }
+        })
+          deferred.resolve(output1);   
+          // deferred.resolve(result);
+       });
+                 
             }
         );
         return deferred.promise;
@@ -342,7 +368,7 @@ models.sequelize.query(query,
     ).then(function(result) {
         var output = [];
         result.forEach(function(obj, index) {
-            var unit =  "K";
+            var unit =  "K";       //commented when value need in miles
             var data = calculatedistance(lat1, lon1, obj.lat, obj.lang, unit);
            // obj.distance = data;
             if (data <= 10){ 
@@ -417,7 +443,7 @@ var findFavMerchant = exports.findFavMerchant = function(consumer_id,merchant_id
 
 
 
-exports.getAllcouponByUserId = function(merchant_id, consumer_id){
+var getAllcouponByUserId = exports.getAllcouponByUserId = function(merchant_id, consumer_id){
     var deferred = Q.defer();
     var replacements = {merchant_id : merchant_id, consumer_id : consumer_id};
 

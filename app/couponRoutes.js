@@ -245,8 +245,14 @@ router.post('/get-request-consumer',[jsonParser,util.hasJsonParam(["consumer_id"
 
 
 
-router.post('/get-merchant-by-category',[jsonParser,util.hasJsonParam(["sub_category_id","consumer_id"])], function (req, res) { 
-    couponService.getMerchantDetailbySubCateId(req.body.sub_category_id).then(function (detail) {
+router.post('/get-merchant-by-category',[jsonParser,util.hasJsonParam(["sub_category_id","lat1","lon1"])], function (req, res) {
+    var consumerId;
+    if (req.body.consumer_id){
+        consumerId = req.body.consumer_id;
+    } else {
+        consumerId = null;
+    }
+    couponService.getMerchantDetailbySubCateId(req.body.sub_category_id, consumerId, req.body.lat1, req.body.lon1).then(function (detail) {
         var response = util.getResponseObject(consts.RESPONSE_SUCCESS);
         var output = [];
         async.eachSeries(detail,function(data,callback){ 

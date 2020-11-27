@@ -196,7 +196,8 @@ exports.createMerchantDetail = function(userId, address, city, state, zipcode, o
         sub_category_id: subCategoryId,
         notification_email: notification_email,
         lat: lat,
-        lang: lang
+        lang: lang,
+        status: 1
     }).then(function(merchantDetail) {
         var cateArray = merchantDetail.sub_category_id.split(",");
         addSubCatetoMap(userId, cateArray).then(function(added){
