@@ -9,31 +9,20 @@ var jsonParser = bodyParser.json({limit: '10mb'});
 var sessionTime = 1 * 60 *  60 * 1000;       //1 hour session
 const jwt = require('jsonwebtoken');
 var multer = require('multer');
-var fileExtension = require('file-extension')
+
 var storage = multer.diskStorage({
     destination: function(req, file, cb) {
         cb(null, 'public/images/uploaded_images/')
     },
     filename: function (req, file, cb) {
-        cb(null, file.fieldname + '-' + Date.now() + '.' + fileExtension(file.originalname))
+        cb(null, file.fieldname)
     }
 })
 
-var upload = multer({
-    storage: storage,
-    limits: {
-        // Setting Image Size Limit to 2MBs
-        fileSize: 2000000
-    },
-    fileFilter(req, file, cb) {
-        if (!file.originalname.match(/\.(jpg|jpeg|png)$/)) {
-            //Error 
-            cb(new Error('Please upload JPG and PNG images only!'))
-        }
-        //Success 
-        cb(undefined, true)
-    }
-})
+var upload = multer({ storage: storage })
+    
+    
+
 
 
 /* API for  Add new Category.............*/

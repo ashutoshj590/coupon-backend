@@ -75,7 +75,7 @@ exports.createSubCategory = function(category_id, name, imgUrl){
     models.SubCategory.create({
         category_id: category_id,
         name: name,
-        img_url: imgUrl.filename,
+        img_url: imgUrl.path,
         status: 1,
         is_deleted: 0
 
