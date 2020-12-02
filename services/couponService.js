@@ -353,33 +353,57 @@ exports.getMerchantDetailbySubCateId = function(sub_category_id, consumer_id, la
     };
 
 
-exports.getAllmerchantBySerach = function(search_query, lat1, lon1){
+exports.getAllmerchantBySerach = function(search_query, lat1, lon1, consumer_id, range){
   var searchQuery = search_query+'%';
 var deferred = Q.defer();
 var replacements = {search_query : searchQuery};
 
 var query = 'SELECT Registrations.*, MAX(UserSubCateMaps.createdAt) as sub_cat_created , GROUP_CONCAT(UploadImgs.image ORDER BY UploadImgs.image) AS images ' +
                 'FROM UserSubCateMaps LEFT JOIN Registrations ON Registrations.user_id = UserSubCateMaps.user_id LEFT JOIN UploadImgs ON UploadImgs.user_id = Registrations.user_id ' +
-                'where Registrations.business_name like :search_query GROUP BY Registrations.id';
+                'where Registrations.business_name like :search_query OR Registrations.address like :search_query GROUP BY Registrations.id';
 
             
 models.sequelize.query(query,
     { replacements: replacements, type: models.sequelize.QueryTypes.SELECT }
     ).then(function(result) {
-        var output = [];
-        result.forEach(function(obj, index) {
-            var unit =  "M";       //commented when value need in miles
-            var data = calculatedistance(lat1, lon1, obj.lat, obj.lang, unit);
-           // obj.distance = data;
-            if (data <= 10){ 
-            output.push(obj);
-            }
-        })
-        deferred.resolve(output);     
+        var output = [];    
+        // deferred.resolve(result);
+        async.eachSeries(result,function(data,callback){ 
+         getAllcouponByUserId(data.user_id, consumer_id).then(function(foundData){
+            data.couponDetail = foundData;
+            output.push(data);
+            callback();
+       }, function(err){
+           deferred.reject(err);
+       })
+        
+
+    }, function(err, detail) {
+        result.coupon_detail = output;
+        var output1 = [];
+     result.forEach(function(obj, index) {
+         var unit =  "M";       //commented when value need in miles
+         var data = calculatedistance(lat1, lon1, obj.lat, obj.lang, unit);
+        // obj.distance = data;
+        var setRange;
+        if (range){
+            setRange = range; 
+        } else {
+            setRange = 10; 
         }
-    );
-    return deferred.promise;
-};
+         if (data <= setRange){
+         output1.push(obj);
+         }
+     })
+       deferred.resolve(output1);   
+       // deferred.resolve(result);
+    });
+              
+         }
+     );
+     return deferred.promise;
+ };
+
     
 //where Registrations.business_name like :search_query';
 var calculatedistance = function(lat1, lon1, lat2, lon2, unit){
