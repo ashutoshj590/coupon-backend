@@ -20,6 +20,7 @@ module.exports.createNewUser = (user) => {
     let { User } = models;
     let { email, password } = user;
     user.type = "consumer";
+    user.is_registered = 0;
     return userDOA.findUserByEmail(email)
         .then((foundUser) => {
             if (foundUser == null || foundUser == undefined) {
@@ -98,6 +99,7 @@ module.exports.googleLogin = (user) => {
     let { User } = models;
     let { email, google_id } = user;
     user.type = "consumer";
+    user.is_registered = 0;
     return userDOA.findUserByGoogleId(google_id)
         .then((foundUser) => {
             if (foundUser == null || foundUser == undefined) {
@@ -174,7 +176,7 @@ module.exports.facebookLogin = (user) => {
 exports.createMerchantDetail = function(userId, address, city, state, zipcode, openingTime, closingTime, businessName, tagline, website, phoneNo, businessLNo, description, subCategoryId, notification_email, lat, lang){
     var deferred = Q.defer();
     foudUserById(userId).then(function(user){
-       if (user != null || undefined){
+       if (user != null || undefined || 0){
            if(user.dataValues.user_id === userId) {
         deferred.reject("user already registered !")
            }  
@@ -386,6 +388,21 @@ var updateIsRegister = function(user_id){
 }
 
 
+var updateIsRegisterFalse = function(user_id){
+    var deferred = Q.defer();
+        models.User.update({
+            is_registered: 0
+        }, {
+            where: {id: user_id}
+        }).then(function (updated) {
+            deferred.resolve(updated);
+        }, function (err) {
+            deferred.reject(err)
+        });
+    return deferred.promise;
+}
+
+
 
 /*exports.uploadImageToDatabase = function (user_id, imgObject) {
     //var deferred = Q.defer();
@@ -426,6 +443,68 @@ exports.deleteImageById = function(user_id, image_id){
     var replacements = {user_id : user_id, image_id : image_id };
 
     var query = 'delete from UploadImgs where user_id=:user_id and id=:image_id';
+
+    models.sequelize.query(query,
+        { replacements: replacements, type: models.sequelize.QueryTypes.DELETE }
+    ).then(function(deleted) {
+        deferred.resolve(deleted);
+
+        }
+    );
+    return deferred.promise;
+    
+};
+
+
+exports.deleteConsumerById = function(user_id){
+    var deferred = Q.defer();
+    var replacements = {user_id : user_id};
+
+    var query = 'delete from Users where id=:user_id';
+
+    models.sequelize.query(query,
+        { replacements: replacements, type: models.sequelize.QueryTypes.DELETE }
+    ).then(function(deleted) {
+        deferred.resolve(deleted);
+
+        }
+    );
+    return deferred.promise;
+    
+};
+
+
+
+exports.deleteMerchantById = function(user_id){
+    var deferred = Q.defer();
+    var replacements = {user_id : user_id };
+
+    var query = 'delete from Registrations where user_id=:user_id';
+
+    models.sequelize.query(query,
+        { replacements: replacements, type: models.sequelize.QueryTypes.DELETE }
+    ).then(function(deleted) {   
+        deleteMerchantSubCate(user_id).then(function(update){
+            updateIsRegisterFalse(user_id).then(function(updated){
+            deferred.resolve(deleted);
+          },function(err){
+              deferred.reject(err)
+          });
+          },function(err){
+              deferred.reject(err)
+          });
+
+        }
+    );
+    return deferred.promise;
+};
+
+
+var deleteMerchantSubCate = function(user_id){
+    var deferred = Q.defer();
+    var replacements = { user_id : user_id };
+
+    var query = 'delete from UserSubCateMaps where user_id=:user_id';
 
     models.sequelize.query(query,
         { replacements: replacements, type: models.sequelize.QueryTypes.DELETE }

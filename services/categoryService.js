@@ -72,10 +72,16 @@ exports.changeStatustoCategory = function(category_id){
 */
 exports.createSubCategory = function(category_id, name, imgUrl){
     var deferred = Q.defer();
+    var path;
+    if (imgUrl == null || undefined){
+        path = 'public/images/uploaded_images/default.png';
+    } else {
+        path = imgUrl.path;
+    }
     models.SubCategory.create({
         category_id: category_id,
         name: name,
-        img_url: imgUrl.path,
+        img_url: path,
         status: 1,
         is_deleted: 0
 
@@ -91,23 +97,23 @@ exports.createSubCategory = function(category_id, name, imgUrl){
 /*
 * Fuction define for get sub category list from database.
 */
-var getSubcategory = exports.getSubcategory = function(categoryId){
+var getSubcategory = exports.getSubcategory = function(){
     var deferred = Q.defer();
-    models.SubCategory.findAll({
-        where: {
-            category_id: categoryId,
-            is_deleted: 0
-            }
-    }).then(function (subCategories) {
-          //  util.addS3BucketBaseUrl(allCategories, 'thumb_url', function(result){
-                deferred.resolve(subCategories);
-          //  });
-        },function (err) {
-          deferred.reject(err);
+    var replacements = null;
+
+    var query = 'select SubCategories.*,Categories.name as' +
+                ' category_name from SubCategories LEFT JOIN Categories on SubCategories.category_id=Categories.id where SubCategories.is_deleted=0';
+
+    models.sequelize.query(query,
+        { replacements: replacements, type: models.sequelize.QueryTypes.SELECT }
+    ).then(function(subCategories) {
+        deferred.resolve(subCategories);
+
         }
     );
     return deferred.promise;
 };
+
 
 
 
@@ -341,6 +347,65 @@ var countsForApple = function(){
     ).then(function(usedCounts) {
         deferred.resolve(usedCounts);
 
+        }
+    );
+    return deferred.promise;
+};
+
+
+
+
+
+exports.changeStatustoCategory = function(sub_category_id){
+    var deferred = Q.defer();
+    findSubCategory(sub_category_id).then(function(foundData) {
+            if (foundData.status == 1 || foundData.status == null) {
+                models.SubCategory.update({
+                    status: 0
+                },{
+                    where: {
+                        id: sub_category_id
+                    }
+                }).then(function(added) {
+                    deferred.resolve(added);
+                },function(err){
+                    deferred.reject(err)
+                });
+            } else if (foundData.status == 0 || foundData.status == null) {
+                models.SubCategory.update({
+                    status: 1
+                },{
+                    where: {
+                        id: sub_category_id
+                    }
+                }).then(function(added) {
+                    deferred.resolve(added);
+                },function(err){
+                    deferred.reject(err)
+                });
+
+            }
+         
+},function(err){
+    deferred.reject(err)
+});
+    return deferred.promise;
+};
+
+
+
+
+var findSubCategory = function(sub_category_id){
+    var deferred = Q.defer();
+    var cond={
+                "id": sub_category_id
+        };
+    models.SubCategory.findOne({
+        where: cond
+    }).then(function (result) {
+            deferred.resolve(result);
+        },function (err) {
+            deferred.reject(err);
         }
     );
     return deferred.promise;

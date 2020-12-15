@@ -46,10 +46,10 @@ router.post('/add-category', [jsonParser, util.hasJsonParam(["name"])], function
 
 /* API for get all category form database.............*/
 router.post('/get-all-category',util.verifyToken,jsonParser, function (req, res) {
-    jwt.verify(req.token, 'secretkey', (err, authData) => {
-        if(err) {
-            res.send("Please use valid token!");
-        } else {
+ //   jwt.verify(req.token, 'secretkey', (err, authData) => {
+  //      if(err) {
+   //         res.send("Please use valid token!");
+   //     } else {
                 categoryService.getAllcategory().then(function (categorylist) {
                         var response = util.getResponseObject(consts.RESPONSE_SUCCESS);
                         response['categories'] = categorylist;
@@ -64,8 +64,8 @@ router.post('/get-all-category',util.verifyToken,jsonParser, function (req, res)
                         res.send(response);
                     }
                 );
-        }
- })
+      //  }
+ //})
 });
 
 
@@ -123,8 +123,8 @@ router.post('/file', upload.single('uploadedImage'), (req, res, next) => {
 
 
 /* API for get sub category form database.............*/
-router.post('/get-sub-category',[jsonParser, util.hasJsonParam(["category_id"])], function (req, res) {
-    categoryService.getSubcategory(req.body.category_id).then(function (subCategorylist) {
+router.post('/get-sub-category',jsonParser, function (req, res) {
+    categoryService.getSubcategory().then(function (subCategorylist) {
             var response = util.getResponseObject(consts.RESPONSE_SUCCESS);
             response['category_id'] = req.body.category_id;
             response['subCategories'] = subCategorylist;
@@ -188,6 +188,24 @@ router.post('/admin-reports',jsonParser, function (req, res) {
                 var response = util.getResponseObject(consts.RESPONSE_SUCCESS);
                // response.detail = result;
                 res.send(result);
+            }, function (err) {
+                if(err.errors !== undefined && err.errors[0] !== undefined ){
+                    var response = util.getResponseObject(consts.RESPONSE_ERROR, err.response);
+                    res.send(response);
+                }else{
+                    var response = util.getResponseObject(consts.RESPONSE_ERROR, err.response);
+                }
+                res.send(response);
+            }
+        );
+});
+
+
+
+router.post('/status-update',[jsonParser,util.hasJsonParam(["sub_category_id"])], function (req, res) { 
+    categoryService.changeStatustoCategory(req.body.sub_category_id).then(function (result) {
+                var response = util.getResponseObject(consts.RESPONSE_SUCCESS);
+                res.send(response);
             }, function (err) {
                 if(err.errors !== undefined && err.errors[0] !== undefined ){
                     var response = util.getResponseObject(consts.RESPONSE_ERROR, err.response);

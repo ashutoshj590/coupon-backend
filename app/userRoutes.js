@@ -156,6 +156,42 @@ router.post('/delete-image',[jsonParser,util.hasJsonParam(["user_id","image_id"]
     });
 
 
+
+router.post('/delete-merchant',[jsonParser,util.hasJsonParam(["user_id"])], function (req, res) { 
+    userService.deleteMerchantById(req.body.user_id).then(function (result) {
+                var response = util.getResponseObject(consts.RESPONSE_SUCCESS);
+                res.send(response);
+            }, function (err) {
+                if(err.errors !== undefined && err.errors[0] !== undefined ){
+                    var response = util.getResponseObject(consts.RESPONSE_ERROR, err.response);
+                    res.send(response);
+                }else{
+                    var response = util.getResponseObject(consts.RESPONSE_ERROR, err.response);
+                }
+                res.send(response);
+            }
+        );
+    });
+
+
+router.post('/delete-consumer',[jsonParser,util.hasJsonParam(["user_id"])], function (req, res) { 
+    userService.deleteConsumerById(req.body.user_id).then(function (result) {
+                var response = util.getResponseObject(consts.RESPONSE_SUCCESS);
+                res.send(response);
+            }, function (err) {
+                if(err.errors !== undefined && err.errors[0] !== undefined ){
+                    var response = util.getResponseObject(consts.RESPONSE_ERROR, err.response);
+                    res.send(response);
+                }else{
+                    var response = util.getResponseObject(consts.RESPONSE_ERROR, err.response);
+                }
+                res.send(response);
+            }
+        );
+    });    
+
+
+
     router.post('/get-merchant-detail',[jsonParser,util.hasJsonParam(["user_id"])], function (req, res) { 
         userService.getMerchantDetail(req.body.user_id).then(function (detail) {
                     var response = util.getResponseObject(consts.RESPONSE_SUCCESS);

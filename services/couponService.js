@@ -788,7 +788,8 @@ exports.getAllUsedCoupons = function(consumer_id){
 exports.getAllcouponByMerchantId = function(merchant_id){
     var deferred = Q.defer();
     var cond={
-                "user_id": merchant_id
+                "user_id": merchant_id,
+                "is_deleted": 0
      };
     models.Coupons.findAll({
       where: cond
@@ -802,12 +803,30 @@ exports.getAllcouponByMerchantId = function(merchant_id){
 };
 
 
+exports.getCouponDetail = function(coupon_id){
+    var deferred = Q.defer();
+    var cond={
+                "id": coupon_id
+     };
+    models.Coupons.find({
+      where: cond
+    }).then(function (Coupon) {
+            deferred.resolve(Coupon);
+        },function (err) {
+          deferred.reject(err);
+        }
+    );
+    return deferred.promise;
+};
+
+
 
 
 exports.getAllcouponByConsumerId = function(consumer_id){
     var deferred = Q.defer();
     var cond={
-                "consumer_id": consumer_id
+                "consumer_id": consumer_id,
+                "is_deleted": 0
      };
     models.Coupons.findAll({
       where: cond
