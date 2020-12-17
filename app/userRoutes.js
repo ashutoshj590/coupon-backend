@@ -7,20 +7,33 @@ var consts = require('../lib/consts.js');
 var jsonParser = bodyParser.json({limit: '10mb'});
 var sessionTime = 1 * 60 *  60 * 1000;       //1 hour session
 var models = require('../models/index.js');
-
+var fileExtension = require('file-extension')
 var multer = require('multer');
 
+
 var storage = multer.diskStorage({
-    destination: function(req, file, cb) {
+    destination: function (req, file, cb) {
         cb(null, 'public/images/uploaded_images/')
     },
-    filename: function(req, file, cb) {
-        cb(null, file.originalname)
+    filename: function (req, file, cb) {
+        cb(null, file.fieldname + '-' + Date.now() + '.' + fileExtension(file.originalname))
     }
 })
 
-var upload = multer({storage: storage})
 
+
+var upload = multer({
+    storage: storage,
+    limits: {
+        fileSize: 2000000
+    },
+    fileFilter(req, file, cb) {
+        if (!file.originalname.match(/\.(jpg|jpeg|png)$/)) {
+            cb(new Error('Please upload JPG and PNG images only!'))
+        }
+        cb(undefined, true)
+    }
+})
 
 
 

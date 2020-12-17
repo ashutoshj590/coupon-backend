@@ -9,17 +9,39 @@ var jsonParser = bodyParser.json({limit: '10mb'});
 var sessionTime = 1 * 60 *  60 * 1000;       //1 hour session
 const jwt = require('jsonwebtoken');
 var multer = require('multer');
+var fileExtension = require('file-extension')
+
 
 var storage = multer.diskStorage({
-    destination: function(req, file, cb) {
+
+    // Setting directory on disk to save uploaded files
+    destination: function (req, file, cb) {
         cb(null, 'public/images/uploaded_images/')
     },
+
+    // Setting name of file saved
     filename: function (req, file, cb) {
-        cb(null, file.originalname)
+        cb(null, file.fieldname + '-' + Date.now() + '.' + fileExtension(file.originalname))
     }
 })
 
-var upload = multer({ storage: storage })
+
+
+var upload = multer({
+    storage: storage,
+    limits: {
+        // Setting Image Size Limit to 2MBs
+        fileSize: 2000000
+    },
+    fileFilter(req, file, cb) {
+        if (!file.originalname.match(/\.(jpg|jpeg|png)$/)) {
+            //Error 
+            cb(new Error('Please upload JPG and PNG images only!'))
+        }
+        //Success 
+        cb(undefined, true)
+    }
+})
     
     
 
@@ -90,6 +112,11 @@ categoryService.changeStatustoCategory(req.body.category_id).then(function (stat
 
 /* API for  Add new Sub Category.............*/
 router.post('/add-sub-category', upload.single('subcateimg'), function (req, res) {
+    if (req.body.name == ''){
+        console.log("Please enter a name!");
+         res.send("Please enter a name!")
+         return false;
+    } 
     categoryService.createSubCategory(req.body.category_id, req.body.name, req.file).then(function (subCategories) {
             var response = util.getResponseObject(consts.RESPONSE_SUCCESS);
             response.subCategories = subCategories;
