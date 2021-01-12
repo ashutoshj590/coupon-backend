@@ -202,7 +202,7 @@ exports.createMerchantDetail = function(userId, address, city, state, zipcode, o
         status: 1
     }).then(function(merchantDetail) {
         var cateArray = merchantDetail.sub_category_id.split(",");
-        addSubCatetoMap(userId, cateArray).then(function(added){
+        addSubCatetoMap(userId, cateArray, lat, lang).then(function(added){
         updateIsRegister(userId).then(function(user){
             udpateMerchantType(userId).then(function(user){
               deferred.resolve(merchantDetail);
@@ -230,12 +230,14 @@ exports.createMerchantDetail = function(userId, address, city, state, zipcode, o
 
 
 /* function for add sub_Cate_id in maping table....*/
-var addSubCatetoMap = function(user_id,sub_category_id){
+var addSubCatetoMap = function(user_id,sub_category_id, lat, lang){
     var deferred = Q.defer();
     for(var i=0; i< sub_category_id.length; i++){
         models.UserSubCateMap.create({
             user_id: user_id,
-            sub_category_id: sub_category_id[i]
+            sub_category_id: sub_category_id[i],
+            lat: lat,
+            lang: lang
        
         }).then(function (added) {
             deferred.resolve(added);

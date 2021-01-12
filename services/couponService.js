@@ -400,7 +400,7 @@ return deferred.promise;
 
     
 //where Registrations.business_name like :search_query';
-var calculatedistance = function(lat1, lon1, lat2, lon2, unit){
+var calculatedistance = exports.calculatedistance = function(lat1, lon1, lat2, lon2, unit){
     if ((lat1 == lat2) && (lon1 == lon2)) {
 		return 0;
 	}

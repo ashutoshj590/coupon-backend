@@ -15,7 +15,9 @@ module.exports = (sequelize, DataTypes) => {
   };
   UserSubCateMap.init({
     user_id: DataTypes.INTEGER,
-    sub_category_id: DataTypes.INTEGER
+    sub_category_id: DataTypes.INTEGER,
+    lat: DataTypes.INTEGER,
+      lang: DataTypes.INTEGER,
   }, {
     sequelize,
     modelName: 'UserSubCateMap',

@@ -2,7 +2,7 @@ var models = require('../models/index.js');
 //var redis = require('../lib/redis.js');
 var Q = require('q');
 var async = require('async');
-
+var couponService = require('./couponService');
 
 
 
@@ -118,7 +118,7 @@ var getSubcategory = exports.getSubcategory = function(){
 
 
 
-exports.getAllcategoryData = function(){
+exports.getAllcategoryData = function(lat, lang){
     var deferred = Q.defer();
     var replacements = null;
     var query = 'select SubCategories.id,SubCategories.name,SubCategories.img_url,Categories.id as category_id,Categories.name as' +
@@ -129,8 +129,8 @@ exports.getAllcategoryData = function(){
         ).then(function(result) {
             var output = [];
             async.eachSeries(result,function(data,callback){ 
-                countsForMerchant(data.id).then(function(counts){
-                    data.merchant_count = counts;
+                countsForMerchant(data.id, lat, lang).then(function(counts){
+                    data.merchant_count = counts.length;
                     output.push(data);
                     callback();
                 }, function(err){
@@ -148,30 +148,35 @@ exports.getAllcategoryData = function(){
 
 
 
-var countsForMerchant = function(sub_category_id){
+var countsForMerchant = function(sub_category_id, lat1, lon1){
     var deferred = Q.defer();
     var replacements = {sub_category_id : sub_category_id};
-    var query = 'select COUNT(*) as merchant_count from UserSubCateMaps where sub_category_id=:sub_category_id';
+    var query = 'select * from UserSubCateMaps where sub_category_id=:sub_category_id';
     models.sequelize.query(query,
         { replacements: replacements, type: models.sequelize.QueryTypes.SELECT }
-    ).then(function(counts) {
-            deferred.resolve(counts);
-        }
-    );
-    return deferred.promise;
-};
+    ).then(function(data) {
+        var output = [];
+        data.forEach(function(obj, index) {
+            var unit =  "M";       //commented when value need in miles
+            var data = couponService.calculatedistance(lat1, lon1, obj.lat, obj.lang, unit);
+           // obj.distance = data;
+            if (data <= 10){ 
+            output.push(obj);
+            }
+        })
+          deferred.resolve(output);   
+          // deferred.resolve(result);
+    }
+        );
+        return deferred.promise;
+         
+
+ };
 
 
-/*countsForMerchant(data.id).then(function(counts){
-    //   console.log(counts[0].merchant_count);
-       data.merchant_counts = counts[0].merchant_count;
-       testData.push(data);
-       console.log(result);
-       deferred.resolve(result);
 
-}, function(err){
-   deferred.reject(err);
-}) */
+
+
 
 
 
