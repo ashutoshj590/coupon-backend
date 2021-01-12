@@ -5,7 +5,6 @@ var async = require('async');
 var uniqid = require('uniqid');
 
 
-
 /*
 *   Function for create coupon .................
 */
@@ -179,13 +178,26 @@ exports.getAllCustomCuponsForConsumer = function(consumer_id){
 
     models.sequelize.query(query,
         { replacements: replacements, type: models.sequelize.QueryTypes.SELECT }
-    ).then(function(data) {
-        deferred.resolve(data);
+    ).then(function(result) {
+        var output = [];
+            async.eachSeries(result,function(data,callback){ 
+                getAllImgsMerchant(data.user_id).then(function(newData){
+                    data.merchant_images = newData;
+                    output.push(data);
+                    callback();
+                }, function(err){
+                   deferred.reject(err);
+                })
+       
+           }, function(err, detail) {
+                 deferred.resolve(output);
+               
+           });
+            
+        });
+        return deferred.promise;
+    };
 
-        }
-    );
-    return deferred.promise;
-};
 
 /*
 *   Function for create request .................
@@ -353,7 +365,7 @@ exports.getMerchantDetailbySubCateId = function(sub_category_id, consumer_id, la
     };
 
 
-exports.getAllmerchantBySerach = function(search_query, lat1, lon1, consumer_id, range){
+exports.getAllmerchantBySerach = function(search_query, consumer_id){
   var searchQuery = search_query+'%';
 var deferred = Q.defer();
 var replacements = {search_query : searchQuery};
@@ -367,42 +379,24 @@ models.sequelize.query(query,
     { replacements: replacements, type: models.sequelize.QueryTypes.SELECT }
     ).then(function(result) {
         var output = [];    
-        // deferred.resolve(result);
-        async.eachSeries(result,function(data,callback){ 
-         getAllcouponByUserId(data.user_id, consumer_id).then(function(foundData){
-            data.couponDetail = foundData;
+    async.eachSeries(result,function(data,callback){ 
+        getAllcouponByUserId(data.user_id, consumer_id).then(function(foundData){
+         data.couponDetail = foundData;
             output.push(data);
             callback();
-       }, function(err){
+        }, function(err){
            deferred.reject(err);
-       })
-        
+        })
 
-    }, function(err, detail) {
-        result.coupon_detail = output;
-        var output1 = [];
-     result.forEach(function(obj, index) {
-         var unit =  "M";       //commented when value need in miles
-         var data = calculatedistance(lat1, lon1, obj.lat, obj.lang, unit);
-        // obj.distance = data;
-        var setRange;
-        if (range){
-            setRange = range; 
-        } else {
-            setRange = 10; 
-        }
-         if (data <= setRange){
-         output1.push(obj);
-         }
-     })
-       deferred.resolve(output1);   
-       // deferred.resolve(result);
-    });
-              
-         }
-     );
-     return deferred.promise;
- };
+   }, function(err, detail) {
+         deferred.resolve(output);
+       
+   });
+    
+});
+return deferred.promise;
+};
+
 
     
 //where Registrations.business_name like :search_query';
@@ -723,6 +717,9 @@ exports.getAllFavouriteMerchaants = function(consumer_id){
 
 
 
+
+
+
 exports.getAllCountsForConsumerCoupons = function(consumer_id){
     var deferred = Q.defer();
     var replacements = {consumer_id : consumer_id};
@@ -775,12 +772,46 @@ exports.getAllUsedCoupons = function(consumer_id){
     models.sequelize.query(query,
         { replacements: replacements, type: models.sequelize.QueryTypes.SELECT }
     ).then(function(usedCounts) {
-        deferred.resolve(usedCounts);
+        var output = [];
+            async.eachSeries(usedCounts,function(data,callback){ 
+                getAllImgsMerchant(data.merchant_id).then(function(newData){
+                    data.merchant_images = newData;
+                    output.push(data);
+                    callback();
+                }, function(err){
+                   deferred.reject(err);
+                })
+       
+           }, function(err, detail) {
+                 deferred.resolve(output);
+               
+           });
+            
+        });
+        return deferred.promise;
+    };
+
+
+
+var getAllImgsMerchant = function(merchant_id){
+    var deferred = Q.defer();
+    var replacements = {merchant_id : merchant_id};
+
+    var query =  'SELECT UploadImgs.image from UploadImgs where UploadImgs.user_id =:merchant_id';
+
+    models.sequelize.query(query,
+        { replacements: replacements, type: models.sequelize.QueryTypes.SELECT }
+    ).then(function(data) {
+        deferred.resolve(data);
 
         }
     );
     return deferred.promise;
 };
+
+
+    
+
 
 
 

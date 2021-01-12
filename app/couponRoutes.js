@@ -200,7 +200,7 @@ router.post('/get-request-consumer',[jsonParser,util.hasJsonParam(["consumer_id"
 });
 
     /* API for get all merchant by key search and under 10 km radius .............*/
-    router.post('/get-search-merchant',[jsonParser,util.hasJsonParam(["search_query","lat1","lon1"])], function (req, res) {
+    router.post('/get-search-merchant',[jsonParser,util.hasJsonParam(["search_query"])], function (req, res) {
         var consumerId;
         if (req.body.consumer_id){
             consumerId = req.body.consumer_id;
@@ -208,7 +208,7 @@ router.post('/get-request-consumer',[jsonParser,util.hasJsonParam(["consumer_id"
         } else {
             consumerId = null;
         }
-        couponService.getAllmerchantBySerach(req.body.search_query, req.body.lat1, req.body.lon1, consumerId, req.body.range).then(function (list) {
+        couponService.getAllmerchantBySerach(req.body.search_query, consumerId).then(function (list) {
            if (req.body.search_query == ""){
                list = "";
             }
