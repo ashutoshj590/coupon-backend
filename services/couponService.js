@@ -365,7 +365,7 @@ exports.getMerchantDetailbySubCateId = function(sub_category_id, consumer_id, la
     };
 
 
-exports.getAllmerchantBySerach = function(search_query, consumer_id){
+/*exports.getAllmerchantBySerach = function(search_query, consumer_id){
   var searchQuery = search_query+'%';
 var deferred = Q.defer();
 var replacements = {search_query : searchQuery};
@@ -394,6 +394,24 @@ models.sequelize.query(query,
    });
     
 });
+return deferred.promise;
+}; */
+
+
+exports.getCouponsBySerach = function(search_query){
+    var searchQuery = search_query+'%';
+  var deferred = Q.defer();
+  var replacements = {search_query : searchQuery};
+  
+    var query = 'SELECT * FROM Coupons where Coupons.short_name like :search_query OR Coupons.description like :search_query';
+              
+  models.sequelize.query(query,
+      { replacements: replacements, type: models.sequelize.QueryTypes.SELECT }
+      ).then(function(result) {
+        deferred.resolve(result);
+
+    }
+);
 return deferred.promise;
 };
 
