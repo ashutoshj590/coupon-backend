@@ -135,12 +135,21 @@ exports.changeStatustoCoupon = function(coupon_id){
 /*
 * Fuction define for get All coupon list from database.
 */
-exports.getAllcoupon = function(){
+exports.getAllcoupon = function(merchant_id){
     var deferred = Q.defer();
-    var replacements = {};
+    var merchantID = merchant_id;
+    if (merchantID == null){
+        console.log("======");
+        var replacements = {};
+        var querySet = ''
 
+    } else {
+        console.log("///////");
+    var replacements = {merchant_id : merchant_id};
+    var querySet = ' AND Coupons.user_id=:merchant_id'
+    }
     var query = 'select Coupons.*,UsedCoupons.coupon_code as is_used from Coupons left join UsedCoupons on' +
-                ' Coupons.coupon_code=UsedCoupons.coupon_code where Coupons.is_deleted=0';
+                ' Coupons.coupon_code=UsedCoupons.coupon_code where Coupons.is_deleted=0' + querySet;
     
 
     models.sequelize.query(query,

@@ -104,7 +104,12 @@ couponService.changeStatustoCoupon(req.body.coupon_id).then(function (statusUpda
 
 /* API for get all category form database.............*/
 router.post('/get-all-coupons',jsonParser, function (req, res) {
-    couponService.getAllcoupon().then(function (couponList) {
+    if(req.body.merchant_id == null || undefined){
+       var merchantId = null;
+    } else {
+       var merchantId = req.body.merchant_id;
+    }
+    couponService.getAllcoupon(merchantId).then(function (couponList) {
             var response = util.getResponseObject(consts.RESPONSE_SUCCESS);
             response['coupon_list'] = couponList;
             res.send(response);
