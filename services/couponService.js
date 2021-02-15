@@ -498,7 +498,7 @@ var getAllcouponByUserId = exports.getAllcouponByUserId = function(merchant_id, 
     var query = 'SELECT Coupons.id as coupon_id,Coupons.user_id as merchant_id,Coupons.coupon_type,Coupons.days,Coupons.start_time,Coupons.end_time,' +
                 'Coupons.expiry_date,Coupons.flash_deal,Coupons.description,Coupons.restriction,Coupons.short_name,Coupons.coupon_code FROM Coupons WHERE NOT EXISTS' +
                 ' ( SELECT * FROM UsedCoupons WHERE Coupons.coupon_code=UsedCoupons.coupon_code AND ' +
-                'UsedCoupons.consumer_id=:consumer_id ) AND Coupons.user_id=:merchant_id AND NOT Coupons.coupon_type="custom" ORDER BY Coupons.coupon_code ASC';
+                'UsedCoupons.consumer_id=:consumer_id ) AND Coupons.user_id=:merchant_id AND NOT Coupons.coupon_type="custom" AND Coupons.is_deleted=0 ORDER BY Coupons.coupon_code ASC';
 
     models.sequelize.query(query,
         { replacements: replacements, type: models.sequelize.QueryTypes.SELECT }
