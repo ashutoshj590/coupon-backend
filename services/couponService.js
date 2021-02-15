@@ -34,15 +34,16 @@ var createCouponForMerchant = exports.createCouponForMerchant = function(user_id
         short_name: shortName,
         coupon_code: couponCode,
         consumer_id: consumerIdValue,
-        status: pendingValue
+        status: pendingValue,
     }).then(function(couponDetail) {
         deferred.resolve(couponDetail);
     },function(err){
         deferred.reject(err)
     });
+
+    
     return deferred.promise;
 };
-
 /*
 *   Function for Update coupon .................
 */
@@ -139,12 +140,10 @@ exports.getAllcoupon = function(merchant_id){
     var deferred = Q.defer();
     var merchantID = merchant_id;
     if (merchantID == null){
-        console.log("======");
         var replacements = {};
         var querySet = ''
 
     } else {
-        console.log("///////");
     var replacements = {merchant_id : merchant_id};
     var querySet = ' AND Coupons.user_id=:merchant_id'
     }

@@ -130,17 +130,19 @@ exports.getAllcategoryData = function(lat, lang){
             var output = [];
             async.eachSeries(result,function(data,callback){ 
                 countsForMerchant(data.id, lat, lang).then(function(counts){
-                    data.merchant_count = counts.length;
+                   data.coupon_count = counts.length;
                     output.push(data);
                     callback();
                 }, function(err){
                    deferred.reject(err);
                 })
+            
        
            }, function(err, detail) {
                  deferred.resolve(output);
                
            });
+        
             
         });
         return deferred.promise;
@@ -151,7 +153,10 @@ exports.getAllcategoryData = function(lat, lang){
 var countsForMerchant = function(sub_category_id, lat1, lon1){
     var deferred = Q.defer();
     var replacements = {sub_category_id : sub_category_id};
-    var query = 'select * from UserSubCateMaps where sub_category_id=:sub_category_id';
+
+      var query = 'select Coupons.*,UserSubCateMaps.user_id,UserSubCateMaps.lat,UserSubCateMaps.lang from Coupons LEFT JOIN UserSubCateMaps' + 
+                  ' on Coupons.user_id=UserSubCateMaps.user_id where UserSubCateMaps.sub_category_id=:sub_category_id and Coupons.is_deleted=0 and NOT Coupons.coupon_type="custom"';
+      
     models.sequelize.query(query,
         { replacements: replacements, type: models.sequelize.QueryTypes.SELECT }
     ).then(function(data) {
@@ -164,18 +169,14 @@ var countsForMerchant = function(sub_category_id, lat1, lon1){
             output.push(obj);
             }
         })
-          deferred.resolve(output);   
-          // deferred.resolve(result);
+          deferred.resolve(output);
+       
     }
         );
         return deferred.promise;
          
 
  };
-
-
-
-
 
 
 
