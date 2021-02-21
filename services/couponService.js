@@ -406,15 +406,23 @@ return deferred.promise;
 }; */
 
 
-exports.getCouponsBySerach = function(search_query){
-    var searchQuery = search_query+'%';
+exports.getCouponsBySerach = function(search_query, consumer_id){
+  var searchQuery = search_query+'%';
   var deferred = Q.defer();
-  var replacements = {search_query : searchQuery};
+  var consumerID = consumer_id;
+  if (consumerID == null){
+      var replacements = {search_query : searchQuery};
+      var querySet = ''
+
+  } else {
+  var replacements = {search_query : searchQuery, consumer_id : consumerID};
+  var querySet = ' AND NOT EXISTS ( SELECT * FROM UsedCoupons WHERE Coupons.coupon_code=UsedCoupons.coupon_code AND UsedCoupons.consumer_id=:consumer_id ) ORDER BY Coupons.coupon_code ASC'
+  }
   
     var query = 'SELECT Coupons.id as coupon_id,Coupons.user_id as merchant_id,Coupons.coupon_type,Coupons.days,Coupons.start_time,Coupons.end_time,' +
                 'Coupons.expiry_date,Coupons.flash_deal,Coupons.description,Coupons.restriction,Coupons.createdAt,Coupons.updatedAt,Coupons.short_name,Coupons.coupon_code,' +
                 'Registrations.business_name as merchant_name,Registrations.lat,Registrations.lang from Coupons LEFT JOIN Registrations ON Coupons.user_id=Registrations.user_id' +
-                '  where NOT Coupons.coupon_type="custom" AND Coupons.is_deleted=0 AND ( Coupons.short_name like :search_query OR Coupons.description like :search_query )';
+                '  where NOT Coupons.coupon_type="custom" AND Coupons.is_deleted=0 AND ( Coupons.short_name like :search_query OR Coupons.description like :search_query )' + querySet;
               
   models.sequelize.query(query,
       { replacements: replacements, type: models.sequelize.QueryTypes.SELECT }

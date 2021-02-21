@@ -257,8 +257,13 @@ router.post('/get-request-consumer',[jsonParser,util.hasJsonParam(["consumer_id"
 
 
 
-router.post('/get-search-merchant',[jsonParser,util.hasJsonParam(["search_query"])], function (req, res) { 
-    couponService.getCouponsBySerach(req.body.search_query).then(function (result) {
+router.post('/get-search-merchant',[jsonParser,util.hasJsonParam(["search_query"])], function (req, res) {
+    if(req.body.consumer_id == null || undefined){
+        var consumerId = null;
+     } else {
+        var consumerId = req.body.consumer_id;
+     } 
+    couponService.getCouponsBySerach(req.body.search_query, consumerId).then(function (result) {
                 var response = util.getResponseObject(consts.RESPONSE_SUCCESS);
                 response.search_detail = result;
                 res.send(response);
