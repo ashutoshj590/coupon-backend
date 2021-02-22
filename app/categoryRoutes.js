@@ -191,7 +191,7 @@ categoryService.changeStatustoSubCategory(req.body.sub_category_id).then(functio
 
 
 router.post('/get-category-data',[jsonParser,util.hasJsonParam(["lat","lang"])], function (req, res) {
-    categoryService.getAllcategoryData(req.body.lat, req.body.lang).then(function (subcategorylist) {
+    categoryService.getAllcategoryData(req.body.lat, req.body.lang, req.body.consumer_id).then(function (subcategorylist) {
         var response = util.getResponseObject(consts.RESPONSE_SUCCESS);
             response['sub_category_data'] = subcategorylist;
             res.send(response);

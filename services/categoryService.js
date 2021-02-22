@@ -118,7 +118,7 @@ var getSubcategory = exports.getSubcategory = function(){
 
 
 
-exports.getAllcategoryData = function(lat, lang){
+exports.getAllcategoryData = function(lat, lang, consumer_id){
     var deferred = Q.defer();
     var replacements = null;
     var query = 'select SubCategories.id,SubCategories.name,SubCategories.img_url,Categories.id as category_id,Categories.name as' +
@@ -129,7 +129,7 @@ exports.getAllcategoryData = function(lat, lang){
         ).then(function(result) {
             var output = [];
             async.eachSeries(result,function(data,callback){ 
-                countsForMerchant(data.id, lat, lang).then(function(counts){
+                countsForMerchant(data.id, lat, lang, consumer_id).then(function(counts){
                    data.coupon_count = counts.length;
                     output.push(data);
                     callback();
@@ -150,12 +150,21 @@ exports.getAllcategoryData = function(lat, lang){
 
 
 
-var countsForMerchant = function(sub_category_id, lat1, lon1){
+var countsForMerchant = function(sub_category_id, lat1, lon1, consumer_id){
     var deferred = Q.defer();
-    var replacements = {sub_category_id : sub_category_id};
+    var consumerId = consumer_id;
+    if(consumerId == null || undefined){
+        var replacements = {sub_category_id : sub_category_id};
+        var queryset = ''
+    } else {
+      var replacements = {sub_category_id : sub_category_id, consumer_id : consumer_id};
+      var queryset =  ' and NOT EXISTS ( SELECT * FROM UsedCoupons WHERE Coupons.coupon_code=UsedCoupons.coupon_code AND UsedCoupons.consumer_id=:consumer_id )'
+
+    }
 
       var query = 'select Coupons.*,UserSubCateMaps.user_id,UserSubCateMaps.lat,UserSubCateMaps.lang from Coupons LEFT JOIN UserSubCateMaps' + 
-                  ' on Coupons.user_id=UserSubCateMaps.user_id where UserSubCateMaps.sub_category_id=:sub_category_id and Coupons.is_deleted=0 and NOT Coupons.coupon_type="custom"';
+                  ' on Coupons.user_id=UserSubCateMaps.user_id where UserSubCateMaps.sub_category_id=:sub_category_id and Coupons.is_deleted=0 and NOT Coupons.coupon_type="custom" and current_date() <= Coupons.createdAt' +
+                    queryset;
       
     models.sequelize.query(query,
         { replacements: replacements, type: models.sequelize.QueryTypes.SELECT }
