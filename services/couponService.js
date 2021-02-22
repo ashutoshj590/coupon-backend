@@ -49,11 +49,16 @@ var createCouponForMerchant = exports.createCouponForMerchant = function(user_id
 */
 var updateCouponForMerchant = exports.updateCouponForMerchant = function(consumer_id,request_id,user_id,coupon_id,coupon_type,days,start_time,end_time,expiry_date,flash_deal,description,restriction,shortName,status){
     var deferred = Q.defer();
+    if (coupon_type == "community"){
+       var endTime = null; 
+    } else {
+        var endTime = end_time;
+    }
     models.Coupons.update({
         coupon_type: coupon_type,
         days: days,
         start_time: start_time,
-        end_time: end_time,
+        end_time: endTime,
         expiry_date: expiry_date,
         flash_deal: flash_deal,
         description: description,
@@ -160,6 +165,9 @@ exports.getAllcoupon = function(merchant_id){
                 coupon.is_used = true;
             } else if(coupon.is_used == null) {
                 coupon.is_used = false;
+            }
+            if(coupon.coupon_type == "community"){
+                coupon.end_time =null;
             }
             data.push(coupon);
             
