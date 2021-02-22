@@ -150,10 +150,9 @@ exports.getAllcoupon = function(merchant_id){
 
     } else {
     var replacements = {merchant_id : merchant_id};
-    var querySet = ' AND Coupons.user_id=:merchant_id'
+    var querySet = ' AND user_id=:merchant_id'
     }
-    var query = 'select Coupons.*,UsedCoupons.coupon_code as is_used from Coupons left join UsedCoupons on' +
-                ' Coupons.coupon_code=UsedCoupons.coupon_code where Coupons.is_deleted=0' + querySet;
+    var query = 'select * from Coupons where is_deleted=0' + querySet;
     
 
     models.sequelize.query(query,
@@ -161,11 +160,7 @@ exports.getAllcoupon = function(merchant_id){
     ).then(function(allcoupons) {
         var data = [];
         allcoupons.forEach(function(coupon, index){
-            if(coupon.is_used != null){
-                coupon.is_used = true;
-            } else if(coupon.is_used == null) {
-                coupon.is_used = false;
-            }
+         
             if(coupon.coupon_type == "community"){
                 coupon.end_time =null;
             }
