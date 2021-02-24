@@ -163,7 +163,7 @@ var countsForMerchant = function(sub_category_id, lat1, lon1, consumer_id){
     }
 
       var query = 'select Coupons.*,UserSubCateMaps.user_id,UserSubCateMaps.lat,UserSubCateMaps.lang from Coupons LEFT JOIN UserSubCateMaps' + 
-                  ' on Coupons.user_id=UserSubCateMaps.user_id where UserSubCateMaps.sub_category_id=:sub_category_id and Coupons.is_deleted=0 and NOT Coupons.coupon_type="custom" and current_date() <= STR_TO_DATE(Coupons.expiry_date,"%d%M%Y %h%i")' +
+                  ' on Coupons.user_id=UserSubCateMaps.user_id where UserSubCateMaps.sub_category_id=:sub_category_id and Coupons.is_deleted=0 and NOT Coupons.coupon_type="custom" and current_date() >= STR_TO_DATE(Coupons.expiry_date,"%d%M%Y %h%i")' +
                     queryset;
       
     models.sequelize.query(query,
