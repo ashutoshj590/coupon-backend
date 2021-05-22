@@ -424,7 +424,7 @@ exports.getCouponsBySerach = function(search_query, consumer_id){
   
     var query = 'SELECT Coupons.id as coupon_id,Coupons.user_id as merchant_id,Coupons.coupon_type,Coupons.days,Coupons.start_time,Coupons.end_time,' +
                 'Coupons.expiry_date,Coupons.flash_deal,Coupons.description,Coupons.restriction,Coupons.createdAt,Coupons.updatedAt,Coupons.short_name,Coupons.coupon_code,' +
-                'Registrations.business_name as merchant_name,Registrations.lat,Registrations.lang from Coupons LEFT JOIN Registrations ON Coupons.user_id=Registrations.user_id' +
+                'Registrations.business_name as merchant_name,Registrations.lat,Registrations.lang,GROUP_CONCAT(UploadImgs.image ORDER BY UploadImgs.image) AS images from Coupons LEFT JOIN Registrations ON Coupons.user_id=Registrations.user_id LEFT JOIN UploadImgs ON UploadImgs.user_id = Registrations.user_id' +
                 '  where NOT Coupons.coupon_type="custom" AND Coupons.is_deleted=0 AND ( Coupons.short_name like :search_query OR Coupons.description like :search_query )' + querySet;
               
   models.sequelize.query(query,
