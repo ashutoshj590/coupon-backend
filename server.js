@@ -138,7 +138,6 @@ app.use("/user", require('./app/userRoutes'));
 app.use("/category", require('./app/categoryRoutes.js'));
 app.use("/coupon", require('./app/couponRoutes.js'));
 
-
 var sslSever = https.createServer(
    {
        key: fs.readFileSync(path.join(__dirname, 'certs', 'mccpapp-new.key')),
@@ -148,7 +147,7 @@ var sslSever = https.createServer(
    app
 )
 
-sslSever.listen(8080, () => console.log("Secure server on port 8080"))
+sslSever.listen(8080, () => console.log("Secure server on port 8080")) 
 
 
 
