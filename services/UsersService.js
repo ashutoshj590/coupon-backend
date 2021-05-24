@@ -10,6 +10,7 @@ let constants = require('../lib/consts');
 const { response } = require('express');
 const nodemailer = require('nodemailer');
 require('dotenv').config();
+var async = require('async');
 
 /*
  * Find a user by email. If does not exist, then create one.
@@ -529,11 +530,47 @@ exports.getMerchantDetail = function(user_id){
     models.sequelize.query(query,
         { replacements: replacements, type: models.sequelize.QueryTypes.SELECT }
     ).then(function(result) {
-            deferred.resolve(result);
+        var output = [];
+        async.eachSeries(result,function(data,callback){ 
+            getAllcouponByMerchantId(data.user_id).then(function(newData){
+                data.coupons_detail = newData;
+                output.push(data);
+                callback();
+            }, function(err){
+               deferred.reject(err);
+            })
+   
+       }, function(err, detail) {
+             deferred.resolve(output);
+           
+       });
+        
+    });
+    return deferred.promise;
+};
+
+
+
+
+
+
+vat = getAllcouponByMerchantId = function(merchant_id){
+    var deferred = Q.defer();
+    var cond={
+                "user_id": merchant_id,
+                "is_deleted": 0
+     };
+    models.Coupons.findAll({
+      where: cond
+    }).then(function (allCoupons) {
+            deferred.resolve(allCoupons);
+        },function (err) {
+          deferred.reject(err);
         }
     );
     return deferred.promise;
 };
+
 
 
 exports.getAllImages = function(user_id){
