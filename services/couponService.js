@@ -828,12 +828,17 @@ exports.getAllUsedCoupons = function(consumer_id){
         var output = [];
             async.eachSeries(usedCounts,function(data,callback){ 
                 getAllImgsMerchant(data.merchant_id).then(function(newData){
+                    getMerchantDetail(data.merchant_id).then(function(newData1){
                     data.merchant_images = newData;
+                    data.merchant_detail = newData1;
                     output.push(data);
                     callback();
                 }, function(err){
                    deferred.reject(err);
                 })
+            }, function(err){
+                deferred.reject(err);
+             })
        
            }, function(err, detail) {
                  deferred.resolve(output);
@@ -851,6 +856,22 @@ var getAllImgsMerchant = function(merchant_id){
     var replacements = {merchant_id : merchant_id};
 
     var query =  'SELECT UploadImgs.image from UploadImgs where UploadImgs.user_id =:merchant_id';
+
+    models.sequelize.query(query,
+        { replacements: replacements, type: models.sequelize.QueryTypes.SELECT }
+    ).then(function(data) {
+        deferred.resolve(data);
+
+        }
+    );
+    return deferred.promise;
+};
+
+var getMerchantDetail = function(merchant_id){
+    var deferred = Q.defer();
+    var replacements = {merchant_id : merchant_id};
+
+    var query =  'SELECT * from Registrations where user_id =:merchant_id';
 
     models.sequelize.query(query,
         { replacements: replacements, type: models.sequelize.QueryTypes.SELECT }
