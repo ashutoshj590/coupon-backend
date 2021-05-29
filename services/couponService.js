@@ -761,11 +761,43 @@ exports.getAllFavouriteMerchaants = function(consumer_id){
     models.sequelize.query(query,
         { replacements: replacements, type: models.sequelize.QueryTypes.SELECT }
     ).then(function (allCoupons) {
-        deferred.resolve(allCoupons);
+        var output = [];
+        async.eachSeries(allCoupons,function(data,callback){ 
+            findCategoryName(data.merchant_id).then(function(newData){
+                data.category_detail = newData;
+                output.push(data);
+                callback();
+            }, function(err){
+               deferred.reject(err);
+            })
+   
+       }, function(err, detail) {
+             deferred.resolve(output);
+           
+       });
+        
+    });
+    return deferred.promise;
+};
 
-    }
-);
-return deferred.promise;
+
+
+
+var findCategoryName = function(merchant_id){
+    var deferred = Q.defer();
+    var replacements = {merchant_id : merchant_id};
+
+    var query = ' select subcategories.category_id,categories.name as category_name  from usersubcatemaps left join '+
+                  'subcategories on usersubcatemaps.sub_category_id=subcategories.id left join categories on subcategories.category_id=categories.id where usersubcatemaps.user_id=:merchant_id;';
+
+    models.sequelize.query(query,
+        { replacements: replacements, type: models.sequelize.QueryTypes.SELECT }
+    ).then(function(categoryDetails) {
+        deferred.resolve(categoryDetails);
+
+        }
+    );
+    return deferred.promise;
 };
 
 
