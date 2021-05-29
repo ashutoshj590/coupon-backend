@@ -786,3 +786,20 @@ var findMerchant = function(merchant_id){
     );
     return deferred.promise;
 };
+
+
+
+exports.addToBlock = function(consumer_id, merchant_id){
+    var deferred = Q.defer();
+    models.BlockMerchants.create({
+        consumer_id: consumer_id,
+        merchant_id: merchant_id,
+        is_blocked: 1
+        
+    }).then(function(blocked) {
+        deferred.resolve(blocked);
+    },function(err){
+        deferred.reject(err)
+    });
+    return deferred.promise;
+};

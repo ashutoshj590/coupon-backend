@@ -334,11 +334,13 @@ exports.getAllRequestForConsumer = function(consumer_id){
 
 exports.getMerchantDetailbySubCateId = function(sub_category_id, consumer_id, lat1, lon1){
     var deferred = Q.defer();
-    var replacements = {sub_category_id : sub_category_id};
+    var replacements = {sub_category_id : sub_category_id, consumer_id : consumer_id};
     
     var query = 'SELECT Registrations.*, MAX(UserSubCateMaps.createdAt) as sub_cat_created , GROUP_CONCAT(UploadImgs.image ORDER BY UploadImgs.image) AS images ' +
                 'FROM UserSubCateMaps LEFT JOIN Registrations ON Registrations.user_id = UserSubCateMaps.user_id LEFT JOIN UploadImgs ON UploadImgs.user_id = Registrations.user_id ' +
-                 'WHERE UserSubCateMaps.sub_category_id=:sub_category_id GROUP BY Registrations.id';
+                 'WHERE NOT EXISTS' +
+                 ' ( SELECT * FROM BlockMerchants WHERE Registrations.user_id=BlockMerchants.merchant_id AND BlockMerchants.is_blocked=1 AND' +
+                 ' BlockMerchants.consumer_id=:consumer_id ) AND UserSubCateMaps.sub_category_id=:sub_category_id GROUP BY Registrations.id';
                 
     models.sequelize.query(query,
         { replacements: replacements, type: models.sequelize.QueryTypes.SELECT }
@@ -760,12 +762,12 @@ exports.getAllFavouriteMerchaants = function(consumer_id){
         { replacements: replacements, type: models.sequelize.QueryTypes.SELECT }
     ).then(function (allCoupons) {
         deferred.resolve(allCoupons);
-        },function (err) {
-          deferred.reject(err);
-        }
-    );
-    return deferred.promise;
+
+    }
+);
+return deferred.promise;
 };
+
 
 
 
@@ -794,6 +796,7 @@ exports.getAllCountsForConsumerCoupons = function(consumer_id){
     );
     return deferred.promise;
 };
+
 
 
 var countsForUsed = function(consumer_id){

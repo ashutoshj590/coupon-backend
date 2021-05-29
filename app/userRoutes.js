@@ -327,6 +327,25 @@ router.post('/status-update',[jsonParser,util.hasJsonParam(["merchant_id"])], fu
 
 
 
+router.post('/block-merchant',[jsonParser,util.hasJsonParam(["consumer_id","merchant_id"])], function (req, res) { 
+    userService.addToBlock(req.body.consumer_id,req.body.merchant_id).then(function (added) {
+                var response = util.getResponseObject(consts.RESPONSE_SUCCESS);
+                res.send(response);
+            }, function (err) {
+                if(err.errors !== undefined && err.errors[0] !== undefined ){
+                    var response = util.getResponseObject(consts.RESPONSE_ERROR, err.response);
+                    res.send(response);
+                }else{
+                    var response = util.getResponseObject(consts.RESPONSE_ERROR, err.response);
+                }
+                res.send(response);
+            }
+        );
+    });
+
+
+
+
 
 
 

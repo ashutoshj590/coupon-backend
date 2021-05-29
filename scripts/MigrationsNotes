@@ -13,6 +13,7 @@ sequelize model:create --name UsedCoupons --attributes "consumer_id:integer,merc
 sequelize model:create --name AcceptRequest --attributes "consumer_id:integer,merchant_id:integer,request_id:integer"
 sequelize model:create --name FavMerchants --attributes "consumer_id:integer,merchant_id:integer,is_fav:boolean"
 sequelize model:create --name UserLoginData --attributes "email:string,user_data:string"
+sequelize model:create --name BlockMerchants --attributes "consumer_id:integer,merchant_id:integer,is_blocked:boolean"
 
 
 
