@@ -788,7 +788,7 @@ var findCategoryName = function(merchant_id){
     var replacements = {merchant_id : merchant_id};
 
     var query = ' select SubCategories.category_id,Categories.name as category_name  from UserSubCateMaps LEFT JOIN '+
-                  'SubCategories on UserSubCateMaps.sub_category_id=SubCategories.id LEFT JOIN Categories on SubCategories.category_id=categories.id where UserSubCateMaps.user_id=:merchant_id;';
+                  'SubCategories on UserSubCateMaps.sub_category_id=SubCategories.id LEFT JOIN Categories on SubCategories.category_id=Categories.id where UserSubCateMaps.user_id=:merchant_id;';
 
     models.sequelize.query(query,
         { replacements: replacements, type: models.sequelize.QueryTypes.SELECT }
