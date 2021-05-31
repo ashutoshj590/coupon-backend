@@ -764,7 +764,7 @@ exports.getAllFavouriteMerchaants = function(consumer_id){
         var output = [];
         async.eachSeries(allCoupons,function(data,callback){ 
             findCategoryName(data.merchant_id).then(function(newData){
-                data.category_detail = newData;
+                data.category_detail = newData[0];
                 output.push(data);
                 callback();
             }, function(err){
