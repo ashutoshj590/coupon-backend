@@ -158,7 +158,8 @@ var countsForMerchant = function(sub_category_id, lat1, lon1, consumer_id){
         var queryset = ''
     } else {
       var replacements = {sub_category_id : sub_category_id, consumer_id : consumer_id};
-      var queryset =  ' and NOT EXISTS ( SELECT * FROM UsedCoupons WHERE Coupons.coupon_code=UsedCoupons.coupon_code AND UsedCoupons.consumer_id=:consumer_id )'
+      var queryset =  ' and NOT EXISTS ( SELECT * FROM UsedCoupons WHERE Coupons.coupon_code=UsedCoupons.coupon_code AND UsedCoupons.consumer_id=:consumer_id )' +
+                      ' and NOT EXISTS ( SELECT * FROM BlockMerchants WHERE BlockMerchants.is_blocked=1 AND BlockMerchants.consumer_id=:consumer_id )';
 
     }
 
