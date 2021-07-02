@@ -293,14 +293,17 @@ router.post('/get-merchant-by-category',[jsonParser,util.hasJsonParam(["sub_cate
         var response = util.getResponseObject(consts.RESPONSE_SUCCESS);
         var output = [];
         async.eachSeries(detail,function(data,callback){ 
-         data.is_fav = false;
+        // data.is_fav = false;
+        console.log(false);
          couponService.findFavMerchant(consumerId, data.user_id).then(function(foundData){
             if (foundData != null || undefined){
                 if (foundData.consumer_id == consumerId && foundData.merchant_id == data.user_id && foundData.is_fav == 1) {
-                    data.is_fav = true;
+                  //  data.is_fav = true;
+                  console.log(true);
                    
                 } else if (foundData.consumer_id == consumerId && foundData.merchant_id == data.user_id && foundData.is_fav == 0) {
-                    data.is_fav = false;
+                   // data.is_fav = false;
+                   console.log(false);
                    
                 }
             }
@@ -471,8 +474,44 @@ router.post('/add-to-favourite',[jsonParser,util.hasJsonParam(["consumer_id","me
     });
 
 
+router.post('/fav-unfav-coupon',[jsonParser,util.hasJsonParam(["consumer_id","merchant_id","coupon_id"])], function (req, res) { 
+    couponService.addToFavouriteCoupon(req.body.consumer_id,req.body.merchant_id,req.body.coupon_id).then(function (added) {
+                var response = util.getResponseObject(consts.RESPONSE_SUCCESS);
+                res.send(response);
+            }, function (err) {
+                if(err.errors !== undefined && err.errors[0] !== undefined ){
+                    var response = util.getResponseObject(consts.RESPONSE_ERROR, err.response);
+                    res.send(response);
+                }else{
+                    var response = util.getResponseObject(consts.RESPONSE_ERROR, err.response);
+                }
+                res.send(response);
+            }
+        );
+    });
+
+
 router.post('/get-favourite-list',[jsonParser,util.hasJsonParam(["consumer_id"])], function (req, res) { 
-    couponService.getAllFavouriteMerchaants(req.body.consumer_id).then(function (detail) {
+    couponService.getAllFavouriteMerchants(req.body.consumer_id).then(function (detail) {
+                var response = util.getResponseObject(consts.RESPONSE_SUCCESS);
+                response.coupon_detail = detail;
+                res.send(response);
+            
+            }, function (err) {
+                if(err.errors !== undefined && err.errors[0] !== undefined ){
+                    var response = util.getResponseObject(consts.RESPONSE_ERROR, err.response);
+                    res.send(response);
+                }else{
+                    var response = util.getResponseObject(consts.RESPONSE_ERROR, err.response);
+                }
+                res.send(response);
+            }
+        );
+});
+
+
+router.post('/get-favourite-coupons',[jsonParser,util.hasJsonParam(["consumer_id"])], function (req, res) { 
+    couponService.getAllFavouriteCoupons(req.body.consumer_id).then(function (detail) {
                 var response = util.getResponseObject(consts.RESPONSE_SUCCESS);
                 response.coupon_detail = detail;
                 res.send(response);

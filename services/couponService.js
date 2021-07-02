@@ -497,6 +497,26 @@ var findFavMerchant = exports.findFavMerchant = function(consumer_id,merchant_id
     return deferred.promise;
 };
 
+
+
+var findFavCoupons = exports.findFavCoupons = function(consumer_id,merchant_id,coupon_id){
+    var deferred = Q.defer();
+    var cond={
+                "consumer_id": consumer_id,
+                "merchant_id": merchant_id,
+                "coupon_id": coupon_id
+        };
+    models.FavCoupon.findOne({
+        where: cond
+    }).then(function (result) {
+            deferred.resolve(result);
+        },function (err) {
+            deferred.reject(err);
+        }
+    );
+    return deferred.promise;
+};
+
 /*var findFavMerchantTest = function(consumer_id,merchant_id){
     var cond={
                 "consumer_id": consumer_id,
@@ -527,14 +547,34 @@ var getAllcouponByUserId = exports.getAllcouponByUserId = function(merchant_id, 
 
     models.sequelize.query(query,
         { replacements: replacements, type: models.sequelize.QueryTypes.SELECT }
-    ).then(function(data) {
-        deferred.resolve(data);
-
-        }
-    );
+    ).then(function(data1) {
+        var output = [];
+        async.eachSeries(data1,function(data,callback){ 
+            data.is_fav = false;
+            findFavCoupons(consumer_id, data.merchant_id, data.coupon_id).then(function(foundData){
+               if (foundData != null || undefined){
+                   if (foundData.consumer_id == consumer_id && foundData.merchant_id == data.merchant_id && foundData.coupon_id == data.coupon_id && foundData.is_fav == 1) {
+                       data.is_fav = true;
+                      
+                   } else if (foundData.consumer_id == consumer_id && foundData.merchant_id == data.merchant_id && foundData.coupon_id == data.coupon_id && foundData.is_fav == 0) {
+                       data.is_fav = false;
+                      
+                   }
+               }
+               output.push(data);
+               callback();
+            }, function(err){
+               deferred.reject(err);
+            })
+   
+       }, function(err, detail) {
+             deferred.resolve(output);
+           
+       });
+        
+    });
     return deferred.promise;
 };
-
 
 
 exports.addUsedCoupontoDatabase = function(consumer_id, merchant_id, coupon_code, coupon_type,lat,lang){
@@ -747,9 +787,65 @@ exports.addToFavourite = function(consumer_id, merchant_id){
 
 
 
+/*  Function for favourite and unfavourite coupons .............. */
+exports.addToFavouriteCoupon = function(consumer_id, merchant_id, coupon_id){
+    var deferred = Q.defer();
+    findFavCoupons(consumer_id, merchant_id, coupon_id).then(function(foundData) {
+        if (foundData != null || undefined){
+            if (foundData.consumer_id == consumer_id && foundData.merchant_id == merchant_id && foundData.coupon_id == coupon_id && foundData.is_fav == 1) {
+                models.FavCoupon.update({
+                    is_fav: 0
+                },{
+                    where: {
+                        consumer_id: consumer_id,
+                        merchant_id: merchant_id,
+                        coupon_id: coupon_id
+                    }
+                }).then(function(added) {
+                    deferred.resolve(added);
+                },function(err){
+                    deferred.reject(err)
+                });
+            } else if (foundData.consumer_id == consumer_id && foundData.merchant_id == merchant_id && foundData.coupon_id == coupon_id && foundData.is_fav == 0) {
+                models.FavCoupon.update({
+                    is_fav: 1
+                },{
+                    where: {
+                        consumer_id: consumer_id,
+                        merchant_id: merchant_id,
+                        coupon_id: coupon_id
+                    }
+                }).then(function(added) {
+                    deferred.resolve(added);
+                },function(err){
+                    deferred.reject(err)
+                });
+
+            }
+         } else { 
+            models.FavCoupon.create({
+                consumer_id: consumer_id,
+                merchant_id: merchant_id,
+                coupon_id: coupon_id,
+                is_fav: 1
+                
+            }).then(function(added) {
+                deferred.resolve(added);
+            },function(err){
+                deferred.reject(err)
+            });
+        }
+},function(err){
+    deferred.reject(err)
+});
+    return deferred.promise;
+};
 
 
-exports.getAllFavouriteMerchaants = function(consumer_id){
+
+
+
+exports.getAllFavouriteMerchants = function(consumer_id){
     var deferred = Q.defer();
     var replacements = {consumer_id : consumer_id};
 
@@ -783,6 +879,27 @@ exports.getAllFavouriteMerchaants = function(consumer_id){
 
 
 
+exports.getAllFavouriteCoupons = function(consumer_id){
+    var deferred = Q.defer();
+    var replacements = {consumer_id : consumer_id};
+
+    var query = 'select Coupons.id as coupon_id,Coupons.user_id as merchant_id,Coupons.coupon_type,Coupons.days,Coupons.start_time,Coupons.end_time,Coupons.expiry_date,' +
+                ' Coupons.flash_deal,Coupons.description,Coupons.restriction,Coupons.createdAt,Coupons.updatedAt,Coupons.short_name,Coupons.coupon_code from Coupons LEFT JOIN FavCoupons' +
+                ' on Coupons.user_id=FavCoupons.merchant_id WHERE FavCoupons.is_fav=1 and FavCoupons.consumer_id=:consumer_id';
+
+    models.sequelize.query(query,
+        { replacements: replacements, type: models.sequelize.QueryTypes.SELECT }
+    ).then(function(allcps) {
+        deferred.resolve(allcps);
+
+        }
+    );
+    return deferred.promise;
+};
+
+
+
+
 var findCategoryName = function(merchant_id){
     var deferred = Q.defer();
     var replacements = {merchant_id : merchant_id};
@@ -799,9 +916,6 @@ var findCategoryName = function(merchant_id){
     );
     return deferred.promise;
 };
-
-
-
 
 
 
