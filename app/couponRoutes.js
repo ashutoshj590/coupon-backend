@@ -13,8 +13,8 @@ var async = require('async');
 
 /* APi For create coupon..................*/
 
-router.post('/create-coupon', [jsonParser, util.hasJsonParam(["user_id","coupon_type","days","start_time","expiry_date",])], function (req, res) {
-    couponService.createCouponForMerchant(req.body.user_id,req.body.coupon_type,req.body.days,req.body.start_time,req.body.end_time,req.body.expiry_date,req.body.flash_deal,req.body.description,req.body.restriction,req.body.short_name,req.body.consumer_id).then(function (coupon) {
+router.post('/create-coupon', [jsonParser, util.hasJsonParam(["user_id","sub_cate_id","coupon_type","days","start_time","expiry_date",])], function (req, res) {
+    couponService.createCouponForMerchant(req.body.user_id,req.body.sub_cate_id,req.body.coupon_type,req.body.days,req.body.start_time,req.body.end_time,req.body.expiry_date,req.body.flash_deal,req.body.description,req.body.restriction,req.body.short_name,req.body.consumer_id).then(function (coupon) {
             var response = util.getResponseObject(consts.RESPONSE_SUCCESS);
             response.coupon_detail = coupon;
             res.send(response);
@@ -51,7 +51,7 @@ router.post('/accept-edit-coupon', [jsonParser, util.hasJsonParam(["consumer_id"
 
 /* APi For update coupon..................*/
 router.post('/edit-coupon', [jsonParser, util.hasJsonParam(["user_id","coupon_id"])], function (req, res) {
-    couponService.updateCouponForMerchant(null,null,req.body.user_id,req.body.coupon_id,req.body.coupon_type,req.body.days,req.body.start_time,req.body.end_time,req.body.expiry_date,req.body.flash_deal,req.body.description,req.body.restriction,req.body.short_name,req.body.status).then(function (coupon) {
+    couponService.updateCouponForMerchant(null,null,req.body.user_id,req.body.coupon_id,req.body.sub_cate_id,req.body.coupon_type,req.body.days,req.body.start_time,req.body.end_time,req.body.expiry_date,req.body.flash_deal,req.body.description,req.body.restriction,req.body.short_name,req.body.status).then(function (coupon) {
             var response = util.getResponseObject(consts.RESPONSE_SUCCESS);
             res.send(response);
         }, function (err) {
@@ -397,7 +397,7 @@ router.post('/use-coupon',[jsonParser,util.hasJsonParam(["consumer_id","merchant
 
 router.post('/reject-request',[jsonParser,util.hasJsonParam(["consumer_id","merchant_id","request_id","coupon_id"])], function (req, res) { 
     couponService.acceptRequestFunction(req.body.consumer_id, req.body.merchant_id, req.body.request_id, 0).then(function (reject) {
-        couponService.updateCouponForMerchant(req.body.consumer_id,null,req.body.merchant_id,req.body.coupon_id,"custom",null,null,null,null,null,null,null,null,"reject").then(function (reject) {
+        couponService.updateCouponForMerchant(req.body.consumer_id,null,req.body.merchant_id,req.body.coupon_id,null,"custom",null,null,null,null,null,null,null,null,"reject").then(function (reject) {
                 var response = util.getResponseObject(consts.RESPONSE_SUCCESS);
                 res.send(response);
             }, function(err){

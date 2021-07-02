@@ -8,7 +8,7 @@ var uniqid = require('uniqid');
 /*
 *   Function for create coupon .................
 */
-var createCouponForMerchant = exports.createCouponForMerchant = function(user_id,coupon_type,days,start_time,end_time,expiry_date,flash_deal,description,restriction, shortName, consumerId){
+var createCouponForMerchant = exports.createCouponForMerchant = function(user_id,sub_cate_id,coupon_type,days,start_time,end_time,expiry_date,flash_deal,description,restriction, shortName, consumerId){
     var deferred = Q.defer();
     var couponCode = uniqid('COUPON','CODE')
     var consumerIdValue;
@@ -22,6 +22,7 @@ var createCouponForMerchant = exports.createCouponForMerchant = function(user_id
     }
     models.Coupons.create({
         user_id: user_id,
+        sub_category_id: sub_cate_id, 
         coupon_type: coupon_type,
         days: days,
         start_time: start_time,
@@ -47,7 +48,7 @@ var createCouponForMerchant = exports.createCouponForMerchant = function(user_id
 /*
 *   Function for Update coupon .................
 */
-var updateCouponForMerchant = exports.updateCouponForMerchant = function(consumer_id,request_id,user_id,coupon_id,coupon_type,days,start_time,end_time,expiry_date,flash_deal,description,restriction,shortName,status){
+var updateCouponForMerchant = exports.updateCouponForMerchant = function(consumer_id,request_id,user_id,coupon_id,sub_cate_id,coupon_type,days,start_time,end_time,expiry_date,flash_deal,description,restriction,shortName,status){
     var deferred = Q.defer();
     if (coupon_type == "community"){
        var endTime = null; 
@@ -55,6 +56,7 @@ var updateCouponForMerchant = exports.updateCouponForMerchant = function(consume
         var endTime = end_time;
     }
     models.Coupons.update({
+        sub_category_id: sub_cate_id,
         coupon_type: coupon_type,
         days: days,
         start_time: start_time,
@@ -226,7 +228,7 @@ exports.addRequestForMerchant = function(consumer_id, merchant_id, sub_category_
         
     }).then(function(requestDetail) {
         var obj = {};
-        createCouponForMerchant(merchant_id,"custom",null,null,null,null,null,null,null,null,consumer_id).then(function(result) {
+        createCouponForMerchant(merchant_id,sub_category_id,"custom",null,null,null,null,null,null,null,null,consumer_id).then(function(result) {
             console.log(result.id);
             obj.detail = requestDetail;
             obj.coupon_id = result.id;
