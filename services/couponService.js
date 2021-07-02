@@ -506,7 +506,7 @@ var findFavCoupons = exports.findFavCoupons = function(consumer_id,merchant_id,c
                 "merchant_id": merchant_id,
                 "coupon_id": coupon_id
         };
-    models.FavCoupon.findOne({
+    models.FavCoupons.findOne({
         where: cond
     }).then(function (result) {
             deferred.resolve(result);
@@ -793,7 +793,7 @@ exports.addToFavouriteCoupon = function(consumer_id, merchant_id, coupon_id){
     findFavCoupons(consumer_id, merchant_id, coupon_id).then(function(foundData) {
         if (foundData != null || undefined){
             if (foundData.consumer_id == consumer_id && foundData.merchant_id == merchant_id && foundData.coupon_id == coupon_id && foundData.is_fav == 1) {
-                models.FavCoupon.update({
+                models.FavCoupons.update({
                     is_fav: 0
                 },{
                     where: {
@@ -807,7 +807,7 @@ exports.addToFavouriteCoupon = function(consumer_id, merchant_id, coupon_id){
                     deferred.reject(err)
                 });
             } else if (foundData.consumer_id == consumer_id && foundData.merchant_id == merchant_id && foundData.coupon_id == coupon_id && foundData.is_fav == 0) {
-                models.FavCoupon.update({
+                models.FavCoupons.update({
                     is_fav: 1
                 },{
                     where: {
@@ -823,7 +823,7 @@ exports.addToFavouriteCoupon = function(consumer_id, merchant_id, coupon_id){
 
             }
          } else { 
-            models.FavCoupon.create({
+            models.FavCoupons.create({
                 consumer_id: consumer_id,
                 merchant_id: merchant_id,
                 coupon_id: coupon_id,
