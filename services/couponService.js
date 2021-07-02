@@ -338,9 +338,7 @@ exports.getMerchantDetailbySubCateId = function(sub_category_id, consumer_id, la
     
     var query = 'SELECT Registrations.*, MAX(UserSubCateMaps.createdAt) as sub_cat_created , GROUP_CONCAT(UploadImgs.image ORDER BY UploadImgs.image) AS images ' +
                 'FROM UserSubCateMaps LEFT JOIN Registrations ON Registrations.user_id = UserSubCateMaps.user_id LEFT JOIN UploadImgs ON UploadImgs.user_id = Registrations.user_id ' +
-                 'WHERE NOT EXISTS' +
-                 ' ( SELECT * FROM BlockMerchants WHERE Registrations.user_id=BlockMerchants.merchant_id AND BlockMerchants.is_blocked=1 AND' +
-                 ' BlockMerchants.consumer_id=:consumer_id ) AND UserSubCateMaps.sub_category_id=:sub_category_id GROUP BY Registrations.id';
+                 'WHERE UserSubCateMaps.sub_category_id=:sub_category_id GROUP BY Registrations.id';
                 
     models.sequelize.query(query,
         { replacements: replacements, type: models.sequelize.QueryTypes.SELECT }
@@ -530,6 +528,9 @@ var findFavCoupons = exports.findFavCoupons = function(consumer_id,merchant_id,c
             return err;
         }
     );
+    NOT EXISTS' +
+                 ' ( SELECT * FROM BlockMerchants WHERE Registrations.user_id=BlockMerchants.merchant_id AND BlockMerchants.is_blocked=1 AND' +
+                 ' BlockMerchants.consumer_id=:consumer_id ) AND
     
 }; */
 
@@ -543,7 +544,7 @@ var getAllcouponByUserId = exports.getAllcouponByUserId = function(merchant_id, 
     var query = 'SELECT Coupons.id as coupon_id,Coupons.user_id as merchant_id,Coupons.coupon_type,Coupons.days,Coupons.start_time,Coupons.end_time,' +
                 'Coupons.expiry_date,Coupons.flash_deal,Coupons.description,Coupons.restriction,Coupons.short_name,Coupons.coupon_code FROM Coupons WHERE NOT EXISTS' +
                 ' ( SELECT * FROM UsedCoupons WHERE Coupons.coupon_code=UsedCoupons.coupon_code AND ' +
-                'UsedCoupons.consumer_id=:consumer_id ) AND Coupons.user_id=:merchant_id AND NOT Coupons.coupon_type="custom" AND Coupons.is_deleted=0 ORDER BY Coupons.coupon_code ASC';
+                'UsedCoupons.consumer_id=:consumer_id ) AND NOT EXISTS ( SELECT * from BlockMerchants WHERE Coupons.id=BlockMerchants.merchant_id AND BlockMerchants.is_blocked=1 ) AND Coupons.user_id=:merchant_id AND NOT Coupons.coupon_type="custom" AND Coupons.is_deleted=0 ORDER BY Coupons.coupon_code ASC';
 
     models.sequelize.query(query,
         { replacements: replacements, type: models.sequelize.QueryTypes.SELECT }
