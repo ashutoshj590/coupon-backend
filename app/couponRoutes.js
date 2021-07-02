@@ -128,8 +128,8 @@ router.post('/get-all-coupons',jsonParser, function (req, res) {
 
 /* API for  create request ................*/
 
-router.post('/create-request',[jsonParser,util.hasJsonParam(["consumer_id","merchant_id","sub_category_id","detail","date","time"])], function (req, res) { 
-    couponService.addRequestForMerchant(req.body.consumer_id,req.body.merchant_id,req.body.sub_category_id,req.body.detail,req.body.date,req.body.time).then(function (created) {
+router.post('/create-request',[jsonParser,util.hasJsonParam(["consumer_id","sub_category_id","detail","date","time"])], function (req, res) { 
+    couponService.addRequestForMerchant(req.body.consumer_id,req.body.sub_category_id,req.body.detail,req.body.date,req.body.time).then(function (created) {
                 var response = util.getResponseObject(consts.RESPONSE_SUCCESS);
                 response['request_detail'] = created;
                 res.send(response);

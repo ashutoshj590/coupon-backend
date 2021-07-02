@@ -15,7 +15,6 @@ module.exports = (sequelize, DataTypes) => {
   };
   Requests.init({
     consumer_id: DataTypes.INTEGER,
-    merchant_id: DataTypes.INTEGER,
     sub_category_id: DataTypes.INTEGER,
     detail: DataTypes.TEXT,
     date: DataTypes.STRING,

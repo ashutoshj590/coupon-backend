@@ -8,11 +8,12 @@ var uniqid = require('uniqid');
 /*
 *   Function for create coupon .................
 */
-var createCouponForMerchant = exports.createCouponForMerchant = function(user_id,sub_cate_id,coupon_type,days,start_time,end_time,expiry_date,flash_deal,description,restriction, shortName, consumerId){
+var createCouponForMerchant = exports.createCouponForMerchant = function(user_id,sub_category_id,coupon_type,days,start_time,end_time,expiry_date,flash_deal,description,restriction, shortName, consumerId){
     var deferred = Q.defer();
     var couponCode = uniqid('COUPON','CODE')
     var consumerIdValue;
     var pendingValue;
+    var userId;
     if (coupon_type == "custom"){
         consumerIdValue = consumerId;
         pendingValue = "pending";
@@ -20,9 +21,14 @@ var createCouponForMerchant = exports.createCouponForMerchant = function(user_id
         consumerIdValue =  null;
         pendingValue = null;
     }
+    if (user_id == null){
+        userId = null;
+    } else {
+       userId = user_id;
+    }
     models.Coupons.create({
-        user_id: user_id,
-        sub_category_id: sub_cate_id, 
+        user_id: userId,
+        sub_category_id: sub_category_id, 
         coupon_type: coupon_type,
         days: days,
         start_time: start_time,
@@ -215,11 +221,10 @@ exports.getAllCustomCuponsForConsumer = function(consumer_id){
 /*
 *   Function for create request .................
 */
-exports.addRequestForMerchant = function(consumer_id, merchant_id, sub_category_id, detail, date, time){
+exports.addRequestForMerchant = function(consumer_id, sub_category_id, detail, date, time){
     var deferred = Q.defer();
     models.Requests.create({
         consumer_id: consumer_id,
-        merchant_id: merchant_id,
         sub_category_id: sub_category_id,
         detail: detail,
         date: date,
@@ -228,8 +233,7 @@ exports.addRequestForMerchant = function(consumer_id, merchant_id, sub_category_
         
     }).then(function(requestDetail) {
         var obj = {};
-        createCouponForMerchant(merchant_id,sub_category_id,"custom",null,null,null,null,null,null,null,null,consumer_id).then(function(result) {
-            console.log(result.id);
+        createCouponForMerchant(null,sub_category_id,"custom",null,null,null,null,null,null,null,null,consumer_id).then(function(result) {
             obj.detail = requestDetail;
             obj.coupon_id = result.id;
             addCouponIdtoRequest(requestDetail.id,result.id).then(function(update) {
@@ -887,8 +891,9 @@ exports.getAllFavouriteCoupons = function(consumer_id){
     var replacements = {consumer_id : consumer_id};
 
     var query = 'select Coupons.id as coupon_id,Coupons.user_id as merchant_id,Coupons.coupon_type,Coupons.days,Coupons.start_time,Coupons.end_time,Coupons.expiry_date,' +
-                ' Coupons.flash_deal,Coupons.description,Coupons.restriction,Coupons.createdAt,Coupons.updatedAt,Coupons.short_name,Coupons.coupon_code from Coupons LEFT JOIN FavCoupons' +
-                ' on Coupons.id=FavCoupons.coupon_id WHERE FavCoupons.is_fav=1 and FavCoupons.consumer_id=:consumer_id GROUP BY Coupons.id';
+                ' Coupons.flash_deal,Coupons.description,Coupons.restriction,Coupons.createdAt,Coupons.updatedAt,Coupons.short_name,Coupons.coupon_code,' + 
+                'GROUP_CONCAT(UploadImgs.image ORDER BY UploadImgs.image) AS images FROM Coupons LEFT JOIN FavCoupons' +
+                ' on Coupons.id=FavCoupons.coupon_id LEFT JOIN UploadImgs ON UploadImgs.user_id = Coupons.user_id WHERE FavCoupons.is_fav=1 and FavCoupons.consumer_id=:consumer_id GROUP BY Coupons.id';
 
     models.sequelize.query(query,
         { replacements: replacements, type: models.sequelize.QueryTypes.SELECT }
