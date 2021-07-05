@@ -33,7 +33,8 @@ router.post('/create-coupon', [jsonParser, util.hasJsonParam(["user_id","sub_cat
 
 /* APi For update coupon..................*/
 router.post('/accept-edit-coupon', [jsonParser, util.hasJsonParam(["consumer_id","request_id","user_id","coupon_id"])], function (req, res) {
-    couponService.updateCouponForMerchant(req.body.consumer_id,req.body.request_id,req.body.user_id,req.body.coupon_id,req.body.coupon_type,req.body.days,req.body.start_time,req.body.end_time,req.body.expiry_date,req.body.flash_deal,req.body.description,req.body.restriction,req.body.short_name,"accept").then(function (coupon) {
+    console.log(req.body);
+    couponService.updateCouponForMerchant(req.body.consumer_id,req.body.request_id,req.body.user_id,req.body.sub_cate_id,req.body.coupon_id,req.body.coupon_type,req.body.days,req.body.start_time,req.body.end_time,req.body.expiry_date,req.body.flash_deal,req.body.description,req.body.restriction,req.body.short_name,"accept").then(function (coupon) {
             var response = util.getResponseObject(consts.RESPONSE_SUCCESS);
             res.send(response);
         }, function (err) {
@@ -51,7 +52,7 @@ router.post('/accept-edit-coupon', [jsonParser, util.hasJsonParam(["consumer_id"
 
 /* APi For update coupon..................*/
 router.post('/edit-coupon', [jsonParser, util.hasJsonParam(["user_id","coupon_id"])], function (req, res) {
-    couponService.updateCouponForMerchant(null,null,req.body.user_id,req.body.coupon_id,req.body.sub_cate_id,req.body.coupon_type,req.body.days,req.body.start_time,req.body.end_time,req.body.expiry_date,req.body.flash_deal,req.body.description,req.body.restriction,req.body.short_name,req.body.status).then(function (coupon) {
+    couponService.updateCouponForMerchant(null,null,req.body.user_id,req.body.sub_cate_id,req.body.coupon_id,req.body.coupon_type,req.body.days,req.body.start_time,req.body.end_time,req.body.expiry_date,req.body.flash_deal,req.body.description,req.body.restriction,req.body.short_name,req.body.status).then(function (coupon) {
             var response = util.getResponseObject(consts.RESPONSE_SUCCESS);
             res.send(response);
         }, function (err) {

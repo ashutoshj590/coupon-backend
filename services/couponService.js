@@ -54,15 +54,19 @@ var createCouponForMerchant = exports.createCouponForMerchant = function(user_id
 /*
 *   Function for Update coupon .................
 */
-var updateCouponForMerchant = exports.updateCouponForMerchant = function(consumer_id,request_id,user_id,coupon_id,sub_cate_id,coupon_type,days,start_time,end_time,expiry_date,flash_deal,description,restriction,shortName,status){
+var updateCouponForMerchant = exports.updateCouponForMerchant = function(consumer_id,request_id,user_id,sub_cate_id,coupon_id,coupon_type,days,start_time,end_time,expiry_date,flash_deal,description,restriction,shortName,status){
     var deferred = Q.defer();
     if (coupon_type == "community"){
        var endTime = null; 
     } else {
         var endTime = end_time;
     }
+    if (coupon_type != "custom"){
+        var subCateId = sub_cate_id
+     } 
     models.Coupons.update({
-        sub_category_id: sub_cate_id,
+        user_id: user_id,
+        sub_category_id: subCateId,
         coupon_type: coupon_type,
         days: days,
         start_time: start_time,
@@ -76,8 +80,8 @@ var updateCouponForMerchant = exports.updateCouponForMerchant = function(consume
         status: status 
      } ,  {
             where:{
-                id: coupon_id,
-                user_id: user_id
+                id: coupon_id
+               // user_id: user_id
             }
     }).then(function(couponUpdate) {
         if (coupon_type === "custom" && status != "reject") {
@@ -279,9 +283,15 @@ var addCouponIdtoRequest = function(request_id,coupon_id){
 exports.getAllRequestForMerchant = function(merchant_id){
     var deferred = Q.defer();
     var replacements = {merchant_id : merchant_id};
-    var query = 'select Requests.id as request_id,Requests.consumer_id,Requests.merchant_id,Requests.sub_category_id,Requests.detail,' +
+
+    /*var query = 'select Requests.id as request_id,Requests.consumer_id,Requests.merchant_id,Requests.sub_category_id,Requests.detail,' +
                 'Requests.date,Requests.time,Requests.coupon_id,Users.email from Requests LEFT JOIN Users ON Requests.consumer_id=Users.id' +
-                ' where Requests.merchant_id=:merchant_id and NOT EXISTS (select * from AcceptRequests where Requests.id=AcceptRequests.request_id)';
+                ' where Requests.merchant_id=:merchant_id and NOT EXISTS (select * from AcceptRequests where Requests.id=AcceptRequests.request_id)'; */
+
+     var query = 'select requests.id as request_id,requests.consumer_id,requests.sub_category_id,requests.detail,requests.date,requests.time,requests.coupon_id,' +
+                    'requests.createdAt,requests.updatedAt' +
+                ' from requests left join usersubcatemaps on requests.sub_category_id=usersubcatemaps.sub_category_id where usersubcatemaps.user_id=:merchant_id' +
+                ' and NOT EXISTS (select * from AcceptRequests where Requests.id=AcceptRequests.request_id)';           
     
     models.sequelize.query(query,
         { replacements: replacements, type: models.sequelize.QueryTypes.SELECT }
