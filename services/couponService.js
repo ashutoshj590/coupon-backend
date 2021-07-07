@@ -901,20 +901,56 @@ exports.getAllFavouriteCoupons = function(consumer_id){
     var deferred = Q.defer();
     var replacements = {consumer_id : consumer_id};
 
-    var query = 'select Coupons.id as coupon_id,Coupons.user_id as merchant_id,Coupons.coupon_type,Coupons.days,Coupons.start_time,Coupons.end_time,Coupons.expiry_date,' +
+  /*  var query = 'select Coupons.id as coupon_id,Coupons.user_id as merchant_id,Coupons.coupon_type,Coupons.days,Coupons.start_time,Coupons.end_time,Coupons.expiry_date,' +
                 ' Coupons.flash_deal,Coupons.description,Coupons.restriction,Coupons.createdAt,Coupons.updatedAt,Coupons.short_name,Coupons.coupon_code,' + 
                 'GROUP_CONCAT(UploadImgs.image ORDER BY UploadImgs.image) AS images FROM Coupons LEFT JOIN FavCoupons' +
-                ' on Coupons.id=FavCoupons.coupon_id LEFT JOIN UploadImgs ON UploadImgs.user_id = Coupons.user_id WHERE FavCoupons.is_fav=1 and FavCoupons.consumer_id=:consumer_id GROUP BY Coupons.id';
+                ' on Coupons.id=FavCoupons.coupon_id LEFT JOIN UploadImgs ON UploadImgs.user_id = Coupons.user_id WHERE FavCoupons.is_fav=1 and FavCoupons.consumer_id=:consumer_id GROUP BY Coupons.id'; */
+
+    var query = 'select Registrations.*,GROUP_CONCAT(UploadImgs.image ORDER BY UploadImgs.image) AS images FROM Registrations LEFT JOIN FavCoupons' +
+                ' ON Registrations.user_id=FavCoupons.merchant_id LEFT JOIN UploadImgs ON UploadImgs.user_id = Registrations.user_id WHERE FavCoupons.is_fav=1 and FavCoupons.consumer_id=:consumer_id GROUP BY Registrations.id';
 
     models.sequelize.query(query,
         { replacements: replacements, type: models.sequelize.QueryTypes.SELECT }
     ).then(function(allcps) {
-        deferred.resolve(allcps);
+        var output = [];
+        async.eachSeries(allcps,function(data,callback){ 
+            getAllFavCoupons(data.user_id).then(function(newData){
+                data.coupon_detail = newData;
+                output.push(data);
+                callback();
+            }, function(err){
+               deferred.reject(err);
+            })
+   
+       }, function(err, detail) {
+             deferred.resolve(output);
+           
+       });
+        
+    });
+    return deferred.promise;
+};
+
+
+var getAllFavCoupons = function(merchant_id){
+    var deferred = Q.defer();
+    var replacements = {merchant_id : merchant_id};
+
+    var query = 'select Coupons.id as coupon_id,Coupons.user_id as merchant_id,Coupons.coupon_type,Coupons.days,Coupons.start_time,Coupons.end_time,Coupons.expiry_date,' +
+                ' Coupons.flash_deal,Coupons.description,Coupons.restriction,Coupons.createdAt,Coupons.updatedAt,Coupons.short_name,Coupons.coupon_code' + 
+                ' FROM Coupons LEFT JOIN FavCoupons on Coupons.id=FavCoupons.coupon_id' +
+                ' WHERE FavCoupons.is_fav=1 AND FavCoupons.merchant_id=:merchant_id';
+
+    models.sequelize.query(query,
+        { replacements: replacements, type: models.sequelize.QueryTypes.SELECT }
+    ).then(function(data) {
+        deferred.resolve(data);
 
         }
     );
     return deferred.promise;
 };
+
 
 
 
@@ -1034,6 +1070,9 @@ var getAllImgsMerchant = function(merchant_id){
     );
     return deferred.promise;
 };
+
+
+
 
 var getMerchantDetail = function(merchant_id){
     var deferred = Q.defer();
