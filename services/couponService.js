@@ -352,6 +352,7 @@ exports.getMerchantDetailbySubCateId = function(sub_category_id, consumer_id, la
     var deferred = Q.defer();
     var merchantID = merchant_id;
     var dist = distance;
+    var subCateId = sub_category_id;
     if (merchantID == null){
         var replacements = {sub_category_id : sub_category_id, consumer_id : consumer_id }
         var querySet = ''
@@ -365,11 +366,25 @@ exports.getMerchantDetailbySubCateId = function(sub_category_id, consumer_id, la
     } else {
         dist = distance;
     }
-    
-    
+
+    if (subCateId == null && merchantID == null){
+
+        var query = 'SELECT Registrations.*, MAX(UserSubCateMaps.createdAt) as sub_cat_created , GROUP_CONCAT(UploadImgs.image ORDER BY UploadImgs.image) AS images ' +
+                'FROM UserSubCateMaps LEFT JOIN Registrations ON Registrations.user_id = UserSubCateMaps.user_id LEFT JOIN UploadImgs ON UploadImgs.user_id = Registrations.user_id ' +
+                 'GROUP BY Registrations.id';
+
+    } else if(subCateId == null && merchantID != null){
+        var query = 'SELECT Registrations.*, MAX(UserSubCateMaps.createdAt) as sub_cat_created , GROUP_CONCAT(UploadImgs.image ORDER BY UploadImgs.image) AS images ' +
+        'FROM UserSubCateMaps LEFT JOIN Registrations ON Registrations.user_id = UserSubCateMaps.user_id LEFT JOIN UploadImgs ON UploadImgs.user_id = Registrations.user_id ' +
+         'WHERE Registrations.user_id=:merchant_id GROUP BY Registrations.id';
+    }             
+
+     else {
+
     var query = 'SELECT Registrations.*, MAX(UserSubCateMaps.createdAt) as sub_cat_created , GROUP_CONCAT(UploadImgs.image ORDER BY UploadImgs.image) AS images ' +
                 'FROM UserSubCateMaps LEFT JOIN Registrations ON Registrations.user_id = UserSubCateMaps.user_id LEFT JOIN UploadImgs ON UploadImgs.user_id = Registrations.user_id ' +
                  'WHERE UserSubCateMaps.sub_category_id=:sub_category_id' + querySet + ' GROUP BY Registrations.id';
+    }
                 
     models.sequelize.query(query,
         { replacements: replacements, type: models.sequelize.QueryTypes.SELECT }

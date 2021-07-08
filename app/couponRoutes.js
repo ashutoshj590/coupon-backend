@@ -283,9 +283,10 @@ router.post('/get-search-merchant',[jsonParser,util.hasJsonParam(["search_query"
 
 
 
-router.post('/get-merchant-by-category',[jsonParser,util.hasJsonParam(["sub_category_id","lat1","lon1"])], function (req, res) {
+router.post('/get-merchant-by-category',[jsonParser,util.hasJsonParam(["lat1","lon1"])], function (req, res) {
     var consumerId;
     var merchantId;
+    var subCateId;
     var dist;
     if (req.body.consumer_id){
         consumerId = req.body.consumer_id;
@@ -302,7 +303,12 @@ router.post('/get-merchant-by-category',[jsonParser,util.hasJsonParam(["sub_cate
     } else {
         dist = null;
     }
-    couponService.getMerchantDetailbySubCateId(req.body.sub_category_id, consumerId, req.body.lat1, req.body.lon1, merchantId, dist).then(function (detail) {
+    if (req.body.sub_category_id){
+        subCateId = req.body.sub_category_id;
+    } else {
+        subCateId = null;
+    }
+    couponService.getMerchantDetailbySubCateId(subCateId, consumerId, req.body.lat1, req.body.lon1, merchantId, dist).then(function (detail) {
         var response = util.getResponseObject(consts.RESPONSE_SUCCESS);
         var output = [];
         async.eachSeries(detail,function(data,callback){ 
