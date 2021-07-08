@@ -348,13 +348,28 @@ exports.getAllRequestForConsumer = function(consumer_id){
 };
 
 
-exports.getMerchantDetailbySubCateId = function(sub_category_id, consumer_id, lat1, lon1){
+exports.getMerchantDetailbySubCateId = function(sub_category_id, consumer_id, lat1, lon1, merchant_id, distance){
     var deferred = Q.defer();
-    var replacements = {sub_category_id : sub_category_id, consumer_id : consumer_id};
+    var merchantID = merchant_id;
+    var dist = distance;
+    if (merchantID == null){
+        var replacements = {sub_category_id : sub_category_id, consumer_id : consumer_id }
+        var querySet = ''
+  
+    } else {
+    var replacements = {sub_category_id : sub_category_id, consumer_id : consumer_id, merchant_id : merchantID};
+    var querySet = ' AND Registrations.user_id=:merchant_id'
+    }
+    if(dist == null){
+        dist = 10;
+    } else {
+        dist = distance;
+    }
+    
     
     var query = 'SELECT Registrations.*, MAX(UserSubCateMaps.createdAt) as sub_cat_created , GROUP_CONCAT(UploadImgs.image ORDER BY UploadImgs.image) AS images ' +
                 'FROM UserSubCateMaps LEFT JOIN Registrations ON Registrations.user_id = UserSubCateMaps.user_id LEFT JOIN UploadImgs ON UploadImgs.user_id = Registrations.user_id ' +
-                 'WHERE UserSubCateMaps.sub_category_id=:sub_category_id GROUP BY Registrations.id';
+                 'WHERE UserSubCateMaps.sub_category_id=:sub_category_id' + querySet + ' GROUP BY Registrations.id';
                 
     models.sequelize.query(query,
         { replacements: replacements, type: models.sequelize.QueryTypes.SELECT }
@@ -378,7 +393,7 @@ exports.getMerchantDetailbySubCateId = function(sub_category_id, consumer_id, la
             var unit =  "M";       //commented when value need in miles
             var data = calculatedistance(lat1, lon1, obj.lat, obj.lang, unit);
            // obj.distance = data;
-            if (data <= 10){ 
+            if (data <= dist){ 
             output1.push(obj);
             }
         })
