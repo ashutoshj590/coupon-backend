@@ -311,7 +311,7 @@ exports.updateMerchantDetail = function(userId, address, city, state, zipcode, o
     }).then(function(merchantUpdated) {
         getSubCategoryIds(userId).then(function(ids) {
             var cateArray = ids[0].dataValues.sub_category_id.split(",");
-            updateSubCatetoMap(userId, cateArray).then(function(update){
+            updateSubCatetoMap(userId, cateArray, lat, lang).then(function(update){
               deferred.resolve(merchantUpdated);
             },function(err){
                 deferred.reject(err)
@@ -336,6 +336,7 @@ var getSubCategoryIds = function(user_id){
             user_id: user_id
         }
     }).then(function (subCateIdData) {
+        console.log(subCateIdData);
             deferred.resolve(subCateIdData);
         },function (err) {
           deferred.reject(err);
@@ -348,7 +349,7 @@ var getSubCategoryIds = function(user_id){
 
 
 /* function for update sub_Cate_id in maping table....*/
-var updateSubCatetoMap = function(user_id, sub_category_id){
+var updateSubCatetoMap = function(user_id, sub_category_id, lat, lang){
     var deferred = Q.defer();
         models.UserSubCateMap.destroy({
                 where: {
@@ -358,7 +359,9 @@ var updateSubCatetoMap = function(user_id, sub_category_id){
             for(var i=0; i< sub_category_id.length; i++){
                 models.UserSubCateMap.create({
                     user_id: user_id,
-                    sub_category_id: sub_category_id[i]
+                    sub_category_id: sub_category_id[i],
+                    lat: lat,
+                    lang: lang
                
                 }).then(function (added) {
                     deferred.resolve(added);

@@ -122,15 +122,17 @@ exports.getAllcategoryData = function(lat, lang, consumer_id, merchant_id){
     var deferred = Q.defer();
     if (merchant_id == null){
     var replacements = null;
-    var queryset = ''
-    } else {
-        var replacements = {merchant_id:merchant_id}
-        var queryset = 'AND UserSubCateMaps.user_id=:merchant_id'
-    }
-
     var query = 'select SubCategories.id,SubCategories.name,SubCategories.img_url,Categories.id as category_id,Categories.name as' +
                 ' category_name from SubCategories LEFT JOIN Categories on SubCategories.category_id=Categories.id LEFT JOIN UserSubCateMaps' +
-                ' ON SubCategories.id=UserSubCateMaps.sub_category_id where SubCategories.is_deleted=0 ' + queryset;
+                ' ON SubCategories.id=UserSubCateMaps.sub_category_id where SubCategories.is_deleted=0' ;
+
+    } else {
+        var replacements = {merchant_id:merchant_id}
+        var query = 'select SubCategories.id,SubCategories.name,SubCategories.img_url,Categories.id as category_id,Categories.name as' +
+                ' category_name from SubCategories LEFT JOIN Categories on SubCategories.category_id=Categories.id LEFT JOIN UserSubCateMaps' +
+                ' ON SubCategories.id=UserSubCateMaps.sub_category_id where SubCategories.is_deleted=0 AND UserSubCateMaps.user_id=:merchant_id';
+    }
+
    
                
     models.sequelize.query(query,
