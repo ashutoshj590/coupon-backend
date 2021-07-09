@@ -945,7 +945,7 @@ exports.getAllFavouriteCoupons = function(consumer_id){
         var output = [];
         async.eachSeries(allcps,function(data,callback){ 
             getAllFavCoupons(data.user_id).then(function(newData){
-                data.coupon_detail = newData;
+                data.couponDetail = newData;
                 output.push(data);
                 callback();
             }, function(err){

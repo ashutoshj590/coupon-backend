@@ -532,7 +532,7 @@ router.post('/get-favourite-list',[jsonParser,util.hasJsonParam(["consumer_id"])
 router.post('/get-favourite-coupons',[jsonParser,util.hasJsonParam(["consumer_id"])], function (req, res) { 
     couponService.getAllFavouriteCoupons(req.body.consumer_id).then(function (detail) {
                 var response = util.getResponseObject(consts.RESPONSE_SUCCESS);
-                response.coupon_detail = detail;
+                response.merchant_detail = detail;
                 res.send(response);
             
             }, function (err) {
