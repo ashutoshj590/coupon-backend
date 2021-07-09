@@ -191,7 +191,13 @@ categoryService.changeStatustoSubCategory(req.body.sub_category_id).then(functio
 
 
 router.post('/get-category-data',[jsonParser,util.hasJsonParam(["lat","lang"])], function (req, res) {
-    categoryService.getAllcategoryData(req.body.lat, req.body.lang, req.body.consumer_id).then(function (subcategorylist) {
+    var merchantId;
+    if(req.body.merchant_id){
+        merchantId = req.body.merchant_id;
+    } else {
+        merchantId = null;
+    }
+    categoryService.getAllcategoryData(req.body.lat, req.body.lang, req.body.consumer_id, merchantId).then(function (subcategorylist) {
         var response = util.getResponseObject(consts.RESPONSE_SUCCESS);
             response['sub_category_data'] = subcategorylist;
             res.send(response);
