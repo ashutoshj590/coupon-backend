@@ -198,8 +198,17 @@ router.post('/get-category-data',[jsonParser,util.hasJsonParam(["lat","lang"])],
         merchantId = null;
     }
     categoryService.getAllcategoryData(req.body.lat, req.body.lang, req.body.consumer_id, merchantId).then(function (subcategorylist) {
-        var response = util.getResponseObject(consts.RESPONSE_SUCCESS);
-            response['sub_category_data'] = subcategorylist;
+        var response = util.getResponseObject(consts.RESPONSE_SUCCESS); 
+            function arrayUnique(arr, uniqueKey) {
+                const flagList = new Set()
+                return arr.filter(function(item) {
+                  if (!flagList.has(item[uniqueKey])) {
+                    flagList.add(item[uniqueKey])
+                    return true
+                  }
+                })
+              }
+            response['sub_category_data'] = arrayUnique(subcategorylist, 'id')
             res.send(response);
         }, function (err) {
         if(err.errors !== undefined && err.errors[0] !== undefined ){
