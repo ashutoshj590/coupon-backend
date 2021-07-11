@@ -350,42 +350,45 @@ exports.getAllRequestForConsumer = function(consumer_id){
 
 exports.getMerchantDetailbySubCateId = function(sub_category_id, consumer_id, lat1, lon1, merchant_id, distance){
     var deferred = Q.defer();
-    var merchantID = merchant_id;
-    var dist = distance;
-    var subCateId = sub_category_id;
-    if (merchantID == null){
-        var replacements = {sub_category_id : sub_category_id, consumer_id : consumer_id }
-        var querySet = ''
-  
-    } else {
-    var replacements = {sub_category_id : sub_category_id, consumer_id : consumer_id, merchant_id : merchantID};
-    var querySet = ' AND Registrations.user_id=:merchant_id'
+    if(sub_category_id != null || undefined){
+        var subCate = sub_category_id.split(",");
+    
     }
+       
+    var dist = distance;
     if(dist == null){
         dist = 10;
     } else {
         dist = distance;
     }
+    if (merchant_id == null && sub_category_id != null){
+        var replacements = {sub_category_id : subCate }
+        var query = 'SELECT Registrations.*, MAX(UserSubCateMaps.createdAt) as sub_cat_created , GROUP_CONCAT(UploadImgs.image ORDER BY UploadImgs.image) AS images ' +
+                'FROM UserSubCateMaps LEFT JOIN Registrations ON Registrations.user_id = UserSubCateMaps.user_id LEFT JOIN UploadImgs ON UploadImgs.user_id = Registrations.user_id ' +
+                 'WHERE UserSubCateMaps.sub_category_id IN (:sub_category_id) GROUP BY Registrations.id';
+  
+    } else if (merchant_id != null && sub_category_id != null) {
+    var replacements = {sub_category_id : subCate, merchant_id : merchant_id};
+    var query = 'SELECT Registrations.*, MAX(UserSubCateMaps.createdAt) as sub_cat_created , GROUP_CONCAT(UploadImgs.image ORDER BY UploadImgs.image) AS images ' +
+    'FROM UserSubCateMaps LEFT JOIN Registrations ON Registrations.user_id = UserSubCateMaps.user_id LEFT JOIN UploadImgs ON UploadImgs.user_id = Registrations.user_id ' +
+     'WHERE UserSubCateMaps.sub_category_id IN (1,2) AND Registrations.user_id=:merchant_id GROUP BY Registrations.id';
+    }
+    
 
-    if (subCateId == null && merchantID == null){
-
+   else if (sub_category_id == null && merchant_id == null){
+    var replacements = {};
         var query = 'SELECT Registrations.*, MAX(UserSubCateMaps.createdAt) as sub_cat_created , GROUP_CONCAT(UploadImgs.image ORDER BY UploadImgs.image) AS images ' +
                 'FROM UserSubCateMaps LEFT JOIN Registrations ON Registrations.user_id = UserSubCateMaps.user_id LEFT JOIN UploadImgs ON UploadImgs.user_id = Registrations.user_id ' +
                  'GROUP BY Registrations.id';
 
-    } else if(subCateId == null && merchantID != null){
+    } else {
+        var replacements = {merchant_id : merchant_id};
         var query = 'SELECT Registrations.*, MAX(UserSubCateMaps.createdAt) as sub_cat_created , GROUP_CONCAT(UploadImgs.image ORDER BY UploadImgs.image) AS images ' +
         'FROM UserSubCateMaps LEFT JOIN Registrations ON Registrations.user_id = UserSubCateMaps.user_id LEFT JOIN UploadImgs ON UploadImgs.user_id = Registrations.user_id ' +
          'WHERE Registrations.user_id=:merchant_id GROUP BY Registrations.id';
-    }             
+    }  
 
-     else {
-
-    var query = 'SELECT Registrations.*, MAX(UserSubCateMaps.createdAt) as sub_cat_created , GROUP_CONCAT(UploadImgs.image ORDER BY UploadImgs.image) AS images ' +
-                'FROM UserSubCateMaps LEFT JOIN Registrations ON Registrations.user_id = UserSubCateMaps.user_id LEFT JOIN UploadImgs ON UploadImgs.user_id = Registrations.user_id ' +
-                 'WHERE UserSubCateMaps.sub_category_id=:sub_category_id' + querySet + ' GROUP BY Registrations.id';
-    }
-                
+   
     models.sequelize.query(query,
         { replacements: replacements, type: models.sequelize.QueryTypes.SELECT }
         ).then(function(result) {
@@ -401,25 +404,26 @@ exports.getMerchantDetailbySubCateId = function(sub_category_id, consumer_id, la
           })
            
    
-       }, function(err, detail) {
-           result.coupon_detail = output;
-           var output1 = [];
-        result.forEach(function(obj, index) {
-            var unit =  "M";       //commented when value need in miles
-            var data = calculatedistance(lat1, lon1, obj.lat, obj.lang, unit);
-           // obj.distance = data;
-            if (data <= dist){ 
-            output1.push(obj);
-            }
-        })
-          deferred.resolve(output1);   
-          // deferred.resolve(result);
-       });
-                 
-            }
-        );
-        return deferred.promise;
-    };
+        }, function(err, detail) {
+            result.coupon_detail = output;
+            var output1 = [];
+         result.forEach(function(obj, index) {
+             var unit =  "M";       //commented when value need in miles
+             var data = calculatedistance(lat1, lon1, obj.lat, obj.lang, unit);
+            // obj.distance = data;
+             if (data <= dist){ 
+             output1.push(obj);
+             }
+         })
+           deferred.resolve(output1);   
+           // deferred.resolve(result);
+        });
+                  
+     });
+        
+         return deferred.promise;
+     };
+  
 
 
 /*exports.getAllmerchantBySerach = function(search_query, consumer_id){
@@ -927,38 +931,51 @@ exports.getAllFavouriteMerchants = function(consumer_id){
 
 
 
-exports.getAllFavouriteCoupons = function(consumer_id){
+exports.getAllFavouriteCoupons = function(consumer_id, sub_category_id){
     var deferred = Q.defer();
-    var replacements = {consumer_id : consumer_id};
+    if(sub_category_id != null || undefined){
+    var subCate = sub_category_id.split(",");
 
-  /*  var query = 'select Coupons.id as coupon_id,Coupons.user_id as merchant_id,Coupons.coupon_type,Coupons.days,Coupons.start_time,Coupons.end_time,Coupons.expiry_date,' +
-                ' Coupons.flash_deal,Coupons.description,Coupons.restriction,Coupons.createdAt,Coupons.updatedAt,Coupons.short_name,Coupons.coupon_code,' + 
-                'GROUP_CONCAT(UploadImgs.image ORDER BY UploadImgs.image) AS images FROM Coupons LEFT JOIN FavCoupons' +
-                ' on Coupons.id=FavCoupons.coupon_id LEFT JOIN UploadImgs ON UploadImgs.user_id = Coupons.user_id WHERE FavCoupons.is_fav=1 and FavCoupons.consumer_id=:consumer_id GROUP BY Coupons.id'; */
+    }
+    
+    if (subCate == null || undefined){
+    var replacements = {consumer_id : consumer_id};
+    var querySet = ''
+    var querySet1 = ''
+    } else {
+        var replacements = {consumer_id : consumer_id, sub_category_id : subCate};
+        var querySet = ' LEFT JOIN UserSubCateMaps ON UserSubCateMaps.user_id=Registrations.user_id'
+        var querySet1 = ' AND UserSubCateMaps.sub_category_id IN (:sub_category_id) '
+    }
 
     var query = 'select Registrations.*,GROUP_CONCAT(UploadImgs.image ORDER BY UploadImgs.image) AS images FROM Registrations LEFT JOIN FavCoupons' +
-                ' ON Registrations.user_id=FavCoupons.merchant_id LEFT JOIN UploadImgs ON UploadImgs.user_id = Registrations.user_id WHERE FavCoupons.is_fav=1 and FavCoupons.consumer_id=:consumer_id GROUP BY Registrations.id';
+                ' ON Registrations.user_id=FavCoupons.merchant_id LEFT JOIN UploadImgs ON UploadImgs.user_id = Registrations.user_id' + querySet + 
+                ' WHERE FavCoupons.is_fav=1 AND FavCoupons.consumer_id=:consumer_id'+querySet1+' GROUP BY Registrations.id';
 
     models.sequelize.query(query,
         { replacements: replacements, type: models.sequelize.QueryTypes.SELECT }
+        
     ).then(function(allcps) {
-        var output = [];
-        async.eachSeries(allcps,function(data,callback){ 
+                var output = [];
+        async.eachSeries(allcps,function(data,callback){
             getAllFavCoupons(data.user_id).then(function(newData){
                 data.couponDetail = newData;
                 output.push(data);
                 callback();
             }, function(err){
-               deferred.reject(err);
+              // deferred.reject(err);
             })
    
        }, function(err, detail) {
-             deferred.resolve(output);
+         deferred.resolve(output);
            
        });
         
-    });
+    })
+
+    
     return deferred.promise;
+   
 };
 
 

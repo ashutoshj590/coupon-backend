@@ -287,6 +287,7 @@ router.post('/get-merchant-by-category',[jsonParser,util.hasJsonParam(["lat1","l
     var consumerId;
     var merchantId;
     var subCateId;
+   
     var dist;
     if (req.body.consumer_id){
         consumerId = req.body.consumer_id;
@@ -310,33 +311,9 @@ router.post('/get-merchant-by-category',[jsonParser,util.hasJsonParam(["lat1","l
     }
     couponService.getMerchantDetailbySubCateId(subCateId, consumerId, req.body.lat1, req.body.lon1, merchantId, dist).then(function (detail) {
         var response = util.getResponseObject(consts.RESPONSE_SUCCESS);
-        var output = [];
-        async.eachSeries(detail,function(data,callback){ 
-        // data.is_fav = false;
-        console.log(false);
-         couponService.findFavMerchant(consumerId, data.user_id).then(function(foundData){
-            if (foundData != null || undefined){
-                if (foundData.consumer_id == consumerId && foundData.merchant_id == data.user_id && foundData.is_fav == 1) {
-                  //  data.is_fav = true;
-                  console.log(true);
-                   
-                } else if (foundData.consumer_id == consumerId && foundData.merchant_id == data.user_id && foundData.is_fav == 0) {
-                   // data.is_fav = false;
-                   console.log(false);
-                   
-                }
-            }
-            output.push(data);
-            callback();
-       }, function(err){
-           deferred.reject(err);
-       })
-        
-
-    }, function(err, detail) {
-        response.merchant_detail = output;
+        response.merchant_detail = detail;
+       
         res.send(response); 
-    });
                       
             }, function (err) {
                 if(err.errors !== undefined && err.errors[0] !== undefined ){
@@ -529,8 +506,14 @@ router.post('/get-favourite-list',[jsonParser,util.hasJsonParam(["consumer_id"])
 });
 
 
-router.post('/get-favourite-coupons',[jsonParser,util.hasJsonParam(["consumer_id"])], function (req, res) { 
-    couponService.getAllFavouriteCoupons(req.body.consumer_id).then(function (detail) {
+router.post('/get-favourite-coupons',[jsonParser,util.hasJsonParam(["consumer_id"])], function (req, res) {
+    var subCateId; 
+    if (req.body.sub_category_id){
+        subCateId = req.body.sub_category_id;
+    } else {
+        subCateId = null;
+    } 
+    couponService.getAllFavouriteCoupons(req.body.consumer_id,subCateId).then(function (detail) {
                 var response = util.getResponseObject(consts.RESPONSE_SUCCESS);
                 response.merchant_detail = detail;
                 res.send(response);
