@@ -1,6 +1,8 @@
 var models = require('../models/index.js');
 var util = require('../lib/Utils.js');
 var Q = require('q');
+var aws = require('../lib/aws.js');
+var redis = require('../lib/redis.js');
 let userDOA = require('../doa/user');
 let commonFuncs = require('../utils/commonFuncs');
 let httpError = require('../errors/httpError');
@@ -630,32 +632,34 @@ exports.saveOTPForUser = function(email){
     var deferred = Q.defer();
     
     userDOA.findUserByEmail(email).then(function(user){
-        foudUserDataByEmail(email).then(function(found){
             if(user == null || undefined){
                 deferred.reject("No user found with given email id.");
             }else {
-            if (found.email === user.email){
-                var passwordData = found.user_data;
-            }
+           
+                var otpcode = Math.floor((Math.random()*10000)+1);
+               
         let mailOptions = {
             from: "bdappashu123@gmail.com",
             to: email,
             subject: "Forgot password",
-            text: "Your password is:- " + passwordData
+            text: "Your OTP is:- " + otpcode,
+           // expireIn: new Date().getTime() + 300*1000
         }; 
            
                 transporter.sendMail(mailOptions, function(err, data) {
                     if(err){
                         deferred.reject(err);
                     } else {
+                        createLoginData(email,otpcode).then(function(data){ 
                         deferred.resolve(data);
+                    }, function(err){
+                        deferred.reject(err);
+                    })
                     }
                 })
                 
             }
-        }, function(err){
-            deferred.reject(err);
-        })
+    
         }, function(err){
             deferred.reject(err);
         })
@@ -664,11 +668,11 @@ exports.saveOTPForUser = function(email){
 };
 
 
-var foudUserDataByEmail = function(email){
+var foudUserDataByOTP = function(otp){
     var deferred = Q.defer();
     models.UserLoginData.findOne({
         where: {
-            email: email
+            user_data: otp
         }
     }).then(function (found) {
             deferred.resolve(found);
@@ -678,6 +682,52 @@ var foudUserDataByEmail = function(email){
     );
     return deferred.promise;
 };
+
+
+
+
+/* function for change password ........*/
+exports.changePasswordForUser = function(otp, new_password, confirm_password){
+    var deferred = Q.defer();
+    if (confirm_password == new_password){
+    foudUserDataByOTP(otp).then(function(user1){
+        console.log("found data for email");
+        console.log(user1.dataValues.email);
+                persistNewPassword(user1.dataValues.email, new_password).then(function(user){
+                    deferred.resolve("Password Changed");
+                }, function(err){
+                    deferred.reject(err);
+                })
+            }, function(err){
+                deferred.reject("OTP incorrect!!");
+            })
+        } else {
+            deferred.reject("password not match!!");
+        }
+      
+   
+    return deferred.promise;
+};
+
+var persistNewPassword = function(email, new_password){
+    var deferred = Q.defer();
+    commonFuncs.encrypt(new_password).then(function(hash) {
+        models.User.update({
+            password: hash
+        }, {
+            where: {email: email}
+        }).then(function (changePassword) {
+            deferred.resolve(changePassword);
+        }, function (err) {
+            deferred.reject(err)
+        });
+    });
+    return deferred.promise;
+}
+
+
+
+
 
 
 

@@ -97,6 +97,22 @@ router.post('/forgot-password', [jsonParser, util.hasJsonParam(["email"])], func
 });
 
 
+router.post('/reset-password', [jsonParser, util.hasJsonParam(["otp","new_password","confirm_password"])], function (req, res) {
+    userService.changePasswordForUser(req.body.otp,req.body.new_password,req.body.confirm_password).then(function (result) {
+        var response = util.getResponseObject(consts.RESPONSE_SUCCESS);
+        res.send(response);
+    }, function(err){
+        if (err.errors !== undefined && err.errors[0] !== undefined) {
+            var response = util.getResponseObject(consts.RESPONSE_ERROR, err.errors[0].message);
+            res.send(response);
+        } else {
+            var response = util.getResponseObject(consts.RESPONSE_ERROR, err);
+        }
+        res.send(response);
+    })
+});
+
+
 
 
 router.post('/google-login', [util.hasJsonParam(["device_type","login_type","google_id"])], function (req, res) { 
