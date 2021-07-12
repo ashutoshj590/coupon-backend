@@ -191,6 +191,13 @@ router.post('/delete-request',[jsonParser,util.hasJsonParam(["request_id"])], fu
 router.post('/get-request-consumer',[jsonParser,util.hasJsonParam(["consumer_id"])], function (req, res) {
     couponService.getAllRequestForConsumer(req.body.consumer_id).then(function (list) {
             var response = util.getResponseObject(consts.RESPONSE_SUCCESS);
+            list.forEach(function(obj, index) {
+                if(obj.is_accepted == 1){
+                    obj.is_accepted = true;
+                } else {
+                    obj.is_accepted = false;
+                }
+            })
             response['request_list'] = list;
             res.send(response);
         }, function (err) {

@@ -290,8 +290,8 @@ exports.getAllRequestForMerchant = function(merchant_id){
 
      var query = 'select requests.id as request_id,requests.consumer_id,requests.sub_category_id,requests.detail,requests.date,requests.time,requests.coupon_id,' +
                     'requests.createdAt,requests.updatedAt' +
-                ' from requests left join usersubcatemaps on requests.sub_category_id=usersubcatemaps.sub_category_id where usersubcatemaps.user_id=:merchant_id' +
-                ' and NOT EXISTS (select * from AcceptRequests where Requests.id=AcceptRequests.request_id)';           
+                ' from requests left join usersubcatemaps on requests.sub_category_id=usersubcatemaps.sub_category_id where usersubcatemaps.user_id=:merchant_id';
+                ' and NOT EXISTS (select * from acceptrequests where Requests.id=acceptrequests.request_id AND acceptrequests.is_accepted=0)';           
     
     models.sequelize.query(query,
         { replacements: replacements, type: models.sequelize.QueryTypes.SELECT }
@@ -333,15 +333,18 @@ exports.changeStatustoRequest = function(request_id){
 */
 exports.getAllRequestForConsumer = function(consumer_id){
     var deferred = Q.defer();
-    var cond={"is_deleted":0,
-                "consumer_id": consumer_id
-     };
-    models.Requests.findAll({
-      where: cond
-    }).then(function (allRequest) {
-            deferred.resolve(allRequest);
-        },function (err) {
-          deferred.reject(err);
+    var replacements = {consumer_id : consumer_id};
+
+     var query = 'select requests.id as request_id,requests.consumer_id,requests.sub_category_id,requests.detail,requests.date,requests.time,requests.coupon_id,' +
+                    'requests.createdAt,requests.updatedAt,subcategories.name as sub_category_name,subcategories.img_url,categories.name as category_name,acceptrequests.is_accepted' +
+                ' from requests LEFT JOIN subcategories ON requests.sub_category_id=subcategories.id LEFT JOIN categories ON subcategories.category_id=categories.id' +
+                ' LEFT JOIN acceptrequests ON acceptrequests.consumer_id=requests.consumer_id WHERE requests.consumer_id=:consumer_id';
+    
+    models.sequelize.query(query,
+        { replacements: replacements, type: models.sequelize.QueryTypes.SELECT }
+    ).then(function(result) {
+        deferred.resolve(result);
+
         }
     );
     return deferred.promise;
