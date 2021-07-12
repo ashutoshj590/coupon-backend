@@ -691,8 +691,9 @@ exports.changePasswordForUser = function(otp, new_password, confirm_password){
     var deferred = Q.defer();
     if (confirm_password == new_password){
     foudUserDataByOTP(otp).then(function(user1){
-        console.log("found data for email");
-        console.log(user1.dataValues.email);
+        if (!user1){
+            deferred.reject("OTP incorect!!!");  
+        }
                 persistNewPassword(user1.dataValues.email, new_password).then(function(user){
                     deferred.resolve("Password Changed");
                 }, function(err){
