@@ -288,10 +288,10 @@ exports.getAllRequestForMerchant = function(merchant_id){
                 'Requests.date,Requests.time,Requests.coupon_id,Users.email from Requests LEFT JOIN Users ON Requests.consumer_id=Users.id' +
                 ' where Requests.merchant_id=:merchant_id and NOT EXISTS (select * from AcceptRequests where Requests.id=AcceptRequests.request_id)'; */
 
-     var query = 'select requests.id as request_id,requests.consumer_id,requests.sub_category_id,requests.detail,requests.date,requests.time,requests.coupon_id,' +
-                    'requests.createdAt,requests.updatedAt' +
-                ' from requests left join usersubcatemaps on requests.sub_category_id=usersubcatemaps.sub_category_id where usersubcatemaps.user_id=:merchant_id';
-                ' and NOT EXISTS (select * from acceptrequests where Requests.id=acceptrequests.request_id AND acceptrequests.is_accepted=0)';           
+     var query = 'select Requests.id as request_id,Requests.consumer_id,Requests.sub_category_id,Requests.detail,Requests.date,Requests.time,Requests.coupon_id,' +
+                    'Requests.createdAt,Requests.updatedAt' +
+                ' from Requests left join UserSubCateMaps on Requests.sub_category_id=UserSubCateMaps.sub_category_id where UserSubCateMaps.user_id=:merchant_id';
+                ' and NOT EXISTS (select * from AcceptRequests where Requests.id=AcceptRequests.request_id AND AcceptRequests.is_accepted=0)';           
     
     models.sequelize.query(query,
         { replacements: replacements, type: models.sequelize.QueryTypes.SELECT }
@@ -335,10 +335,10 @@ exports.getAllRequestForConsumer = function(consumer_id){
     var deferred = Q.defer();
     var replacements = {consumer_id : consumer_id};
 
-     var query = 'select requests.id as request_id,requests.consumer_id,requests.sub_category_id,requests.detail,requests.date,requests.time,requests.coupon_id,' +
-                    'requests.createdAt,requests.updatedAt,subcategories.name as sub_category_name,subcategories.img_url,categories.name as category_name,acceptrequests.is_accepted' +
-                ' from requests LEFT JOIN subcategories ON requests.sub_category_id=subcategories.id LEFT JOIN categories ON subcategories.category_id=categories.id' +
-                ' LEFT JOIN acceptrequests ON acceptrequests.consumer_id=requests.consumer_id WHERE requests.consumer_id=:consumer_id';
+     var query = 'select Requests.id as request_id,Requests.consumer_id,Requests.sub_category_id,Requests.detail,Requests.date,Requests.time,Requests.coupon_id,' +
+                    'Requests.createdAt,Requests.updatedAt,SubCategories.name as sub_category_name,SubCategories.img_url,Categories.name as category_name,AcceptRequests.is_accepted' +
+                ' from Requests LEFT JOIN SubCategories ON Requests.sub_category_id=SubCategories.id LEFT JOIN Categories ON SubCategories.category_id=Categories.id' +
+                ' LEFT JOIN AcceptRequests ON AcceptRequests.consumer_id=Requests.consumer_id WHERE Requests.consumer_id=:consumer_id';
     
     models.sequelize.query(query,
         { replacements: replacements, type: models.sequelize.QueryTypes.SELECT }
