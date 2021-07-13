@@ -338,7 +338,7 @@ exports.getAllRequestForConsumer = function(consumer_id){
      var query = 'select Requests.id as request_id,Requests.consumer_id,Requests.sub_category_id,Requests.detail,Requests.date,Requests.time,Requests.coupon_id,' +
                     'Requests.createdAt,Requests.updatedAt,SubCategories.name as sub_category_name,SubCategories.img_url,Categories.name as category_name,AcceptRequests.is_accepted' +
                 ' from Requests LEFT JOIN SubCategories ON Requests.sub_category_id=SubCategories.id LEFT JOIN Categories ON SubCategories.category_id=Categories.id' +
-                ' LEFT JOIN AcceptRequests ON AcceptRequests.consumer_id=Requests.consumer_id WHERE Requests.consumer_id=:consumer_id';
+                ' LEFT JOIN AcceptRequests ON AcceptRequests.consumer_id=Requests.consumer_id WHERE Requests.consumer_id=:consumer_id AND Requests.is_deleted=0';
     
     models.sequelize.query(query,
         { replacements: replacements, type: models.sequelize.QueryTypes.SELECT }
