@@ -336,17 +336,29 @@ exports.getAllRequestForConsumer = function(consumer_id){
     var replacements = {consumer_id : consumer_id};
 
      var query = 'select Requests.id as request_id,Requests.consumer_id,Requests.sub_category_id,Requests.detail,Requests.date,Requests.time,Requests.coupon_id,' +
-                    'Requests.createdAt,Requests.updatedAt,SubCategories.name as sub_category_name,SubCategories.img_url,Categories.name as category_name,AcceptRequests.is_accepted' +
+                    'Requests.createdAt,Requests.updatedAt,SubCategories.name as sub_category_name,SubCategories.img_url,Categories.name as category_name,AcceptRequests.is_accepted,AcceptRequests.merchant_id' +
                 ' from Requests LEFT JOIN SubCategories ON Requests.sub_category_id=SubCategories.id LEFT JOIN Categories ON SubCategories.category_id=Categories.id' +
                 ' LEFT JOIN AcceptRequests ON AcceptRequests.consumer_id=Requests.consumer_id WHERE Requests.consumer_id=:consumer_id AND Requests.is_deleted=0';
     
     models.sequelize.query(query,
         { replacements: replacements, type: models.sequelize.QueryTypes.SELECT }
     ).then(function(result) {
-        deferred.resolve(result);
-
-        }
-    );
+        var output = [];
+        async.eachSeries(result,function(data,callback){ 
+            getMerchantDetail(data.merchant_id).then(function(newData){
+                data.merchant_detail = newData;
+                output.push(data);
+                callback();
+            }, function(err){
+               deferred.reject(err);
+            })
+   
+       }, function(err, detail) {
+             deferred.resolve(output);
+           
+       });
+        
+    });
     return deferred.promise;
 };
 
