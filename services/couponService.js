@@ -342,10 +342,10 @@ exports.getAllRequestForConsumer = function(consumer_id){
     
     models.sequelize.query(query,
         { replacements: replacements, type: models.sequelize.QueryTypes.SELECT }
-    ).then(function(result) {
+    ).then(function(result) { 
         var output = [];
-        async.eachSeries(result,function(data,callback){ 
-            getMerchantDetailForFavCoupons(data.merchant_id).then(function(newData){
+        async.eachSeries(result,function(data,callback){ //getCouponDetail
+            getMerchantDetailForReqCoupons(data.merchant_id, data.coupon_id).then(function(newData){
                 if (data.is_accepted == 1){
                 data.merchant_detail = newData;
                 output.push(data);
@@ -355,9 +355,10 @@ exports.getAllRequestForConsumer = function(consumer_id){
                     output.push(data);
                     callback();  
                 }
-            }, function(err){
-               deferred.reject(err);
-            })
+          
+        }, function(err){
+            deferred.reject(err);
+         })
    
        }, function(err, detail) {
              deferred.resolve(output);
@@ -1158,7 +1159,7 @@ var getMerchantDetail = function(merchant_id){
     return deferred.promise;
 };
 
-var getMerchantDetailForFavCoupons = function(merchant_id){
+var getMerchantDetailForReqCoupons = function(merchant_id, coupon_id){
     var deferred = Q.defer();
     var replacements = {merchant_id : merchant_id};
 
@@ -1169,11 +1170,24 @@ var getMerchantDetailForFavCoupons = function(merchant_id){
 
     models.sequelize.query(query,
         { replacements: replacements, type: models.sequelize.QueryTypes.SELECT }
-    ).then(function(data) {
-        deferred.resolve(data);
-
-        }
-    );
+    ).then(function(merchantDetail) {
+        var output = [];
+        async.eachSeries(merchantDetail,function(data,callback){ //getCouponDetail
+            getCouponDetail(coupon_id).then(function(newData){
+                data.coupon_detail = newData;
+                output.push(data);
+                callback();
+               
+        }, function(err){
+            deferred.reject(err);
+         })
+   
+       }, function(err, detail) {
+             deferred.resolve(output);
+           
+       });
+        
+    });
     return deferred.promise;
 };
 
@@ -1202,7 +1216,7 @@ exports.getAllcouponByMerchantId = function(merchant_id){
 };
 
 
-exports.getCouponDetail = function(coupon_id){
+var getCouponDetail = exports.getCouponDetail = function(coupon_id){
     var deferred = Q.defer();
     var cond={
                 "id": coupon_id
