@@ -346,16 +346,16 @@ exports.getAllRequestForConsumer = function(consumer_id){
         var output = [];
         async.eachSeries(result,function(data,callback){ //getCouponDetail
             getMerchantDetailForReqCoupons(data.merchant_id, data.coupon_id).then(function(newData){
-                if (data.is_accepted == 1){
+                if (data.is_accepted != 1){
+                delete data.merchant_id;
                 data.merchant_detail = newData;
                 output.push(data);
                 callback();
                 } else {
-                    data.merchant_id = '';
+                    data.merchant_detail = newData;
                     output.push(data);
-                    callback();  
+                    callback(); 
                 }
-          
         }, function(err){
             deferred.reject(err);
          })
@@ -1166,7 +1166,7 @@ var getMerchantDetailForReqCoupons = function(merchant_id, coupon_id){
     var query =  'SELECT Registrations.user_id as merchant_id,Registrations.address,Registrations.city,Registrations.state,Registrations.zipcode,'+
                 'Registrations.opening_time,Registrations.closing_time,Registrations.business_name,Registrations.tagline,Registrations.website,'+
                  'Registrations.phone_no,Registrations.business_license_no,Registrations.description,Registrations.createdAt,Registrations.updatedAt,'+
-                 'Registrations.lat,Registrations.lang from Registrations where user_id =:merchant_id';
+                 'Registrations.lat,Registrations.lang,GROUP_CONCAT(UploadImgs.image ORDER BY UploadImgs.image) AS images FROM Registrations LEFT JOIN UploadImgs ON UploadImgs.user_id = Registrations.user_id where Registrations.user_id =:merchant_id';
 
     models.sequelize.query(query,
         { replacements: replacements, type: models.sequelize.QueryTypes.SELECT }
