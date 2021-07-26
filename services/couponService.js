@@ -338,23 +338,36 @@ exports.getAllRequestForConsumer = function(consumer_id){
      var query = 'select Requests.id as request_id,Requests.consumer_id,Requests.sub_category_id,Requests.detail,Requests.date,Requests.time,Requests.coupon_id,' +
                     'Requests.createdAt,Requests.updatedAt,SubCategories.name as sub_category_name,SubCategories.img_url,Categories.name as category_name,AcceptRequests.is_accepted,AcceptRequests.merchant_id' +
                 ' from Requests LEFT JOIN SubCategories ON Requests.sub_category_id=SubCategories.id LEFT JOIN Categories ON SubCategories.category_id=Categories.id' +
-                ' LEFT JOIN AcceptRequests ON AcceptRequests.consumer_id=Requests.consumer_id WHERE Requests.consumer_id=:consumer_id AND Requests.is_deleted=0';
+                ' LEFT JOIN AcceptRequests ON AcceptRequests.request_id=Requests.id WHERE Requests.consumer_id=:consumer_id AND Requests.is_deleted=0';
     
     models.sequelize.query(query,
         { replacements: replacements, type: models.sequelize.QueryTypes.SELECT }
-    ).then(function(result) { 
+    ).then(function(result) {         
         var output = [];
         async.eachSeries(result,function(data,callback){ //getCouponDetail
             getMerchantDetailForReqCoupons(data.merchant_id, data.coupon_id).then(function(newData){
                 if (data.is_accepted != 1){
                 delete data.merchant_id;
-                data.merchant_detail = newData;
+                data.merchant_detail = [];
                 output.push(data);
                 callback();
                 } else {
+                    findAcceptReq(data.consumer_id,data.merchant_id,data.request_id).then(function(getdata) {
+                    if(getdata){
                     data.merchant_detail = newData;
                     output.push(data);
-                    callback(); 
+                    callback();
+                    } else {
+                        delete data.merchant_id;
+                        data.is_accepted = 0;
+                        data.merchant_detail = [];
+                        output.push(data);
+                        callback();
+                    }
+                }, function(err){
+                    deferred.reject(err);
+                 })
+            
                 }
         }, function(err){
             deferred.reject(err);
@@ -368,6 +381,30 @@ exports.getAllRequestForConsumer = function(consumer_id){
     });
     return deferred.promise;
 };
+
+
+          
+
+
+
+var findAcceptReq = function(consumer_id,merchant_id,request_id){
+    var deferred = Q.defer();
+    var cond={
+                "consumer_id": consumer_id,
+                "merchant_id": merchant_id,
+                "request_id": request_id
+        };
+    models.AcceptRequest.findOne({
+        where: cond
+    }).then(function (result) {
+            deferred.resolve(result);
+        },function (err) {
+            deferred.reject(err);
+        }
+    );
+    return deferred.promise;
+};
+
 
 
 exports.getMerchantDetailbySubCateId = function(sub_category_id, consumer_id, lat1, lon1, merchant_id, distance){
@@ -678,6 +715,23 @@ var acceptRequestFunction = exports.acceptRequestFunction = function(consumer_id
     } else if (is_accepted == 0){
         action = "reject";
     }
+    findAcceptReq(consumer_id,merchant_id,request_id).then(function(getdata) {
+        if(getdata){
+            models.AcceptRequest.update({
+                consumer_id: consumer_id,
+                merchant_id: merchant_id,
+                request_id: request_id,
+            },{
+                where: {
+                    id: getdata.dataValues.id
+                }
+            }).then(function(added) {
+                deferred.resolve(added);
+            },function(err){
+                deferred.reject(err)
+            });
+
+        } else {
     models.AcceptRequest.create({
         consumer_id: consumer_id,
         merchant_id: merchant_id,
@@ -685,7 +739,11 @@ var acceptRequestFunction = exports.acceptRequestFunction = function(consumer_id
         is_accepted: is_accepted
         
     }).then(function(requestAccpeted) {
-        deferred.resolve(requestAccpeted);    
+        deferred.resolve(requestAccpeted);
+    },function(err){
+        deferred.reject(err)
+        });
+    }    
     },function(err){
         deferred.reject(err)
     });
@@ -1221,10 +1279,10 @@ var getCouponDetail = exports.getCouponDetail = function(coupon_id){
     var cond={
                 "id": coupon_id
      };
-    models.Coupons.find({
+    models.Coupons.findOne({
       where: cond
-    }).then(function (Coupon) {
-            deferred.resolve(Coupon);
+    }).then(function(coupon) {
+            deferred.resolve(coupon);
         },function (err) {
           deferred.reject(err);
         }

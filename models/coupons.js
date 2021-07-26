@@ -27,14 +27,10 @@ module.exports = (sequelize, DataTypes) => {
     flash_deal: DataTypes.BOOLEAN,
     description: DataTypes.TEXT,
     restriction: DataTypes.TEXT,
-    is_deleted: DataTypes.BOOLEAN,
     short_name: DataTypes.STRING,
     coupon_code: DataTypes.STRING,
-    consumer_id: DataTypes.INTEGER,
-    status: {
-      type :DataTypes.ENUM,
-      values: ['accept','reject','pending']
-      }
+    consumer_id: DataTypes.INTEGER
+    
   }, {
     sequelize,
     modelName: 'Coupons',
