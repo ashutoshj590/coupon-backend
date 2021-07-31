@@ -205,7 +205,8 @@ router.post('/delete-consumer',[jsonParser,util.hasJsonParam(["user_id"])], func
 
 
 
-    router.post('/get-merchant-detail',[jsonParser,util.hasJsonParam(["user_id"])], function (req, res) { 
+    router.post('/get-merchant-detail',[jsonParser,util.hasJsonParam(["user_id"])], function (req, res) {
+        console.log("1.."); 
         userService.getMerchantDetail(req.body.user_id).then(function (detail) {
                     var response = util.getResponseObject(consts.RESPONSE_SUCCESS);
                    response.merchant_detail = detail[0];

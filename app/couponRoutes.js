@@ -13,7 +13,7 @@ var async = require('async');
 
 /* APi For create coupon..................*/
 
-router.post('/create-coupon', [jsonParser, util.hasJsonParam(["user_id","sub_cate_id","coupon_type","days","start_time","expiry_date",])], function (req, res) {
+router.post('/create-coupon', [jsonParser, util.hasJsonParam(["user_id","sub_cate_id","coupon_type","days","start_time","end_time","expiry_date",])], function (req, res) {
     couponService.createCouponForMerchant(req.body.user_id,req.body.sub_cate_id,req.body.coupon_type,req.body.days,req.body.start_time,req.body.end_time,req.body.expiry_date,req.body.flash_deal,req.body.description,req.body.restriction,req.body.short_name,req.body.consumer_id).then(function (coupon) {
             var response = util.getResponseObject(consts.RESPONSE_SUCCESS);
             response.coupon_detail = coupon;
@@ -399,8 +399,11 @@ router.post('/use-coupon',[jsonParser,util.hasJsonParam(["consumer_id","merchant
 
 
 router.post('/reject-request',[jsonParser,util.hasJsonParam(["consumer_id","merchant_id","request_id","coupon_id"])], function (req, res) { 
+    console.log("1..");
     couponService.acceptRequestFunction(req.body.consumer_id, req.body.merchant_id, req.body.request_id, 0).then(function (reject) {
+        console.log("10..");
         couponService.updateCouponForMerchant(req.body.consumer_id,null,req.body.merchant_id,req.body.coupon_id,null,"custom",null,null,null,null,null,null,null,null,"reject").then(function (reject) {
+            console.log("17..");
                 var response = util.getResponseObject(consts.RESPONSE_SUCCESS);
                 res.send(response);
             }, function(err){
@@ -560,6 +563,25 @@ router.post('/get-used-coupons',[jsonParser,util.hasJsonParam(["consumer_id"])],
 
 router.post('/get-coupon-detail',[jsonParser,util.hasJsonParam(["coupon_id"])], function (req, res) { 
     couponService.getCouponDetail(req.body.coupon_id).then(function (detail) {
+                var response = util.getResponseObject(consts.RESPONSE_SUCCESS);
+                response.coupon_detail = detail;
+                res.send(response);
+            
+            }, function (err) {
+                if(err.errors !== undefined && err.errors[0] !== undefined ){
+                    var response = util.getResponseObject(consts.RESPONSE_ERROR, err.response);
+                    res.send(response);
+                }else{
+                    var response = util.getResponseObject(consts.RESPONSE_ERROR, err.response);
+                }
+                res.send(response);
+            }
+        );
+});
+
+
+router.post('/get-all-coupons-by-detail', function (req, res) { 
+    couponService.getAllcouponByDetail().then(function (detail) {
                 var response = util.getResponseObject(consts.RESPONSE_SUCCESS);
                 response.coupon_detail = detail;
                 res.send(response);

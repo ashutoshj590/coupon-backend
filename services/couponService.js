@@ -56,21 +56,19 @@ var createCouponForMerchant = exports.createCouponForMerchant = function(user_id
 */
 var updateCouponForMerchant = exports.updateCouponForMerchant = function(consumer_id,request_id,user_id,sub_cate_id,coupon_id,coupon_type,days,start_time,end_time,expiry_date,flash_deal,description,restriction,shortName,status){
     var deferred = Q.defer();
-    if (coupon_type == "community"){
-       var endTime = null; 
-    } else {
-        var endTime = end_time;
-    }
+    console.log("11..");
     if (coupon_type != "custom"){
+        console.log("12..");
         var subCateId = sub_cate_id
      } 
+     console.log("13..");
     models.Coupons.update({
         user_id: user_id,
         sub_category_id: subCateId,
         coupon_type: coupon_type,
         days: days,
         start_time: start_time,
-        end_time: endTime,
+        end_time: end_time,
         expiry_date: expiry_date,
         flash_deal: flash_deal,
         description: description,
@@ -84,8 +82,11 @@ var updateCouponForMerchant = exports.updateCouponForMerchant = function(consume
                // user_id: user_id
             }
     }).then(function(couponUpdate) {
+        console.log("14..");
         if (coupon_type === "custom" && status != "reject") {
+            console.log("15..");
         acceptRequestFunction(consumer_id, user_id, request_id, 1).then(function(accept) {
+            console.log("16..");
         deferred.resolve(couponUpdate);
     
         },function(err){
@@ -290,8 +291,8 @@ exports.getAllRequestForMerchant = function(merchant_id){
 
      var query = 'select Requests.id as request_id,Requests.consumer_id,Requests.sub_category_id,Requests.detail,Requests.date,Requests.time,Requests.coupon_id,' +
                     'Requests.createdAt,Requests.updatedAt' +
-                ' from Requests left join UserSubCateMaps on Requests.sub_category_id=UserSubCateMaps.sub_category_id where UserSubCateMaps.user_id=:merchant_id';
-                ' and NOT EXISTS (select * from AcceptRequests where Requests.id=AcceptRequests.request_id AND AcceptRequests.is_accepted=0)';           
+                ' from Requests left join UserSubCateMaps on Requests.sub_category_id=UserSubCateMaps.sub_category_id where UserSubCateMaps.user_id=:merchant_id' +
+                ' and NOT EXISTS (select * from AcceptRequests where Requests.id=AcceptRequests.request_id AND AcceptRequests.consumer_id=Requests.consumer_id AND AcceptRequests.is_accepted=0) ORDER BY Requests.id ASC';           
     
     models.sequelize.query(query,
         { replacements: replacements, type: models.sequelize.QueryTypes.SELECT }
@@ -708,15 +709,20 @@ exports.addUsedCoupontoDatabase = function(consumer_id, merchant_id, coupon_code
 
 
 var acceptRequestFunction = exports.acceptRequestFunction = function(consumer_id, merchant_id, request_id, is_accepted){
+    console.log("2..");
     var deferred = Q.defer();
     var action;
     if (is_accepted == 1){
+        console.log("3..if");
         action = "accept";
     } else if (is_accepted == 0){
         action = "reject";
+        console.log("3..else if");
     }
+    console.log("4..");
     findAcceptReq(consumer_id,merchant_id,request_id).then(function(getdata) {
         if(getdata){
+            console.log("5..");
             models.AcceptRequest.update({
                 consumer_id: consumer_id,
                 merchant_id: merchant_id,
@@ -726,12 +732,15 @@ var acceptRequestFunction = exports.acceptRequestFunction = function(consumer_id
                     id: getdata.dataValues.id
                 }
             }).then(function(added) {
+                console.log("6..");
                 deferred.resolve(added);
             },function(err){
+                console.log("7..");
                 deferred.reject(err)
             });
 
         } else {
+            console.log("8..");
     models.AcceptRequest.create({
         consumer_id: consumer_id,
         merchant_id: merchant_id,
@@ -739,8 +748,10 @@ var acceptRequestFunction = exports.acceptRequestFunction = function(consumer_id
         is_accepted: is_accepted
         
     }).then(function(requestAccpeted) {
+        console.log("9..");
         deferred.resolve(requestAccpeted);
     },function(err){
+        console.log("10..");
         deferred.reject(err)
         });
     }    
@@ -1305,6 +1316,59 @@ exports.getAllcouponByConsumerId = function(consumer_id){
             deferred.resolve(allCoupons);
         },function (err) {
           deferred.reject(err);
+        }
+    );
+    return deferred.promise;
+};
+
+
+
+exports.getAllcouponByDetail = function(){
+    var deferred = Q.defer();
+    var replacements = {};
+
+    var query =  'SELECT * from Coupons';
+
+    models.sequelize.query(query,
+        { replacements: replacements, type: models.sequelize.QueryTypes.SELECT }
+    ).then(function (allCoupons) {
+        var output = [];
+        async.eachSeries(allCoupons,function(data,callback){ 
+            getAllDataOfMerchant(data.user_id).then(function(newData){
+                if (data.coupon_type == "custom"){
+                    data.merchant_detail = [];
+                    output.push(data);
+                    callback();
+                } else {
+                data.merchant_detail = newData;
+                output.push(data);
+                callback();
+                }
+            }, function(err){
+               deferred.reject(err);
+            })
+   
+       }, function(err, detail) {
+             deferred.resolve(output);
+           
+       });
+        
+    });
+    return deferred.promise;
+};
+
+
+var getAllDataOfMerchant = function(merchant_id){
+    var deferred = Q.defer();
+    var replacements = {merchant_id : merchant_id};
+
+    var query =  'SELECT Registrations.*,GROUP_CONCAT(UploadImgs.image ORDER BY UploadImgs.image) AS images FROM Registrations LEFT JOIN UploadImgs ON UploadImgs.user_id = Registrations.user_id where Registrations.user_id =:merchant_id';
+
+    models.sequelize.query(query,
+        { replacements: replacements, type: models.sequelize.QueryTypes.SELECT }
+    ).then(function(data) {
+        deferred.resolve(data);
+
         }
     );
     return deferred.promise;

@@ -295,7 +295,7 @@ exports.getAllCountsForConsumer = function(){
 var countsForMerchantAdmin = function(){
     var deferred = Q.defer();
     var replacements = null;
-    var query = "select COUNT(*) as merchant from Users WHERE type='merchant,consumer'";
+    var query = "select COUNT(*) as merchant from Registrations";
 
     models.sequelize.query(query,
         { replacements: replacements, type: models.sequelize.QueryTypes.SELECT }
