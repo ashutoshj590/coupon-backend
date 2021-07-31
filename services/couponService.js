@@ -171,16 +171,7 @@ exports.getAllcoupon = function(merchant_id){
     models.sequelize.query(query,
         { replacements: replacements, type: models.sequelize.QueryTypes.SELECT }
     ).then(function(allcoupons) {
-        var data = [];
-        allcoupons.forEach(function(coupon, index){
-         
-            if(coupon.coupon_type == "community"){
-                coupon.end_time =null;
-            }
-            data.push(coupon);
-            
-        })
-        deferred.resolve(data);
+        deferred.resolve(allcoupons);
 
 
         }
