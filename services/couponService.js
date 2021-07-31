@@ -156,8 +156,7 @@ exports.changeStatustoCoupon = function(coupon_id){
 */
 exports.getAllcoupon = function(merchant_id){
     var deferred = Q.defer();
-    var merchantID = merchant_id;
-    if (merchantID == null){
+    if (merchant_id == null){
         var replacements = {};
         var querySet = ''
 
