@@ -29,7 +29,8 @@ module.exports = (sequelize, DataTypes) => {
     restriction: DataTypes.TEXT,
     short_name: DataTypes.STRING,
     coupon_code: DataTypes.STRING,
-    consumer_id: DataTypes.INTEGER
+    consumer_id: DataTypes.INTEGER,
+    is_deleted: DataTypes.BOOLEAN,
     
   }, {
     sequelize,
