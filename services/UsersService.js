@@ -528,21 +528,17 @@ var deleteMerchantSubCate = function(user_id){
 
 
 exports.getMerchantDetail = function(user_id){
-    console.log("2..");
     var deferred = Q.defer();
     var replacements = {user_id : user_id};
-    console.log("3..");
     var query = 'select Registrations.user_id, Registrations.address,Registrations.city,Registrations.state,Registrations.zipcode,'+
                 'Registrations.business_name,Registrations.tagline,Registrations.website,Registrations.phone_no,Registrations.business_license_no,'+
                 'Registrations.description,Registrations.opening_time,Registrations.closing_time,Registrations.notification_email,' +
-                'Registrations.sub_category_id,Registrations.lat,Registrations.lang from Registrations where Registrations.user_id=:user_id;'
+                'Registrations.sub_category_id,Registrations.lat,Registrations.lang,Users.email,Users.device_type From Registrations LEFT JOIN Users ON Registrations.user_id=Users.id where Registrations.user_id=:user_id;'
     models.sequelize.query(query,
         { replacements: replacements, type: models.sequelize.QueryTypes.SELECT }
     ).then(function(result) {
-        console.log("4..");
         console.log(result);
         var output = [];
-        console.log("5..");
         async.eachSeries(result,function(data,callback){ 
             getAllcouponByMerchantId(data.user_id).then(function(newData){
                 data.coupons_detail = newData;
