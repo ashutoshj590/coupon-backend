@@ -231,6 +231,8 @@ router.post('/delete-consumer',[jsonParser,util.hasJsonParam(["user_id"])], func
             );
         });
 
+       
+
 
 
 
@@ -269,6 +271,7 @@ router.post('/get-all-merchant',jsonParser, function (req, res) {
             }
     );
 });
+
 
 
 
@@ -342,6 +345,31 @@ router.post('/block-coupon',[jsonParser,util.hasJsonParam(["consumer_id","coupon
             }
         );
     });
+
+
+
+
+ 
+router.post('/get-merchant-detail-admin',[jsonParser,util.hasJsonParam(["user_id"])], function (req, res) {
+    userService.getMerchantDetailAdmin(req.body.user_id).then(function (detail) {
+                var response = util.getResponseObject(consts.RESPONSE_SUCCESS);
+                response.merchant_detail = detail[0];
+                if(response.merchant_detail.notification_email === null){
+                    response.merchant_detail.notification_email = false;
+                }
+                res.send(response);
+          
+            }, function (err) {
+                if(err.errors !== undefined && err.errors[0] !== undefined ){
+                    var response = util.getResponseObject(consts.RESPONSE_ERROR, err.response);
+                    res.send(response);
+                }else{
+                    var response = util.getResponseObject(consts.RESPONSE_ERROR, err.response);
+                }
+                res.send(response);
+            }
+        );
+    });    
 
 
 

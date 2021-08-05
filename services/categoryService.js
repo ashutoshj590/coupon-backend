@@ -437,3 +437,23 @@ var findSubCategory = function(sub_category_id){
     );
     return deferred.promise;
 };
+
+
+
+exports.categoriesDetail = function(){
+    var deferred = Q.defer();
+    var replacements = {};
+
+    var query = 'SELECT Categories.id as category_id,Categories.name as category_name,SubCategories.id as sub_category_id,SubCategories.name as sub_cate_name'+
+                ' FROM Categories LEFT JOIN SubCategories ON SubCategories.category_id=Categories.id';
+
+    models.sequelize.query(query,
+        { replacements: replacements, type: models.sequelize.QueryTypes.SELECT }
+    ).then(function(coummnityCounts) {
+        deferred.resolve(coummnityCounts);
+
+        }
+    );
+    return deferred.promise;
+};
+

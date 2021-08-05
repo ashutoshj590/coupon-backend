@@ -262,4 +262,24 @@ router.post('/status-update',[jsonParser,util.hasJsonParam(["sub_category_id"])]
 
 
 
+router.post('/get-cate-sub-cate',jsonParser, function (req, res) {
+    categoryService.categoriesDetail().then(function (subCategorylist) {
+            var response = util.getResponseObject(consts.RESPONSE_SUCCESS);
+            response['category_data'] = subCategorylist;
+            res.send(response);
+        }, function (err) {
+            if(err.errors !== undefined && err.errors[0] !== undefined ){
+                var response = util.getResponseObject(consts.RESPONSE_ERROR, err.response);
+                res.send(response);
+            }else{
+                var response = util.getResponseObject(consts.RESPONSE_ERROR, err.response);
+            }
+            res.send(response);
+        }
+    );
+});
+
+
+
+
 module.exports = router;

@@ -533,7 +533,8 @@ exports.getMerchantDetail = function(user_id){
     var query = 'select Registrations.user_id, Registrations.address,Registrations.city,Registrations.state,Registrations.zipcode,'+
                 'Registrations.business_name,Registrations.tagline,Registrations.website,Registrations.phone_no,Registrations.business_license_no,'+
                 'Registrations.description,Registrations.opening_time,Registrations.closing_time,Registrations.notification_email,' +
-                'Registrations.sub_category_id,Registrations.lat,Registrations.lang,Users.email,Users.device_type From Registrations LEFT JOIN Users ON Registrations.user_id=Users.id where Registrations.user_id=:user_id;'
+                'Registrations.sub_category_id,Registrations.lat,Registrations.lang,Users.email,Users.device_type From Registrations'+ 
+                ' LEFT JOIN Users ON Registrations.user_id=Users.id where Registrations.user_id=:user_id';
     models.sequelize.query(query,
         { replacements: replacements, type: models.sequelize.QueryTypes.SELECT }
     ).then(function(result) {
@@ -544,9 +545,9 @@ exports.getMerchantDetail = function(user_id){
                 data.coupons_detail = newData;
                 output.push(data);
                 callback();
-            }, function(err){
-               deferred.reject(err);
-            })
+        }, function(err){
+            deferred.reject(err);
+         })
    
        }, function(err, detail) {
              deferred.resolve(output);
@@ -556,6 +557,117 @@ exports.getMerchantDetail = function(user_id){
     });
     return deferred.promise;
 };
+
+
+
+
+exports.getMerchantDetailAdmin = function(user_id){
+    var deferred = Q.defer();
+    var replacements = {user_id : user_id};
+    var query = 'select Registrations.user_id, Registrations.address,Registrations.city,Registrations.state,Registrations.zipcode,'+
+                'Registrations.business_name,Registrations.tagline,Registrations.website,Registrations.phone_no,Registrations.business_license_no,'+
+                'Registrations.description,Registrations.opening_time,Registrations.closing_time,Registrations.notification_email,' +
+                'Registrations.sub_category_id,Registrations.lat,Registrations.lang,Users.email,Users.device_type From Registrations'+ 
+                ' LEFT JOIN Users ON Registrations.user_id=Users.id where Registrations.user_id=:user_id';
+    models.sequelize.query(query,
+        { replacements: replacements, type: models.sequelize.QueryTypes.SELECT }
+    ).then(function(result) {
+        var output = [];
+        var count = ["A"];
+        async.eachSeries(result,function(data,callback){ 
+            getAllcouponByMerchantId(data.user_id).then(function(newData){
+                categoriesDetail(data.user_id).then(function(cateData){
+                    getAllImages(data.user_id).then(function(imgData){
+                        usedCouponDetail(data.user_id).then(function(countsUsed){
+                            customCouponDetail(data.user_id).then(function(custom){
+                data.coupons_detail = newData;
+                data.category_detail = cateData;
+                data.images = imgData;
+                data.total_coupons = newData.length;
+                
+               
+                data.custom_coupons = custom.length;
+                data.used_coupons = countsUsed.length;
+                output.push(data);
+                callback();
+            }, function(err){
+                deferred.reject(err);
+             })
+            }, function(err){
+                deferred.reject(err);
+             })
+            }, function(err){
+                deferred.reject(err);
+             })
+            }, function(err){
+               deferred.reject(err);
+            })
+        }, function(err){
+            deferred.reject(err);
+         })
+   
+       }, function(err, detail) {
+             deferred.resolve(output);
+           
+       });
+        
+    });
+    return deferred.promise;
+};
+
+
+
+
+var categoriesDetail = function(merchant_id){
+    var deferred = Q.defer();
+    var replacements = {merchant_id : merchant_id};
+
+    var query = 'select Registrations.user_id,UserSubCateMaps.sub_category_id,SubCategories.id,SubCategories.name from Registrations left join'+ 
+                ' UserSubCateMaps on UserSubCateMaps.user_id=Registrations.user_id left join SubCategories on UserSubCateMaps.sub_category_id=SubCategories.id where Registrations.user_id=:merchant_id';
+
+    models.sequelize.query(query,
+        { replacements: replacements, type: models.sequelize.QueryTypes.SELECT }
+    ).then(function(coummnityCounts) {
+        deferred.resolve(coummnityCounts);
+
+        }
+    );
+    return deferred.promise;
+}; 
+
+
+var usedCouponDetail = function(merchant_id){
+    var deferred = Q.defer();
+    var replacements = {merchant_id : merchant_id};
+
+    var query =  'select * from UsedCoupons where merchant_id=:merchant_id';
+
+    models.sequelize.query(query,
+        { replacements: replacements, type: models.sequelize.QueryTypes.SELECT }
+    ).then(function(dataC) {
+        deferred.resolve(dataC);
+
+        }
+    );
+    return deferred.promise;
+}; 
+
+
+var customCouponDetail = function(merchant_id){
+    var deferred = Q.defer();
+    var replacements = {merchant_id : merchant_id};
+
+    var query =  'select * from Coupons where coupon_type="custom" and user_id=:merchant_id';
+
+    models.sequelize.query(query,
+        { replacements: replacements, type: models.sequelize.QueryTypes.SELECT }
+    ).then(function(dataC) {
+        deferred.resolve(dataC);
+
+        }
+    );
+    return deferred.promise;
+}; 
 
 
 
@@ -581,7 +693,7 @@ vat = getAllcouponByMerchantId = function(merchant_id){
 
 
 
-exports.getAllImages = function(user_id){
+var getAllImages = exports.getAllImages = function(user_id){
     var deferred = Q.defer();
     models.UploadImgs.findAll({
         attributes: ['id','image','user_id'], 
