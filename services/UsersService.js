@@ -714,6 +714,7 @@ var getAllImages = exports.getAllImages = function(user_id){
 
 
 
+
 /* function for add sub_Cate_id in maping table....*/
 exports.addUserFeedback = function(user_id,feedback){
     var deferred = Q.defer();

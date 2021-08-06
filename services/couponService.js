@@ -162,9 +162,9 @@ exports.getAllcoupon = function(merchant_id){
 
     } else {
     var replacements = {merchant_id : merchant_id};
-    var querySet = ' AND user_id=:merchant_id'
+    var querySet = ' AND Coupons.user_id=:merchant_id'
     }
-    var query = 'select * from Coupons where is_deleted=0' + querySet;
+    var query = 'select Coupons.*, GROUP_CONCAT(UploadImgs.image ORDER BY UploadImgs.image) AS images FROM Coupons LEFT JOIN UploadImgs ON UploadImgs.coupon_id = Coupons.id where Coupons.is_deleted=0' + querySet;
     
 
     models.sequelize.query(query,
@@ -524,7 +524,7 @@ exports.getCouponsBySerach = function(search_query, consumer_id){
   
     var query = 'SELECT Coupons.id as coupon_id,Coupons.user_id as merchant_id,Coupons.coupon_type,Coupons.days,Coupons.start_time,Coupons.end_time,' +
                 'Coupons.expiry_date,Coupons.flash_deal,Coupons.description,Coupons.restriction,Coupons.createdAt,Coupons.updatedAt,Coupons.short_name,Coupons.coupon_code,' +
-                'Registrations.business_name as merchant_name,Registrations.lat,Registrations.lang,SubCategories.name as category_name from Coupons LEFT JOIN Registrations ON Coupons.user_id=Registrations.user_id' +
+                'Registrations.business_name as merchant_name,Registrations.lat,Registrations.lang,SubCategories.name as category_name, GROUP_CONCAT(UploadImgs.image ORDER BY UploadImgs.image) AS images FROM Coupons LEFT JOIN UploadImgs ON UploadImgs.coupon_id = Coupons.id LEFT JOIN Registrations ON Coupons.user_id=Registrations.user_id' +
                 ' LEFT JOIN SubCategories ON Coupons.sub_category_id=SubCategories.id where NOT Coupons.coupon_type="custom" AND Coupons.is_deleted=0 AND ( Coupons.short_name like :search_query OR Coupons.description like :search_query OR Coupons.coupon_type like :search_query' +
                 ' OR Registrations.business_name like :search_query OR SubCategories.name like :search_query )' + querySet;
               
@@ -643,7 +643,7 @@ var getAllcouponByUserId = exports.getAllcouponByUserId = function(merchant_id, 
     var replacements = {merchant_id : merchant_id, consumer_id : consumer_id};
 
     var query = 'SELECT Coupons.id as coupon_id,Coupons.user_id as merchant_id,Coupons.coupon_type,Coupons.days,Coupons.start_time,Coupons.end_time,' +
-                'Coupons.expiry_date,Coupons.flash_deal,Coupons.description,Coupons.restriction,Coupons.short_name,Coupons.coupon_code FROM Coupons WHERE NOT EXISTS' +
+                'Coupons.expiry_date,Coupons.flash_deal,Coupons.description,Coupons.restriction,Coupons.short_name,Coupons.coupon_code, GROUP_CONCAT(UploadImgs.image ORDER BY UploadImgs.image) AS images FROM Coupons LEFT JOIN UploadImgs ON UploadImgs.coupon_id = Coupons.id WHERE NOT EXISTS' +
                 ' ( SELECT * FROM UsedCoupons WHERE Coupons.coupon_code=UsedCoupons.coupon_code AND ' +
                 'UsedCoupons.consumer_id=:consumer_id ) AND NOT EXISTS ( SELECT * from BlockMerchants WHERE Coupons.id=BlockMerchants.merchant_id AND BlockMerchants.is_blocked=1 ) AND Coupons.user_id=:merchant_id AND NOT Coupons.coupon_type="custom" AND Coupons.is_deleted=0 ORDER BY Coupons.coupon_code ASC';
 
@@ -699,20 +699,20 @@ exports.addUsedCoupontoDatabase = function(consumer_id, merchant_id, coupon_code
 
 
 var acceptRequestFunction = exports.acceptRequestFunction = function(consumer_id, merchant_id, request_id, is_accepted){
-    console.log("2..");
+   
     var deferred = Q.defer();
     var action;
     if (is_accepted == 1){
-        console.log("3..if");
+        
         action = "accept";
     } else if (is_accepted == 0){
         action = "reject";
-        console.log("3..else if");
+        
     }
-    console.log("4..");
+    
     findAcceptReq(consumer_id,merchant_id,request_id).then(function(getdata) {
         if(getdata){
-            console.log("5..");
+           
             models.AcceptRequest.update({
                 consumer_id: consumer_id,
                 merchant_id: merchant_id,
@@ -722,15 +722,15 @@ var acceptRequestFunction = exports.acceptRequestFunction = function(consumer_id
                     id: getdata.dataValues.id
                 }
             }).then(function(added) {
-                console.log("6..");
+               
                 deferred.resolve(added);
             },function(err){
-                console.log("7..");
+               
                 deferred.reject(err)
             });
 
         } else {
-            console.log("8..");
+            
     models.AcceptRequest.create({
         consumer_id: consumer_id,
         merchant_id: merchant_id,
@@ -738,10 +738,10 @@ var acceptRequestFunction = exports.acceptRequestFunction = function(consumer_id
         is_accepted: is_accepted
         
     }).then(function(requestAccpeted) {
-        console.log("9..");
+        
         deferred.resolve(requestAccpeted);
     },function(err){
-        console.log("10..");
+       
         deferred.reject(err)
         });
     }    
@@ -1065,8 +1065,8 @@ var getAllFavCoupons = function(merchant_id){
     var replacements = {merchant_id : merchant_id};
 
     var query = 'select Coupons.id as coupon_id,Coupons.user_id as merchant_id,Coupons.coupon_type,Coupons.days,Coupons.start_time,Coupons.end_time,Coupons.expiry_date,' +
-                ' Coupons.flash_deal,Coupons.description,Coupons.restriction,Coupons.createdAt,Coupons.updatedAt,Coupons.short_name,Coupons.coupon_code' + 
-                ' FROM Coupons LEFT JOIN FavCoupons on Coupons.id=FavCoupons.coupon_id' +
+                ' Coupons.flash_deal,Coupons.description,Coupons.restriction,Coupons.createdAt,Coupons.updatedAt,Coupons.short_name,Coupons.coupon_code, GROUP_CONCAT(UploadImgs.image ORDER BY UploadImgs.image) AS images FROM Coupons LEFT JOIN UploadImgs ON UploadImgs.coupon_id = Coupons.id' + 
+                ' LEFT JOIN FavCoupons on Coupons.id=FavCoupons.coupon_id' +
                 ' WHERE FavCoupons.is_fav=1 AND FavCoupons.merchant_id=:merchant_id';
 
     models.sequelize.query(query,
@@ -1150,8 +1150,8 @@ exports.getAllUsedCoupons = function(consumer_id){
     var replacements = {consumer_id : consumer_id};
 
     var query = 'select Coupons.id as coupon_id,Coupons.user_id as merchant_id,Coupons.coupon_type,Coupons.days,Coupons.start_time,Coupons.end_time,' +
-                'Coupons.expiry_date,Coupons.description,Coupons.restriction,Coupons.short_name,Coupons.coupon_code' + 
-                ' from Coupons left join UsedCoupons on Coupons.coupon_code=UsedCoupons.coupon_code where UsedCoupons.consumer_id=:consumer_id';
+                'Coupons.expiry_date,Coupons.description,Coupons.restriction,Coupons.short_name,Coupons.coupon_code, GROUP_CONCAT(UploadImgs.image ORDER BY UploadImgs.image) AS images FROM Coupons LEFT JOIN UploadImgs ON UploadImgs.coupon_id = Coupons.id' + 
+                ' left join UsedCoupons on Coupons.coupon_code=UsedCoupons.coupon_code where UsedCoupons.consumer_id=:consumer_id';
     
 
     models.sequelize.query(query,
@@ -1259,13 +1259,14 @@ var getMerchantDetailForReqCoupons = function(merchant_id, coupon_id){
 
 exports.getAllcouponByMerchantId = function(merchant_id){
     var deferred = Q.defer();
-    var cond={
-                "user_id": merchant_id,
-                "is_deleted": 0
-     };
-    models.Coupons.findAll({
-      where: cond
-    }).then(function (allCoupons) {
+    var deferred = Q.defer();
+    var replacements = {merchant_id : merchant_id};
+
+    var query =  'SELECT Coupons.*,GROUP_CONCAT(UploadImgs.image ORDER BY UploadImgs.image) AS images FROM Coupons LEFT JOIN UploadImgs ON UploadImgs.coupon_id = Coupons.id where Coupons.user_id=:merchant_id';
+
+    models.sequelize.query(query,
+        { replacements: replacements, type: models.sequelize.QueryTypes.SELECT }
+    ).then(function (allCoupons) {
             deferred.resolve(allCoupons);
         },function (err) {
           deferred.reject(err);
@@ -1277,12 +1278,13 @@ exports.getAllcouponByMerchantId = function(merchant_id){
 
 var getCouponDetail = exports.getCouponDetail = function(coupon_id){
     var deferred = Q.defer();
-    var cond={
-                "id": coupon_id
-     };
-    models.Coupons.findOne({
-      where: cond
-    }).then(function(coupon) {
+    var replacements = {coupon_id : coupon_id};
+
+    var query =  'SELECT Coupons.*,GROUP_CONCAT(UploadImgs.image ORDER BY UploadImgs.image) AS images FROM Coupons LEFT JOIN UploadImgs ON UploadImgs.coupon_id = Coupons.id where Coupons.id=:coupon_id';
+
+    models.sequelize.query(query,
+        { replacements: replacements, type: models.sequelize.QueryTypes.SELECT }
+    ).then(function (coupon) {
             deferred.resolve(coupon);
         },function (err) {
           deferred.reject(err);
@@ -1296,13 +1298,13 @@ var getCouponDetail = exports.getCouponDetail = function(coupon_id){
 
 exports.getAllcouponByConsumerId = function(consumer_id){
     var deferred = Q.defer();
-    var cond={
-                "consumer_id": consumer_id,
-                "is_deleted": 0
-     };
-    models.Coupons.findAll({
-      where: cond
-    }).then(function (allCoupons) {
+    var replacements = {consumer_id : consumer_id};
+
+    var query =  'SELECT Coupons.*,GROUP_CONCAT(UploadImgs.image ORDER BY UploadImgs.image) AS images FROM Coupons LEFT JOIN UploadImgs ON UploadImgs.coupon_id = Coupons.id where Coupons.consumer_id=:consumer_id';
+
+    models.sequelize.query(query,
+        { replacements: replacements, type: models.sequelize.QueryTypes.SELECT }
+    ).then(function (allCoupons) {
             deferred.resolve(allCoupons);
         },function (err) {
           deferred.reject(err);
@@ -1317,7 +1319,7 @@ exports.getAllcouponByDetail = function(){
     var deferred = Q.defer();
     var replacements = {};
 
-    var query =  'SELECT * from Coupons';
+    var query =  'SELECT Coupons.*,GROUP_CONCAT(UploadImgs.image ORDER BY UploadImgs.image) AS images FROM Coupons LEFT JOIN UploadImgs ON UploadImgs.coupon_id = Coupons.id where Coupons.user_id=UploadImgs.user_id';
 
     models.sequelize.query(query,
         { replacements: replacements, type: models.sequelize.QueryTypes.SELECT }
