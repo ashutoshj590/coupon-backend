@@ -119,7 +119,7 @@ router.post('/update-register-merchant', [jsonParser, util.hasJsonParam(["user_i
 
 /* API for  upload images for merchant registration.............*/
 router.post('/uplaod-image',upload.array('images', 5), function (req, res) {
-            userService.uploadImageToDatabase(req.body.user_id, req.files).then(function (result) {
+            userService.uploadImageToDatabase(req.body.user_id, req.files, req.body.is_flash_deal, req.body.coupon_id).then(function (result) {
             var response = util.getResponseObject(consts.RESPONSE_SUCCESS);
             userService.getAllImages(req.body.user_id).then(function(data){
                 response.imageData = data;

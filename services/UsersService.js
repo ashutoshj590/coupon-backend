@@ -426,12 +426,14 @@ var updateIsRegisterFalse = function(user_id){
          
  }; */
 
- exports.uploadImageToDatabase = function (user_id, imgObject) {
+ exports.uploadImageToDatabase = function (user_id, imgObject, isFlashDeal, coupon_id) {
     var deferred = Q.defer();
     imgObject.forEach(function (image, index) {
         models.UploadImgs.create({
             user_id: user_id,
             image: image.path,
+            is_flash_deal: isFlashDeal,
+            coupon_id: coupon_id,
             is_deleted: 0
         }).then(function (data) {
             deferred.resolve(data);

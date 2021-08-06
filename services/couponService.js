@@ -1363,3 +1363,21 @@ var getAllDataOfMerchant = function(merchant_id){
     );
     return deferred.promise;
 };
+
+
+
+exports.getAllReq = function(){
+    var deferred = Q.defer();
+   
+    var query = ''; 
+    
+    models.sequelize.query(query,
+        { replacements: replacements, type: models.sequelize.QueryTypes.SELECT }
+    ).then(function(allcoupons) {
+        deferred.resolve(allcoupons);
+
+
+        }
+    );
+    return deferred.promise;
+};

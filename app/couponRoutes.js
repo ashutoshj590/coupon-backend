@@ -127,6 +127,24 @@ router.post('/get-all-coupons',jsonParser, function (req, res) {
 });
 
 
+router.post('/get-all-request',jsonParser, function (req, res) {
+    couponService.getAllReq().then(function (couponList) {
+            var response = util.getResponseObject(consts.RESPONSE_SUCCESS);
+            response['request_list'] = couponList;
+            res.send(response);
+        }, function (err) {
+            if(err.errors !== undefined && err.errors[0] !== undefined ){
+                var response = util.getResponseObject(consts.RESPONSE_ERROR, err.response);
+                res.send(response);
+            }else{
+                var response = util.getResponseObject(consts.RESPONSE_ERROR, err.response);
+            }
+            res.send(response);
+        }
+    );
+});
+
+
 /* API for  create request ................*/
 
 router.post('/create-request',[jsonParser,util.hasJsonParam(["consumer_id","sub_category_id","detail","date","time"])], function (req, res) { 
@@ -399,11 +417,8 @@ router.post('/use-coupon',[jsonParser,util.hasJsonParam(["consumer_id","merchant
 
 
 router.post('/reject-request',[jsonParser,util.hasJsonParam(["consumer_id","merchant_id","request_id","coupon_id"])], function (req, res) { 
-    console.log("1..");
     couponService.acceptRequestFunction(req.body.consumer_id, req.body.merchant_id, req.body.request_id, 0).then(function (reject) {
-        console.log("10..");
         couponService.updateCouponForMerchant(req.body.consumer_id,null,req.body.merchant_id,req.body.coupon_id,null,"custom",null,null,null,null,null,null,null,null,"reject").then(function (reject) {
-            console.log("17..");
                 var response = util.getResponseObject(consts.RESPONSE_SUCCESS);
                 res.send(response);
             }, function(err){
