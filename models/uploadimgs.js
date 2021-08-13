@@ -16,7 +16,9 @@ module.exports = (sequelize, DataTypes) => {
   UploadImgs.init({
     user_id: DataTypes.INTEGER,
     image: DataTypes.STRING,
-    is_deleted: DataTypes.BOOLEAN
+    is_deleted: DataTypes.BOOLEAN,
+    is_flash_deal: DataTypes.BOOLEAN,
+    coupon_id: DataTypes.INTEGER
   }, {
     sequelize,
     modelName: 'UploadImgs',

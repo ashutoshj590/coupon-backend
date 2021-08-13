@@ -399,7 +399,8 @@ var updateIsRegister = function(user_id){
 var updateIsRegisterFalse = function(user_id){
     var deferred = Q.defer();
         models.User.update({
-            is_registered: 0
+            is_registered: 0,
+            type: "consumer"
         }, {
             where: {id: user_id}
         }).then(function (updated) {
@@ -582,16 +583,19 @@ exports.getMerchantDetailAdmin = function(user_id){
                     getAllImages(data.user_id).then(function(imgData){
                         usedCouponDetail(data.user_id).then(function(countsUsed){
                             customCouponDetail(data.user_id).then(function(custom){
+                                communityCouponDetail(data.user_id).then(function(community){
                 data.coupons_detail = newData;
                 data.category_detail = cateData;
                 data.images = imgData;
-                data.total_coupons = newData.length;
-                
-               
+                data.flash_coupons = newData.length - (community.length+custom.length);
+                data.community_coupons = community.length;
                 data.custom_coupons = custom.length;
                 data.used_coupons = countsUsed.length;
                 output.push(data);
                 callback();
+            }, function(err){
+                deferred.reject(err);
+             })
             }, function(err){
                 deferred.reject(err);
              })
@@ -659,7 +663,26 @@ var customCouponDetail = function(merchant_id){
     var deferred = Q.defer();
     var replacements = {merchant_id : merchant_id};
 
-    var query =  'select * from Coupons where coupon_type="custom" and user_id=:merchant_id';
+    var query =  'select * from Coupons where coupon_type="custom" and is_deleted=0 and user_id=:merchant_id';
+
+    models.sequelize.query(query,
+        { replacements: replacements, type: models.sequelize.QueryTypes.SELECT }
+    ).then(function(dataC) {
+        deferred.resolve(dataC);
+
+        }
+    );
+    return deferred.promise;
+}; 
+
+
+
+
+var communityCouponDetail = function(merchant_id){
+    var deferred = Q.defer();
+    var replacements = {merchant_id : merchant_id};
+
+    var query =  'select * from Coupons where coupon_type="community" and is_deleted=0 and user_id=:merchant_id';
 
     models.sequelize.query(query,
         { replacements: replacements, type: models.sequelize.QueryTypes.SELECT }
@@ -804,7 +827,7 @@ var foudUserDataByOTP = function(otp){
 
 
 
-/* function for change password ........*/
+/* function for reset password ........*/
 exports.changePasswordForUser = function(otp, new_password, confirm_password){
     var deferred = Q.defer();
     if (confirm_password == new_password){
@@ -819,6 +842,32 @@ exports.changePasswordForUser = function(otp, new_password, confirm_password){
                 })
             }, function(err){
                 deferred.reject("OTP incorrect!!");
+            })
+        } else {
+            deferred.reject("password not match!!");
+        }
+      
+   
+    return deferred.promise;
+};
+
+
+
+/* function for change admin password ........*/
+exports.changePasswordForAdmin = function(email, new_password, confirm_password){
+    var deferred = Q.defer();
+    if (confirm_password == new_password){
+        userDOA.findUserByEmail(email).then(function(user1){
+        if (!user1){
+            deferred.reject("User not found!");  
+        }
+                persistNewPassword(user1.dataValues.email, new_password).then(function(user){
+                    deferred.resolve("Password Changed");
+                }, function(err){
+                    deferred.reject(err);
+                })
+            }, function(err){
+                deferred.reject("User not found!");
             })
         } else {
             deferred.reject("password not match!!");
