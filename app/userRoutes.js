@@ -352,6 +352,19 @@ router.post('/block-coupon',[jsonParser,util.hasJsonParam(["consumer_id","coupon
  
 router.post('/get-merchant-detail-admin',[jsonParser,util.hasJsonParam(["user_id"])], function (req, res) {
     userService.getMerchantDetailAdmin(req.body.user_id).then(function (detail) {
+      /*  console.log("detail for lat log and adderss>>>>>>>>>>>=======");
+        console.log(detail[0].lat);
+        console.log(detail[0].lang);
+        var locAPI = "http://maps.googleapis.com/maps/api/geocode/json?latlng="+detail[0].lat+","+detail[0].lang+"&sensor=true";
+        $.get({
+            url : locAPI,
+            success : function(data){
+                console.log("address....");
+                console.log(data);
+            }
+        })
+
+        console.log(locAPI); */
                 var response = util.getResponseObject(consts.RESPONSE_SUCCESS);
                 response.merchant_detail = detail[0];
                 if(response.merchant_detail.notification_email === null){

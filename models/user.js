@@ -30,7 +30,8 @@ module.exports = (sequelize, DataTypes) => {
       values: ['g','f']
       },
       fb_id: DataTypes.STRING,
-      google_id: DataTypes.STRING
+      google_id: DataTypes.STRING,
+      status: DataTypes.STRING
   }, {
     sequelize,
     modelName: 'User',

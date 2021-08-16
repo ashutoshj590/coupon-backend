@@ -24,11 +24,11 @@ module.exports.createNewUser = (user) => {
     let { email, password } = user;
     user.type = "consumer";
     user.is_registered = 0;
+    user.status = 0;
     return userDOA.findUserByEmail(email)
         .then((foundUser) => {
             if (foundUser == null || foundUser == undefined) {
                 //create 
-                createLoginData(user.email,user.password).then(function(data){ 
                 return commonFuncs.encrypt(password)
                     .then((hashed) => {
                         user.password = hashed;
@@ -40,9 +40,7 @@ module.exports.createNewUser = (user) => {
                 .then(() => {
                     return util.getResponseObject(constants.RESPONSE_SUCCESS);
                 })
-            },function(err){
-                deferred.reject(err)
-            });
+         
             } else {
                 throw new httpError(httpStatusCodes.OK, { response: 'User already exists' });
             }
@@ -68,6 +66,21 @@ var createLoginData = function(email,user_data){
 };
 
 
+var updateStatusUsers = function(email){
+    var deferred = Q.defer();
+    models.User.increment({
+        status: 1
+    }, {
+        where: {email: email}
+        }).then(function (inc) {
+            deferred.resolve(inc);
+        }, function (err) {
+            deferred.reject(err)
+        });
+    return deferred.promise;
+}
+
+
 
 module.exports.login = (user, session) => {
     let { email, password } = user;
@@ -88,7 +101,12 @@ module.exports.login = (user, session) => {
                  
                 })
                 .then(() => {
+                    updateStatusUsers(user.email).then(function(data){ 
+                        console.log(user.email);
                     return util.getResponseObject(constants.RESPONSE_SUCCESS, 'Logged in');
+                },function(err){
+                    deferred.reject(err)
+                });
                 })
                 .catch((err) => {
                     return Promise.reject(err);
@@ -903,7 +921,7 @@ exports.getAllMerchant = function(){
     var deferred = Q.defer();
     var replacements = null;
 
-    var query =  'SELECT Registrations.*, MAX(UserSubCateMaps.createdAt) as sub_cat_created ,Users.email, GROUP_CONCAT(UploadImgs.image ORDER BY UploadImgs.image) AS images ' +
+    var query =  'SELECT Registrations.*, MAX(UserSubCateMaps.createdAt) as sub_cat_created ,Users.email,Users.createdAt as first_login,Users.updatedAt as last_login, GROUP_CONCAT(UploadImgs.image ORDER BY UploadImgs.image) AS images ' +
                 'FROM UserSubCateMaps LEFT JOIN Registrations ON Registrations.user_id = UserSubCateMaps.user_id LEFT JOIN UploadImgs ON UploadImgs.user_id = Registrations.user_id ' +
                 'LEFT JOIN Users ON Users.id = Registrations.user_id GROUP BY Registrations.id';
 

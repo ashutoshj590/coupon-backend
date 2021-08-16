@@ -1319,7 +1319,7 @@ exports.getAllcouponByDetail = function(){
     var deferred = Q.defer();
     var replacements = {};
 
-    var query =  'SELECT Coupons.*,GROUP_CONCAT(UploadImgs.image ORDER BY UploadImgs.image) AS images FROM Coupons LEFT JOIN UploadImgs ON UploadImgs.coupon_id = Coupons.id where Coupons.user_id=UploadImgs.user_id';
+    var query =  'SELECT Coupons.*,GROUP_CONCAT(UploadImgs.image ORDER BY UploadImgs.image) AS images FROM Coupons LEFT JOIN UploadImgs ON UploadImgs.coupon_id = Coupons.id';
 
     models.sequelize.query(query,
         { replacements: replacements, type: models.sequelize.QueryTypes.SELECT }
