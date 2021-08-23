@@ -579,7 +579,7 @@ router.post('/get-used-coupons',[jsonParser,util.hasJsonParam(["consumer_id"])],
 router.post('/get-coupon-detail',[jsonParser,util.hasJsonParam(["coupon_id"])], function (req, res) { 
     couponService.getCouponDetail(req.body.coupon_id).then(function (detail) {
                 var response = util.getResponseObject(consts.RESPONSE_SUCCESS);
-                response.coupon_detail = detail;
+                response.coupon_detail = detail[0];
                 res.send(response);
             
             }, function (err) {
@@ -595,23 +595,6 @@ router.post('/get-coupon-detail',[jsonParser,util.hasJsonParam(["coupon_id"])], 
 });
 
 
-router.post('/get-all-coupons-by-detail', function (req, res) { 
-    couponService.getAllcouponByDetail().then(function (detail) {
-                var response = util.getResponseObject(consts.RESPONSE_SUCCESS);
-                response.coupon_detail = detail;
-                res.send(response);
-            
-            }, function (err) {
-                if(err.errors !== undefined && err.errors[0] !== undefined ){
-                    var response = util.getResponseObject(consts.RESPONSE_ERROR, err.response);
-                    res.send(response);
-                }else{
-                    var response = util.getResponseObject(consts.RESPONSE_ERROR, err.response);
-                }
-                res.send(response);
-            }
-        );
-});
 
 
 router.post('/get-coupons-admin',[jsonParser,util.hasJsonParam(["merchant_id"])], function (req, res) { 
@@ -696,6 +679,42 @@ router.post('/get-coupons-consumer',[jsonParser,util.hasJsonParam(["consumer_id"
                 response.coupon_detail = data;
                     res.send(response);      
             
+            }, function (err) {
+                if(err.errors !== undefined && err.errors[0] !== undefined ){
+                    var response = util.getResponseObject(consts.RESPONSE_ERROR, err.response);
+                    res.send(response);
+                }else{
+                    var response = util.getResponseObject(consts.RESPONSE_ERROR, err.response);
+                }
+                res.send(response);
+            }
+        );
+});
+
+
+
+router.post('/allow-request-admin',[jsonParser,util.hasJsonParam(["request_id"])], function (req, res) { 
+    couponService.allowRequest(req.body.request_id).then(function (result) {
+                var response = util.getResponseObject(consts.RESPONSE_SUCCESS);
+                res.send(response);
+            }, function (err) {
+                if(err.errors !== undefined && err.errors[0] !== undefined ){
+                    var response = util.getResponseObject(consts.RESPONSE_ERROR, err.response);
+                    res.send(response);
+                }else{
+                    var response = util.getResponseObject(consts.RESPONSE_ERROR, err.response);
+                }
+                res.send(response);
+            }
+        );
+});
+
+
+
+router.post('/reject-request-admin',[jsonParser,util.hasJsonParam(["request_id"])], function (req, res) { 
+    couponService.rejectRequest(req.body.request_id).then(function (result) {
+                var response = util.getResponseObject(consts.RESPONSE_SUCCESS);
+                res.send(response);
             }, function (err) {
                 if(err.errors !== undefined && err.errors[0] !== undefined ){
                     var response = util.getResponseObject(consts.RESPONSE_ERROR, err.response);

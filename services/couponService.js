@@ -224,7 +224,8 @@ exports.addRequestForMerchant = function(consumer_id, sub_category_id, detail, d
         detail: detail,
         date: date,
         time: time,
-        is_deleted: 0
+        is_deleted: 0,
+        is_allow: 2
         
     }).then(function(requestDetail) {
         var obj = {};
@@ -281,7 +282,7 @@ exports.getAllRequestForMerchant = function(merchant_id){
 
      var query = 'select Requests.id as request_id,Requests.consumer_id,Requests.sub_category_id,Requests.detail,Requests.date,Requests.time,Requests.coupon_id,' +
                     'Requests.createdAt,Requests.updatedAt' +
-                ' from Requests left join UserSubCateMaps on Requests.sub_category_id=UserSubCateMaps.sub_category_id where UserSubCateMaps.user_id=:merchant_id' +
+                ' from Requests left join UserSubCateMaps on Requests.sub_category_id=UserSubCateMaps.sub_category_id where Requests.is_allow=1 AND UserSubCateMaps.user_id=:merchant_id' +
                 ' and NOT EXISTS (select * from AcceptRequests where Requests.id=AcceptRequests.request_id AND AcceptRequests.consumer_id=Requests.consumer_id AND AcceptRequests.is_accepted=0) ORDER BY Requests.id ASC';           
     
     models.sequelize.query(query,
@@ -1262,7 +1263,7 @@ exports.getAllcouponByMerchantId = function(merchant_id){
     var deferred = Q.defer();
     var replacements = {merchant_id : merchant_id};
 
-    var query =  'SELECT Coupons.*,GROUP_CONCAT(UploadImgs.image ORDER BY UploadImgs.image) AS images FROM Coupons LEFT JOIN UploadImgs ON UploadImgs.coupon_id = Coupons.id where Coupons.user_id=:merchant_id';
+    var query =  'select * from Coupons where user_id=:merchant_id';
 
     models.sequelize.query(query,
         { replacements: replacements, type: models.sequelize.QueryTypes.SELECT }
@@ -1300,7 +1301,7 @@ exports.getAllcouponByConsumerId = function(consumer_id){
     var deferred = Q.defer();
     var replacements = {consumer_id : consumer_id};
 
-    var query =  'SELECT Coupons.*,GROUP_CONCAT(UploadImgs.image ORDER BY UploadImgs.image) AS images FROM Coupons LEFT JOIN UploadImgs ON UploadImgs.coupon_id = Coupons.id where Coupons.consumer_id=:consumer_id';
+    var query =  'SELECT * FROM Cupons WHERE consumer_id=:consumer_id';
 
     models.sequelize.query(query,
         { replacements: replacements, type: models.sequelize.QueryTypes.SELECT }
@@ -1315,71 +1316,71 @@ exports.getAllcouponByConsumerId = function(consumer_id){
 
 
 
-exports.getAllcouponByDetail = function(){
-    var deferred = Q.defer();
-    var replacements = {};
-
-    var query =  'SELECT Coupons.*,GROUP_CONCAT(UploadImgs.image ORDER BY UploadImgs.image) AS images FROM Coupons LEFT JOIN UploadImgs ON UploadImgs.coupon_id = Coupons.id';
-
-    models.sequelize.query(query,
-        { replacements: replacements, type: models.sequelize.QueryTypes.SELECT }
-    ).then(function (allCoupons) {
-        var output = [];
-        async.eachSeries(allCoupons,function(data,callback){ 
-            getAllDataOfMerchant(data.user_id).then(function(newData){
-                if (data.coupon_type == "custom"){
-                    data.merchant_detail = [];
-                    output.push(data);
-                    callback();
-                } else {
-                data.merchant_detail = newData;
-                output.push(data);
-                callback();
-                }
-            }, function(err){
-               deferred.reject(err);
-            })
-   
-       }, function(err, detail) {
-             deferred.resolve(output);
-           
-       });
-        
-    });
-    return deferred.promise;
-};
-
-
-var getAllDataOfMerchant = function(merchant_id){
-    var deferred = Q.defer();
-    var replacements = {merchant_id : merchant_id};
-
-    var query =  'SELECT Registrations.*,GROUP_CONCAT(UploadImgs.image ORDER BY UploadImgs.image) AS images FROM Registrations LEFT JOIN UploadImgs ON UploadImgs.user_id = Registrations.user_id where Registrations.user_id =:merchant_id';
-
-    models.sequelize.query(query,
-        { replacements: replacements, type: models.sequelize.QueryTypes.SELECT }
-    ).then(function(data) {
-        deferred.resolve(data);
-
-        }
-    );
-    return deferred.promise;
-};
 
 
 
 exports.getAllReq = function(){
     var deferred = Q.defer();
+    var replacements = {};
    
-    var query = ''; 
+    var query = 'SELECT Requests.id as request_id,Requests.detail,Requests.date,Requests.time,Requests.createdAt,Requests.updatedAt,' +
+                'Requests.coupon_id,Requests.is_allow,Users.email as consumer_email,Subcategories.name as sub_category_name FROM Requests LEFT JOIN Users' +
+                ' ON Requests.consumer_id=Users.id LEFT JOIN SubCategories ON Requests.sub_category_id=SubCategories.id WHERE Requests.is_allow=2 and Requests.is_deleted=0'; 
     
     models.sequelize.query(query,
         { replacements: replacements, type: models.sequelize.QueryTypes.SELECT }
-    ).then(function(allcoupons) {
-        deferred.resolve(allcoupons);
+    ).then(function(reqDetail) {
+        deferred.resolve(reqDetail);
 
 
         }
     );
     return deferred.promise;
 };
+
+
+
+exports.allowRequest = function(request_id){
+    var deferred = Q.defer();
+                models.Requests.update({
+                    is_allow: 1
+                },{
+                    where: {
+                        id: request_id
+                    }
+                }).then(function(added) {
+                    deferred.resolve(added);
+
+                },function(err){
+                    deferred.reject(err)
+                });
+                
+
+    return deferred.promise;
+};
+
+
+
+exports.rejectRequest = function(request_id){
+    var deferred = Q.defer();
+                models.Requests.update({
+                    is_allow: 0
+                },{
+                    where: {
+                        id: request_id
+                    }
+                }).then(function(added) {
+                    deferred.resolve(added);
+
+                },function(err){
+                    deferred.reject(err)
+                });
+                
+
+    return deferred.promise;
+};
+
+
+
+
+

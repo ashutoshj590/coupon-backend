@@ -124,13 +124,13 @@ exports.getAllcategoryData = function(lat, lang, consumer_id, merchant_id){
     var replacements = null;
     var query = 'select SubCategories.id,SubCategories.name,SubCategories.img_url,Categories.id as category_id,Categories.name as' +
                 ' category_name from SubCategories LEFT JOIN Categories on SubCategories.category_id=Categories.id LEFT JOIN UserSubCateMaps' +
-                ' ON SubCategories.id=UserSubCateMaps.sub_category_id where SubCategories.is_deleted=0' ;
+                ' ON SubCategories.id=UserSubCateMaps.sub_category_id where SubCategories.is_deleted=0 AND SubCategories.status=1' ;
 
     } else {
         var replacements = {merchant_id:merchant_id}
         var query = 'select SubCategories.id,SubCategories.name,SubCategories.img_url,Categories.id as category_id,Categories.name as' +
                 ' category_name from SubCategories LEFT JOIN Categories on SubCategories.category_id=Categories.id LEFT JOIN UserSubCateMaps' +
-                ' ON SubCategories.id=UserSubCateMaps.sub_category_id where SubCategories.is_deleted=0 AND UserSubCateMaps.user_id=:merchant_id';
+                ' ON SubCategories.id=UserSubCateMaps.sub_category_id where SubCategories.is_deleted=0 AND SubCategories.status=1 AND UserSubCateMaps.user_id=:merchant_id';
     }
 
    
@@ -241,33 +241,37 @@ exports.getAllCountsForConsumer = function(){
         countsForMerchantAdmin().then(function(commCounts) {
             countsForAllCoupons().then(function(cusCounts) {
                 countsForCustom().then(function(usedCounts) {
-                    countsForAndroid().then(function(reqCounts) {
+                    countsForAndroid().then(function(andCounts) {
                         countsForApple().then(function(appleCounts) {
+                            countsForRequests().then(function(reqCounts) { //countsForRequests
                             var test1 = createdCounts[0];
                             var test2 = commCounts[0];
                             var test3 = cusCounts[0];
                             var test4 = usedCounts[0];
-                            var test5 = reqCounts[0];
+                            var test5 = andCounts[0];
                             var test6 = appleCounts[0];
-                            
+                            var test7 = reqCounts[0];
                             Object.keys(test1)[0];
                             Object.keys(test2)[0];
                             Object.keys(test3)[0];
                             Object.keys(test4)[0];
                             Object.keys(test5)[0];
                             Object.keys(test6)[0];
+                            Object.keys(test7)[0];
                             var key1 = Object.keys(test1)[0];
                             var key2 = Object.keys(test2)[0];
                             var key3 = Object.keys(test3)[0];
                             var key4 = Object.keys(test4)[0];
                             var key5 = Object.keys(test5)[0];
-                            var key6 = Object.keys(test6)[0]; 
+                            var key6 = Object.keys(test6)[0];
+                            var key7 = Object.keys(test7)[0];  
                         object.consumer = test1[key1];
                         object.merchant = test2[key2];
                         object.coupons = test3[key3];
                         object.custom = test4[key4];
                         object.android = test5[key5];
                         object.apple = test6[key6];
+                        object.requests = test7[key7];
                         deferred.resolve(object);
                     },function(err){
                         deferred.reject(err)
@@ -281,6 +285,9 @@ exports.getAllCountsForConsumer = function(){
     },function(err){
         deferred.reject(err)
     });
+},function(err){
+    deferred.reject(err)
+});
             },function(err){
                 deferred.reject(err)
             });
@@ -378,6 +385,25 @@ var countsForApple = function(){
     );
     return deferred.promise;
 };
+
+
+
+var countsForRequests = function(){
+    var deferred = Q.defer();
+    var replacements = null;
+
+    var query = 'select COUNT(*) as requests from Requests WHERE is_deleted=0';
+
+    models.sequelize.query(query,
+        { replacements: replacements, type: models.sequelize.QueryTypes.SELECT }
+    ).then(function(usedCounts) {
+        deferred.resolve(usedCounts);
+
+        }
+    );
+    return deferred.promise;
+};
+
 
 
 

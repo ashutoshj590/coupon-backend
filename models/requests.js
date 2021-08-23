@@ -23,7 +23,8 @@ module.exports = (sequelize, DataTypes) => {
       values: ['morning','afternoon','evening']
       },
     is_deleted: DataTypes.BOOLEAN,
-    coupon_id: DataTypes.INTEGER
+    coupon_id: DataTypes.INTEGER,
+    is_allow: DataTypes.INTEGER
   }, {
     sequelize,
     modelName: 'Requests',
