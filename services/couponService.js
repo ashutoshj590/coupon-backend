@@ -1324,7 +1324,7 @@ exports.getAllReq = function(){
     var replacements = {};
    
     var query = 'SELECT Requests.id as request_id,Requests.detail,Requests.date,Requests.time,Requests.createdAt,Requests.updatedAt,' +
-                'Requests.coupon_id,Requests.is_allow,Users.email as consumer_email,Subcategories.name as sub_category_name FROM Requests LEFT JOIN Users' +
+                'Requests.coupon_id,Requests.is_allow,Users.email as consumer_email,SubCategories.name as sub_category_name FROM Requests LEFT JOIN Users' +
                 ' ON Requests.consumer_id=Users.id LEFT JOIN SubCategories ON Requests.sub_category_id=SubCategories.id WHERE Requests.is_allow=2 and Requests.is_deleted=0'; 
     
     models.sequelize.query(query,
