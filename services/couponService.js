@@ -400,6 +400,7 @@ var findAcceptReq = function(consumer_id,merchant_id,request_id){
 
 
 exports.getMerchantDetailbySubCateId = function(sub_category_id, consumer_id, lat1, lon1, merchant_id, distance){
+    console.log("1....");
     var deferred = Q.defer();
     if(sub_category_id != null || undefined){
         var subCate = sub_category_id.split(",");
@@ -426,7 +427,8 @@ exports.getMerchantDetailbySubCateId = function(sub_category_id, consumer_id, la
     }
     
 
-   else if (sub_category_id == null && merchant_id == null){
+   else if (sub_category_id == null || undefined && merchant_id == null || undefined){
+       console.log("2....");
     var replacements = {};
         var query = 'SELECT Registrations.*, MAX(UserSubCateMaps.createdAt) as sub_cat_created , GROUP_CONCAT(UploadImgs.image ORDER BY UploadImgs.image) AS images ' +
                 'FROM UserSubCateMaps LEFT JOIN Registrations ON Registrations.user_id = UserSubCateMaps.user_id LEFT JOIN UploadImgs ON UploadImgs.user_id = Registrations.user_id ' +
@@ -445,7 +447,8 @@ exports.getMerchantDetailbySubCateId = function(sub_category_id, consumer_id, la
         ).then(function(result) {
             var output = [];    
            // deferred.resolve(result);
-           async.eachSeries(result,function(data,callback){ 
+           async.eachSeries(result,function(data,callback){
+            
             getAllcouponByUserId(data.user_id, consumer_id).then(function(foundData){
                data.couponDetail = foundData;
                output.push(data);
@@ -1301,7 +1304,8 @@ exports.getAllcouponByConsumerId = function(consumer_id){
     var deferred = Q.defer();
     var replacements = {consumer_id : consumer_id};
 
-    var query =  'SELECT * FROM Cupons WHERE consumer_id=:consumer_id';
+    var query =  'select Coupons.* FROM Coupons LEFT JOIN UsedCoupons ON Coupons.coupon_code=UsedCoupons.coupon_code' +
+                ' WHERE Coupons.consumer_id=:consumer_id OR UsedCoupons.consumer_id=:consumer_id';
 
     models.sequelize.query(query,
         { replacements: replacements, type: models.sequelize.QueryTypes.SELECT }
@@ -1313,6 +1317,7 @@ exports.getAllcouponByConsumerId = function(consumer_id){
     );
     return deferred.promise;
 };
+
 
 
 
