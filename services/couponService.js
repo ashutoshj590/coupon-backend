@@ -56,12 +56,9 @@ var createCouponForMerchant = exports.createCouponForMerchant = function(user_id
 */
 var updateCouponForMerchant = exports.updateCouponForMerchant = function(consumer_id,request_id,user_id,sub_cate_id,coupon_id,coupon_type,days,start_time,end_time,expiry_date,flash_deal,description,restriction,shortName,status){
     var deferred = Q.defer();
-    console.log("11..");
     if (coupon_type != "custom"){
-        console.log("12..");
         var subCateId = sub_cate_id
      } 
-     console.log("13..");
     models.Coupons.update({
         user_id: user_id,
         sub_category_id: subCateId,
@@ -82,11 +79,8 @@ var updateCouponForMerchant = exports.updateCouponForMerchant = function(consume
                // user_id: user_id
             }
     }).then(function(couponUpdate) {
-        console.log("14..");
         if (coupon_type === "custom" && status != "reject") {
-            console.log("15..");
         acceptRequestFunction(consumer_id, user_id, request_id, 1).then(function(accept) {
-            console.log("16..");
         deferred.resolve(couponUpdate);
     
         },function(err){
@@ -400,7 +394,6 @@ var findAcceptReq = function(consumer_id,merchant_id,request_id){
 
 
 exports.getMerchantDetailbySubCateId = function(sub_category_id, consumer_id, lat1, lon1, merchant_id, distance){
-    console.log("1....");
     var deferred = Q.defer();
     if(sub_category_id != null || undefined){
         var subCate = sub_category_id.split(",");
@@ -428,11 +421,10 @@ exports.getMerchantDetailbySubCateId = function(sub_category_id, consumer_id, la
     
 
    else if (sub_category_id == null || undefined && merchant_id == null || undefined){
-       console.log("2....");
     var replacements = {};
-        var query = 'SELECT Registrations.*, MAX(UserSubCateMaps.createdAt) as sub_cat_created , GROUP_CONCAT(UploadImgs.image ORDER BY UploadImgs.image) AS images ' +
+        var query = 'SELECT Registrations.*, MAX(UserSubCateMaps.createdAt) as sub_cat_created, GROUP_CONCAT(UploadImgs.image ORDER BY UploadImgs.image) AS images ' +
                 'FROM UserSubCateMaps LEFT JOIN Registrations ON Registrations.user_id = UserSubCateMaps.user_id LEFT JOIN UploadImgs ON UploadImgs.user_id = Registrations.user_id ' +
-                 'GROUP BY Registrations.id';
+                 'GROUP BY UserSubCateMaps.user_id';
 
     } else {
         var replacements = {merchant_id : merchant_id};
@@ -448,7 +440,6 @@ exports.getMerchantDetailbySubCateId = function(sub_category_id, consumer_id, la
             var output = [];    
            // deferred.resolve(result);
            async.eachSeries(result,function(data,callback){
-            
             getAllcouponByUserId(data.user_id, consumer_id).then(function(foundData){
                data.couponDetail = foundData;
                output.push(data);
@@ -655,19 +646,25 @@ var getAllcouponByUserId = exports.getAllcouponByUserId = function(merchant_id, 
         { replacements: replacements, type: models.sequelize.QueryTypes.SELECT }
     ).then(function(data1) {
         var output = [];
-        async.eachSeries(data1,function(data,callback){ 
-            data.is_fav = false;
-            findFavCoupons(consumer_id, data.merchant_id, data.coupon_id).then(function(foundData){
+        async.eachSeries(data1,function(data2,callback){ 
+            data2.is_fav = false;
+            findFavCoupons(consumer_id, data2.merchant_id, data2.coupon_id).then(function(foundData){
                if (foundData != null || undefined){
-                   if (foundData.consumer_id == consumer_id && foundData.merchant_id == data.merchant_id && foundData.coupon_id == data.coupon_id && foundData.is_fav == 1) {
-                       data.is_fav = true;
+                   if (foundData.consumer_id == consumer_id && foundData.merchant_id == data2.merchant_id && foundData.coupon_id == data2.coupon_id && foundData.is_fav == 1) {
+                       data2.is_fav = true;
                       
-                   } else if (foundData.consumer_id == consumer_id && foundData.merchant_id == data.merchant_id && foundData.coupon_id == data.coupon_id && foundData.is_fav == 0) {
-                       data.is_fav = false;
+                   } else if (foundData.consumer_id == consumer_id && foundData.merchant_id == data2.merchant_id && foundData.coupon_id == data2.coupon_id && foundData.is_fav == 0) {
+                       data2.is_fav = false;
                       
                    }
                }
-               output.push(data);
+             //  output.push(data2);
+             if (data2.coupon_id == null || undefined){
+                output.push();
+             } else {
+                output.push(data2);
+             }
+
                callback();
             }, function(err){
                deferred.reject(err);
