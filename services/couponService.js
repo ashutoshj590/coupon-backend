@@ -410,27 +410,27 @@ exports.getMerchantDetailbySubCateId = function(sub_category_id, consumer_id, la
         var replacements = {sub_category_id : subCate }
         var query = 'SELECT Registrations.*, MAX(UserSubCateMaps.createdAt) as sub_cat_created ' +
                 'FROM UserSubCateMaps LEFT JOIN Registrations ON Registrations.user_id = UserSubCateMaps.user_id ' +
-                 'WHERE UserSubCateMaps.sub_category_id IN (:sub_category_id) GROUP BY Registrations.id';
+                 'WHERE Registrations.status=1 AND UserSubCateMaps.sub_category_id IN (:sub_category_id) GROUP BY Registrations.id';
   
     } else if (merchant_id != null && sub_category_id != null) {
     var replacements = {sub_category_id : subCate, merchant_id : merchant_id};
     var query = 'SELECT Registrations.*, MAX(UserSubCateMaps.createdAt) as sub_cat_created ' +
     'FROM UserSubCateMaps LEFT JOIN Registrations ON Registrations.user_id = UserSubCateMaps.user_id ' +
-     'WHERE UserSubCateMaps.sub_category_id IN (1,2) AND Registrations.user_id=:merchant_id GROUP BY Registrations.id';
+     'WHERE Registrations.status=1 AND UserSubCateMaps.sub_category_id IN (1,2) AND Registrations.user_id=:merchant_id GROUP BY Registrations.id';
     }
     
 
    else if (sub_category_id == null || undefined && merchant_id == null || undefined){
     var replacements = {};
         var query = 'SELECT Registrations.*, MAX(UserSubCateMaps.createdAt) as sub_cat_created ' +
-                'FROM UserSubCateMaps LEFT JOIN Registrations ON Registrations.user_id = UserSubCateMaps.user_id ' +
+                'FROM UserSubCateMaps LEFT JOIN Registrations ON Registrations.user_id = UserSubCateMaps.user_id WHERE Registrations.status=1 ' +
                  'GROUP BY Registrations.user_id';
 
     } else {
         var replacements = {merchant_id : merchant_id};
         var query = 'SELECT Registrations.*, MAX(UserSubCateMaps.createdAt) as sub_cat_created ' +
         'FROM UserSubCateMaps LEFT JOIN Registrations ON Registrations.user_id = UserSubCateMaps.user_id ' +
-         'WHERE Registrations.user_id=:merchant_id GROUP BY Registrations.id';
+         'WHERE Registrations.status=1 AND Registrations.user_id=:merchant_id GROUP BY Registrations.id';
     }  
 
    
