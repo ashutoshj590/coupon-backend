@@ -18,14 +18,6 @@ app.use(cors())
 var https = require('https');
 var fs = require('fs');
 
-var admin = require("firebase-admin");
-var serviceAccount = require("./certs/my-custom-coupon-6431f-firebase-adminsdk-g688y-da0d43a439.json");
-
-admin.initializeApp({
-  credential: admin.credential.cert(serviceAccount),
-  databaseURL: "https://coupon-app-293511.firebaseio.com"
-});
-
 
 
 
@@ -120,7 +112,6 @@ app.use("/user", require('./app/userRoutes'));
 app.use("/category", require('./app/categoryRoutes.js'));
 app.use("/coupon", require('./app/couponRoutes.js'));
 
-
 var sslSever = https.createServer(
    {
        key: fs.readFileSync(path.join(__dirname, 'certs', 'mccpapp-new.key')),
@@ -130,7 +121,7 @@ var sslSever = https.createServer(
    app
 )
 
-sslSever.listen(8080, () => console.log("Secure server on port 8080")) 
+sslSever.listen(8080, () => console.log("Secure server on port 8080"))
 
 
 
