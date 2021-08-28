@@ -14,6 +14,11 @@ const nodemailer = require('nodemailer');
 require('dotenv').config();
 var async = require('async');
 
+var admin = require("firebase-admin");
+var notificationConsts = require('../lib/NotificationConsts.js');
+
+
+
 /*
  * Find a user by email. If does not exist, then create one.
  * todo: validations for mandatory fields.
@@ -842,6 +847,22 @@ var foudUserDataByOTP = function(otp){
     return deferred.promise;
 };
 
+/*getToken  from database for notification...........*/
+var getTokenFromdb = exports.getTokenFromdb = function (user_id) {
+    var deferred = Q.defer();
+    models.DeviceToken.findOne({
+        where: {
+            user_id: user_id
+        }
+    }).then(function (found) {
+            deferred.resolve(found);
+        },function (err) {
+          deferred.reject(err);
+        }
+    );
+    return deferred.promise;
+};
+
 
 
 
@@ -851,10 +872,22 @@ exports.changePasswordForUser = function(otp, new_password, confirm_password){
     if (confirm_password == new_password){
     foudUserDataByOTP(otp).then(function(user1){
         if (!user1){
-            deferred.reject("OTP incorect!!!");  
+            deferred.reject("OTP incorect!");  
         }
-                persistNewPassword(user1.dataValues.email, new_password).then(function(user){
-                    deferred.resolve("Password Changed");
+                persistNewPassword(user1.email, new_password).then(function(user){
+                    getTokenFromdb(user1.id).then(function(newData){
+                    admin.messaging().sendToDevice(newData.token, notificationConsts.NOTIFICATION__CONSTS.reset_password, notificationConsts.NOTIFICATION__CONSTS.options).then(function(response) {
+                        console.log("successfullee send message", response);
+                        deferred.resolve("Password Changed");
+
+                    })
+                    .catch(function(error) {
+                        console.log("error send message", error);
+                    })
+                },function(err){
+                    deferred.reject(err)
+                })
+                   
                 }, function(err){
                     deferred.reject(err);
                 })
@@ -879,7 +912,7 @@ exports.changePasswordForAdmin = function(email, new_password, confirm_password)
         if (!user1){
             deferred.reject("User not found!");  
         }
-                persistNewPassword(user1.dataValues.email, new_password).then(function(user){
+                persistNewPassword(user1.email, new_password).then(function(user){
                     deferred.resolve("Password Changed");
                 }, function(err){
                     deferred.reject(err);
@@ -1040,5 +1073,64 @@ exports.addToBlock = function(consumer_id, coupon_id){
     },function(err){
         deferred.reject(err)
     });
+    return deferred.promise;
+};
+
+
+
+
+exports.addTokenForNotifications = function(user_id,device_type, token){
+    var deferred = Q.defer();
+    findToken(user_id, token, device_type).then(function(foundData) {
+            if (foundData){
+                models.DeviceToken.update({
+                    device_type: device_type,
+                    token: token
+                },{
+                    where: {
+                        user_id: user_id
+                    }
+                }).then(function(added) {
+                    deferred.resolve(added);
+                },function(err){
+                    deferred.reject(err)
+                });
+            } else {
+                models.DeviceToken.create({
+                   device_type: device_type,
+                   token: token,
+                   user_id: user_id
+                }).then(function(added) {
+                    deferred.resolve(added);
+                },function(err){
+                    deferred.reject(err)
+                });
+
+            }
+         
+},function(err){
+    deferred.reject(err)
+});
+    return deferred.promise;
+};
+
+
+
+
+var findToken = function(user_id, token, device_type){
+    var deferred = Q.defer();
+    var cond={
+                "token": token,
+                "device_type": device_type,
+                "user_id": user_id
+        };
+    models.DeviceToken.findOne({
+        where: cond
+    }).then(function (result) {
+            deferred.resolve(result);
+        },function (err) {
+            deferred.reject(err);
+        }
+    );
     return deferred.promise;
 };

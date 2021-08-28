@@ -2,7 +2,10 @@ var models = require('../models/index.js');
 //var redis = require('../lib/redis.js');
 var Q = require('q');
 var async = require('async');
+var userService = require('./UsersService.js');
 var uniqid = require('uniqid');
+var notificationConsts = require('../lib/NotificationConsts.js');
+var admin = require("firebase-admin");
 
 
 /*
@@ -714,7 +717,18 @@ exports.addUsedCoupontoDatabase = function(consumer_id, merchant_id, coupon_code
         lang: lang
         
     }).then(function(couponUsed) {
-        deferred.resolve(couponUsed);
+        userService.getTokenFromdb(merchant_id).then(function(newData){
+            admin.messaging().sendToDevice(newData.token, notificationConsts.NOTIFICATION__CONSTS.used_coupon, notificationConsts.NOTIFICATION__CONSTS.options).then(function(response) {
+                console.log("successfullee send message", response);
+                deferred.resolve(couponUsed);
+
+            })
+            .catch(function(error) {
+                console.log("error send message", error);
+            })
+        },function(err){
+            deferred.reject(err)
+        })
     },function(err){
         deferred.reject(err)
     });
@@ -1358,8 +1372,9 @@ exports.getAllReq = function(){
         deferred.resolve(reqDetail);
 
 
-        }
-    );
+        });
+
+    
     return deferred.promise;
 };
 
@@ -1374,11 +1389,26 @@ exports.allowRequest = function(request_id){
                         id: request_id
                     }
                 }).then(function(added) {
-                    deferred.resolve(added);
+                    getUserDetailsFormReq(request_id).then(function(userDetail){
+                        userService.getTokenFromdb(userDetail.consumer_id).then(function(newData){
+                        admin.messaging().sendToDevice(newData.token, notificationConsts.NOTIFICATION__CONSTS.request_approved, notificationConsts.NOTIFICATION__CONSTS.options).then(function(response) {
+                            console.log("successfullee send message", response);
+                            deferred.resolve(added);
+    
+                        })
+                        .catch(function(error) {
+                            console.log("error send message", error);
+                        })
+                    },function(err){
+                        deferred.reject(err)
+                    })
 
                 },function(err){
                     deferred.reject(err)
-                });
+                })
+            },function(err){
+                deferred.reject(err)
+            });
                 
 
     return deferred.promise;
@@ -1394,9 +1424,24 @@ exports.rejectRequest = function(request_id){
                     where: {
                         id: request_id
                     }
-                }).then(function(added) {
-                    deferred.resolve(added);
+                }).then(function(reject) {
+                    getUserDetailsFormReq(request_id).then(function(userDetail){
+                    userService.getTokenFromdb(userDetail.consumer_id).then(function(newData){
+                    admin.messaging().sendToDevice(newData.token, notificationConsts.NOTIFICATION__CONSTS.request_reject, notificationConsts.NOTIFICATION__CONSTS.options).then(function(response) {
+                        console.log("successfullee send message", response);
+                        //console.log(response.results[0].error);
+                        deferred.resolve(reject);
 
+                    })
+                    .catch(function(error) {
+                        console.log("error send message", error);
+                    })
+                },function(err){
+                    deferred.reject(err)
+                })
+            },function(err){
+                deferred.reject(err)
+            })
                 },function(err){
                     deferred.reject(err)
                 });
@@ -1404,6 +1449,24 @@ exports.rejectRequest = function(request_id){
 
     return deferred.promise;
 };
+
+
+
+var getUserDetailsFormReq = function (request_id) {
+    var deferred = Q.defer();
+    models.Requests.findOne({
+        where: {
+            id: request_id
+        }
+    }).then(function (detail) {
+            deferred.resolve(detail);
+        },function (err) {
+          deferred.reject(err);
+        }
+    );
+    return deferred.promise;
+};
+
 
 
 

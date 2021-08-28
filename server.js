@@ -17,8 +17,16 @@ var cors = require('cors');
 app.use(cors())
 var https = require('https');
 var fs = require('fs');
+
 var admin = require("firebase-admin");
-var serviceAccount = require("./certs/coupon-app-293511-firebase-adminsdk-qig61-26c962f44d.json");
+var serviceAccount = require("./certs/my-custom-coupon-6431f-firebase-adminsdk-g688y-da0d43a439.json");
+
+admin.initializeApp({
+  credential: admin.credential.cert(serviceAccount),
+  databaseURL: "https://coupon-app-293511.firebaseio.com"
+});
+
+
 
 
 app.use(function(req, res, next) {
@@ -35,37 +43,11 @@ app.use("/public", express.static(path.join(__dirname, 'public')));
 
 
 
+
+
 app.use(bodyParser.json({limit: '10mb', extended: true}))
 app.use(bodyParser.urlencoded({limit: '10mb', extended: true}))
 app.use(cookieParser());
-/*admin.initializeApp({
-    credential: admin.credential.cert(serviceAccount),
-    databaseURL: "https://coupon-app-293511.firebaseio.com"
-  });
- 
-  
-var token = [''];  
-
-var payload = {
-    notification: {
-        title: "This is a notification",
-        body: "This is the body of the notification message"
-    }
-};
-
-var options = {
-    priority: "high",
-    timeToLive: 60 * 60 * 24
-};
-
-admin.messaging().sendToDevice(token, payload, options)
-.then(function(response){
-    console.log("Successfully sent message:", response);
-})
-.catch(function(error){
-    console.log("Error sending message:", error);
-}); */
-
 
 var sequelize = new Sequelize(config.database.db_name, config.database.db_user, config.database.db_pass, {
     host: config.database.hostname,
@@ -148,7 +130,7 @@ var sslSever = https.createServer(
    app
 )
 
-sslSever.listen(8080, () => console.log("Secure server on port 8080"))
+sslSever.listen(8080, () => console.log("Secure server on port 8080")) 
 
 
 
@@ -161,5 +143,9 @@ sslSever.listen(8080, () => console.log("Secure server on port 8080"))
 
 }); */
 //module.exports = app;
+
+
+
+  
 
 
