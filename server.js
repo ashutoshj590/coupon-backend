@@ -17,8 +17,6 @@ var cors = require('cors');
 app.use(cors())
 var https = require('https');
 var fs = require('fs');
-var admin = require("firebase-admin");
-var notificationConsts = require('./lib/notificationConsts');
 
 
 app.use(function(req, res, next) {
