@@ -4,8 +4,9 @@ var Q = require('q');
 var async = require('async');
 var userService = require('./UsersService.js');
 var uniqid = require('uniqid');
-var notificationConsts = require('../lib/NotificationConsts.js');
+
 var admin = require("firebase-admin");
+var notificationConsts = require('../lib/NotificationConsts.js');
 
 
 /*
