@@ -1,7 +1,7 @@
 {
   "write": {
     "username": "root",
-    "password": "ashu123",
+    "password": "coupon123",
     "database": "coupon_app",
     "host": "localhost",
     "dialect": "mysql",
@@ -9,28 +9,28 @@
   },
   "read": {
       "username": "root",
-      "password": "ashu123",
+      "password": "coupon123",
       "database": "coupon_app",
       "host": "localhost",
       "dialect": "mysql",
       "logging": false
   },"development": {
     "username": "root",
-    "password": "ashu123",
+    "password": "coupon123",
     "database": "coupon_app",
     "host": "localhost",
     "dialect": "mysql"
   },
   "test": {
     "username": "root",
-    "password": "ashu123",
+    "password": "coupon123",
     "database": "coupon_app",
     "host": "localhost",
     "dialect": "mysql"
   },
   "production": {
     "username": "root",
-    "password": "ashu123",
+    "password": "coupon123",
     "database": "coupon_app",
     "host": "localhost",
     "dialect": "mysql"
