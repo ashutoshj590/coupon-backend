@@ -10,6 +10,7 @@ var bodyParser = require('body-parser');
 const passport = require('passport');
 var jsonParser = bodyParser.json({limit: '10mb'});
 
+
 /* API funcation for crearte new user sign up..................*/
 
 router.post('/sign-up', [util.hasJsonParam(["email", "password", "device_type"])], function (req, res) {
