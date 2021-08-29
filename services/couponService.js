@@ -162,20 +162,29 @@ exports.getAllcoupon = function(merchant_id){
     var replacements = {merchant_id : merchant_id};
     var querySet = ' AND Coupons.user_id=:merchant_id'
     }
-    var query = 'select Coupons.*, GROUP_CONCAT(UploadImgs.image ORDER BY UploadImgs.image) AS images FROM Coupons LEFT JOIN UploadImgs ON UploadImgs.coupon_id = Coupons.id where Coupons.is_deleted=0' + querySet;
-    
+     var query = 'select * FROM Coupons where Coupons.is_deleted=0' + querySet;
 
     models.sequelize.query(query,
         { replacements: replacements, type: models.sequelize.QueryTypes.SELECT }
     ).then(function(allcoupons) {
-        deferred.resolve(allcoupons);
-
-
-        }
-    );
+        var output = [];
+        async.eachSeries(allcoupons,function(data,callback){ 
+            getAllImgsMerchant(data.user_id).then(function(newData){
+                data.merchant_images = newData;
+                output.push(data);
+                callback();
+            }, function(err){
+               deferred.reject(err);
+            })
+   
+       }, function(err, detail) {
+             deferred.resolve(output);
+           
+       });
+        
+    });
     return deferred.promise;
 };
-
 
 /*
 * Fuction define for get All custom coupons for consumer
@@ -443,7 +452,7 @@ exports.getMerchantDetailbySubCateId = function(sub_category_id, consumer_id, la
         ).then(function(result) {
             var output = [];    
            async.eachSeries(result,function(data,callback){
-            getImagesForMerchant(data.user_id).then(function(imgData){
+            getAllImgsMerchant(data.user_id).then(function(imgData){
                data.images = imgData;
             getAllcouponByUserId(data.user_id, consumer_id).then(function(foundData){
                data.couponDetail = foundData;
@@ -480,21 +489,7 @@ exports.getMerchantDetailbySubCateId = function(sub_category_id, consumer_id, la
 
 
 
-     var getImagesForMerchant = function(merchant_id){
-        var deferred = Q.defer();
-        var replacements = {merchant_id : merchant_id};
     
-        var query = 'SELECT UploadImgs.image FROM UploadImgs WHERE UploadImgs.user_id=:merchant_id';
-    
-        models.sequelize.query(query,
-            { replacements: replacements, type: models.sequelize.QueryTypes.SELECT }
-        ).then(function(coummnityCounts) {
-            deferred.resolve(coummnityCounts);
-    
-            }
-        );
-        return deferred.promise;
-    };
   
 
 
