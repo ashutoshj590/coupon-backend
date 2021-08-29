@@ -6,7 +6,7 @@ var userService = require('./UsersService.js');
 var uniqid = require('uniqid');
 
 var admin = require("firebase-admin");
-var notificationConsts = require('../lib/NotificationConsts.js');
+var notificationConsts = require('../constants/notificationConsts');
 
 
 /*
