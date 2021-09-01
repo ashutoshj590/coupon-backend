@@ -1,7 +1,6 @@
 var models = require('../models/index.js');
 var util = require('../lib/Utils.js');
 var Q = require('q');
-const request = require('request');
 let userDOA = require('../doa/user');
 let commonFuncs = require('../utils/commonFuncs');
 let httpError = require('../errors/httpError');
