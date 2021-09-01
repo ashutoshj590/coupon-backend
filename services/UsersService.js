@@ -1,8 +1,7 @@
 var models = require('../models/index.js');
 var util = require('../lib/Utils.js');
 var Q = require('q');
-var aws = require('../lib/aws.js');
-var redis = require('../lib/redis.js');
+const request = require('request');
 let userDOA = require('../doa/user');
 let commonFuncs = require('../utils/commonFuncs');
 let httpError = require('../errors/httpError');
@@ -607,6 +606,14 @@ exports.getMerchantDetailAdmin = function(user_id){
                         usedCouponDetail(data.user_id).then(function(countsUsed){
                             customCouponDetail(data.user_id).then(function(custom){
                                 communityCouponDetail(data.user_id).then(function(community){
+                                    request({
+                                        url: 'https://maps.googleapis.com/maps/api/geocode/json?latlng='+data.lat+','+data.lang+'&sensor=true&key=AIzaSyD77Zkie1yZTZ4NajXwau1Xd9dyDUWRTLE',
+                                        json: true
+                                    },(error, response, body) => {
+                                       data.country_name = body.results[0].address_components[5].long_name;
+                                       data.zipcode_new = body.results[0].address_components[6].long_name;
+                                        data.formatted_address = body.results[0].formatted_address;
+                                       
                 data.coupons_detail = newData;
                 data.category_detail = cateData;
                 data.images = imgData;
@@ -616,6 +623,8 @@ exports.getMerchantDetailAdmin = function(user_id){
                 data.used_coupons = countsUsed.length;
                 output.push(data);
                 callback();
+            }) 
+
             }, function(err){
                 deferred.reject(err);
              })
@@ -814,7 +823,7 @@ exports.saveOTPForUser = function(email){
                     if(err){
                         deferred.reject(err);
                     } else {
-                        createLoginData(email,otpcode).then(function(data){ 
+                        createLoginData(email,otpcode).then(function(data1){ 
                         deferred.resolve(data);
                     }, function(err){
                         deferred.reject(err);
@@ -961,13 +970,29 @@ exports.getAllMerchant = function(){
 
     models.sequelize.query(query,
         { replacements: replacements, type: models.sequelize.QueryTypes.SELECT }
-    ).then(function(data) {
-        deferred.resolve(data);
-
-        }
-    );
+    ).then(function(merchants) {
+        var output = [];
+        async.eachSeries(merchants,function(data,callback){ 
+              request({
+            url: 'https://maps.googleapis.com/maps/api/geocode/json?latlng='+data.lat+','+data.lang+'&sensor=true&key=AIzaSyD77Zkie1yZTZ4NajXwau1Xd9dyDUWRTLE',
+            json: true
+        },(error, response, body) => {
+           data.country_name = body.results[0].address_components[5].long_name;
+           data.zipcode_new = body.results[0].address_components[6].long_name;
+            data.formatted_address = body.results[0].formatted_address;
+            output.push(data);
+            callback();
+        }) 
+               
+       }, function(err, detail) {
+             deferred.resolve(output);
+           
+       });
+        
+    });
     return deferred.promise;
 };
+
 
 
 exports.getAllConsumer = function(){
