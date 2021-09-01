@@ -971,6 +971,7 @@ exports.getAllMerchant = function(){
             axios.get('https://maps.googleapis.com/maps/api/geocode/json?latlng='+data.lat+','+data.lang+'&sensor=true&key='+key)
   .then(function (response) {
     // handle success
+    console.log(response.data);
     data.country_name = response.data.results[0].address_components[5].long_name;
     data.zipcode_new = response.data.results[0].address_components[6].long_name;
     data.formatted_address = response.data.results[0].formatted_address;
