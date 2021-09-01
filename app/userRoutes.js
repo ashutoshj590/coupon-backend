@@ -57,16 +57,9 @@ router.get('/logout', jsonParser, function (req, res) {
 
 
 
-/* API for get all Users...........*/
-/*router.get('/get-all-users', jsonParser, function(req, res){
-    findUsers(req.body).then(function (allusers) {  
-        deferred.resolve(response);
-    }, function(err){
-        err.response_code !== undefined ? res.send(err) :  res.send(util.getResponseObject(consts.RESPONSE_ERROR, "There was trying to get more Users"));
-    });
-    res.send(response);
-    
-}); */
+
+
+
 
 
 

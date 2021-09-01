@@ -25,9 +25,9 @@ exports.NOTIFICATION__CONSTS = {
            
     },
     reset_password : {
-            "notification" : {
-                "title":"Password Reset",
-                "body":"Dear <strong>PARAM_USER_EMAIL</strong> <br /> Your Password has been changed."
+            notification : {
+                title: "Password Reset",
+                body: "Dear <strong>PARAM_USER_EMAIL</strong> <br /> Your Password has been changed."
         }
     } 
 
