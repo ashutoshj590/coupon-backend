@@ -968,9 +968,7 @@ exports.getAllMerchant = function(){
     ).then(function(merchants) {
         var output = [];
         async.eachSeries(merchants,function(data,callback){
-            console.log("latlng");
-            console.log(data.lat);
-            console.log(data.lang);
+          
             axios.get('https://maps.googleapis.com/maps/api/geocode/json?latlng='+data.lat+','+data.lang+'&sensor=true&key='+key)
   .then(function (response) {
       if (response.data.results[0] != null || undefined ){     

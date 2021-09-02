@@ -9,7 +9,7 @@ var sessionTime = 1 * 60 *  60 * 1000;       //1 hour session
 var models = require('../models/index.js');
 var fileExtension = require('file-extension')
 var multer = require('multer');
-
+const { response } = require('express');
 
 var storage = multer.diskStorage({
     destination: function (req, file, cb) {

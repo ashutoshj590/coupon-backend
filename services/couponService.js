@@ -4,7 +4,7 @@ var Q = require('q');
 var async = require('async');
 var userService = require('./UsersService.js');
 var uniqid = require('uniqid');
-
+const { response } = require('express');
 var admin = require("firebase-admin");
 var notificationConsts = require('../constants/notificationConsts');
 
@@ -713,11 +713,9 @@ exports.addUsedCoupontoDatabase = function(consumer_id, merchant_id, coupon_code
         lang: lang
         
     }).then(function(couponUsed) {
-        console.log("1..");
         userService.getTokenFromdb(merchant_id).then(function(newData){
-            console.log("2..");
             admin.messaging().sendToDevice(newData.token, notificationConsts.NOTIFICATION__CONSTS.used_coupon, notificationConsts.NOTIFICATION__CONSTS.options).then(function(response) {
-                console.log("3..");
+                
                 console.log("successfullee send message", response);
                 deferred.resolve(couponUsed);
 

@@ -10,7 +10,7 @@ var sessionTime = 1 * 60 *  60 * 1000;       //1 hour session
 const jwt = require('jsonwebtoken');
 var multer = require('multer');
 var fileExtension = require('file-extension')
-
+const { response } = require('express');
 
 var storage = multer.diskStorage({
 

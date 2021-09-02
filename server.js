@@ -18,6 +18,13 @@ app.use(cors())
 var https = require('https');
 var fs = require('fs');
 
+var admin = require("firebase-admin");
+var serviceAccount = require("./certs/my-custom-coupon-6431f-firebase-adminsdk-g688y-da0d43a439.json");
+admin.initializeApp({
+  credential: admin.credential.cert(serviceAccount),
+  databaseURL: "https://coupon-app-293511.firebaseio.com"
+});
+
 
 app.use(function(req, res, next) {
     res.setHeader("Access-Control-Allow-Origin", "*"); // http://localhost:4200   //https://www.mccpapp.com
