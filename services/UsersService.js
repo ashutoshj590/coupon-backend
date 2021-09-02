@@ -968,14 +968,16 @@ exports.getAllMerchant = function(){
     ).then(function(merchants) {
         var output = [];
         async.eachSeries(merchants,function(data,callback){
+            if (data.lat != null || undefined  && data.lang != null || undefined)
             axios.get('https://maps.googleapis.com/maps/api/geocode/json?latlng='+data.lat+','+data.lang+'&sensor=true&key='+key)
   .then(function (response) {
       if (response.data.results[0] != null || undefined ){
           console.log("if>>>>>>>>.");
           console.log(response.data.results[0].address_components);
+          console.log(response.data.results[0].formatted_address);
  //   data.country_name = response.data.results[0].address_components[5].long_name;
   //  data.zipcode_new = response.data.results[0].address_components[6].long_name;
-    data.formatted_address = response.data.results[0]
+  //  data.formatted_address = response.data.results[0].formatted_address;
     } else {
         data.country_name = '';
         data.zipcode_new = ''; 
