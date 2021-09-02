@@ -713,8 +713,11 @@ exports.addUsedCoupontoDatabase = function(consumer_id, merchant_id, coupon_code
         lang: lang
         
     }).then(function(couponUsed) {
+        console.log("1..");
         userService.getTokenFromdb(merchant_id).then(function(newData){
+            console.log("2..");
             admin.messaging().sendToDevice(newData.token, notificationConsts.NOTIFICATION__CONSTS.used_coupon, notificationConsts.NOTIFICATION__CONSTS.options).then(function(response) {
+                console.log("3..");
                 console.log("successfullee send message", response);
                 deferred.resolve(couponUsed);
 
