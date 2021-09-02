@@ -975,7 +975,7 @@ exports.getAllMerchant = function(){
           console.log(response.data.results[0].address_components);
  //   data.country_name = response.data.results[0].address_components[5].long_name;
   //  data.zipcode_new = response.data.results[0].address_components[6].long_name;
-    data.formatted_address = response.data.results[0].formatted_address;
+    data.formatted_address = response.data.results[0]
     } else {
         data.country_name = '';
         data.zipcode_new = ''; 
