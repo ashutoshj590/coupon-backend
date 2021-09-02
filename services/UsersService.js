@@ -970,14 +970,19 @@ exports.getAllMerchant = function(){
         async.eachSeries(merchants,function(data,callback){
             axios.get('https://maps.googleapis.com/maps/api/geocode/json?latlng='+data.lat+','+data.lang+'&sensor=true&key='+key)
   .then(function (response) {
-    // handle success
-    if (response.data.result != null || undefined ){    
+      if (response.data.results[0] != null || undefined ){
     data.country_name = response.data.results[0].address_components[5].long_name;
     data.zipcode_new = response.data.results[0].address_components[6].long_name;
     data.formatted_address = response.data.results[0].formatted_address;
+    } else {
+        data.country_name = '';
+        data.zipcode_new = ''; 
+        data.formatted_address = '';
     }
+
     output.push(data);
     callback();
+
   
   })
   .catch(function (error) {
