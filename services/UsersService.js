@@ -973,7 +973,9 @@ exports.getAllMerchant = function(){
     ).then(function(merchants) {
         var output = [];
         async.eachSeries(merchants,function(data,callback){
-            console.log("lat lng >>>.");
+            output.push(data);
+            callback();
+      /*      console.log("lat lng >>>.");
             console.log(data.lang);
             console.log(data.lat);
             axios.get('https://maps.googleapis.com/maps/api/geocode/json?latlng='+data.lat+','+data.lang+'&sensor=true&key='+key)
@@ -987,8 +989,7 @@ exports.getAllMerchant = function(){
         data.zipcode_new = ''; 
         data.formatted_address = '';
     }
-    output.push(data);
-    callback();
+   
   
   })
   
@@ -998,7 +999,7 @@ exports.getAllMerchant = function(){
   })
   .then(function () {
     // always executed
-  }); 
+  }); */
       
     }, function(err, detail) {
             deferred.resolve(output);
