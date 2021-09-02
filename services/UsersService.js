@@ -963,9 +963,8 @@ exports.getAllMerchant = function(){
     var deferred = Q.defer();
     var replacements = null;
 
-    var query =  'SELECT Registrations.*, MAX(UserSubCateMaps.createdAt) as sub_cat_created ,Users.email,Users.createdAt as first_login,Users.updatedAt as last_login, GROUP_CONCAT(UploadImgs.image ORDER BY UploadImgs.image) AS images ' +
-                'FROM UserSubCateMaps LEFT JOIN Registrations ON Registrations.user_id = UserSubCateMaps.user_id LEFT JOIN UploadImgs ON UploadImgs.user_id = Registrations.user_id ' +
-                'LEFT JOIN Users ON Users.id = Registrations.user_id GROUP BY Registrations.id';
+    var query =  'SELECT Registrations.*,Users.email,Users.createdAt as first_login,Users.updatedAt as last_login,GROUP_CONCAT(UploadImgs.image ORDER BY UploadImgs.image) AS images ' +
+                'FROM Registrations LEFT JOIN Users ON Users.id = Registrations.user_id LEFT JOIN UploadImgs ON UploadImgs.user_id = Registrations.user_id GROUP BY Registrations.id';
 
 
     models.sequelize.query(query,
@@ -973,11 +972,6 @@ exports.getAllMerchant = function(){
     ).then(function(merchants) {
         var output = [];
         async.eachSeries(merchants,function(data,callback){
-            output.push(data);
-            callback();
-      /*      console.log("lat lng >>>.");
-            console.log(data.lang);
-            console.log(data.lat);
             axios.get('https://maps.googleapis.com/maps/api/geocode/json?latlng='+data.lat+','+data.lang+'&sensor=true&key='+key)
   .then(function (response) {    
       if (response.data.results[0] != null || undefined ){     
@@ -989,7 +983,8 @@ exports.getAllMerchant = function(){
         data.zipcode_new = ''; 
         data.formatted_address = '';
     }
-   
+            output.push(data);
+            callback();
   
   })
   
@@ -999,7 +994,7 @@ exports.getAllMerchant = function(){
   })
   .then(function () {
     // always executed
-  }); */
+  });
       
     }, function(err, detail) {
             deferred.resolve(output);
