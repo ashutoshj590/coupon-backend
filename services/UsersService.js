@@ -880,6 +880,7 @@ exports.changePasswordForUser = function(otp, new_password, confirm_password){
         }
                 persistNewPassword(user1.email, new_password).then(function(user){
                     getTokenFromdb(user1.id).then(function(newData){
+                        if (newData){
                     admin.messaging().sendToDevice(newData.token, notificationConsts.NOTIFICATION__CONSTS.reset_password, notificationConsts.NOTIFICATION__CONSTS.options).then(function(response) {
                         console.log("successfullee send message", response);
                         deferred.resolve("Password Changed");
@@ -888,6 +889,10 @@ exports.changePasswordForUser = function(otp, new_password, confirm_password){
                     .catch(function(error) {
                         console.log("error send message", error);
                     })
+                } else {
+                    console.log("without notifications");
+                    deferred.resolve("Password Changed");
+                }
                 },function(err){
                     deferred.reject(err)
                 })

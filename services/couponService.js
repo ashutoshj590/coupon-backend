@@ -714,8 +714,9 @@ exports.addUsedCoupontoDatabase = function(consumer_id, merchant_id, coupon_code
         
     }).then(function(couponUsed) {
         userService.getTokenFromdb(merchant_id).then(function(newData){
+            if (newData){
             admin.messaging().sendToDevice(newData.token, notificationConsts.NOTIFICATION__CONSTS.used_coupon, notificationConsts.NOTIFICATION__CONSTS.options).then(function(response) {
-                
+  
                 console.log("successfullee send message", response);
                 deferred.resolve(couponUsed);
 
@@ -723,6 +724,10 @@ exports.addUsedCoupontoDatabase = function(consumer_id, merchant_id, coupon_code
             .catch(function(error) {
                 console.log("error send message", error);
             })
+        } else {
+            console.log("without notifications");
+            deferred.resolve(couponUsed);
+        }
         },function(err){
             deferred.reject(err)
         })
