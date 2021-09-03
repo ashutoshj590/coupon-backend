@@ -31,7 +31,9 @@ module.exports = (sequelize, DataTypes) => {
       },
       fb_id: DataTypes.STRING,
       google_id: DataTypes.STRING,
-      status: DataTypes.STRING
+      status: DataTypes.STRING,
+      lat: DataTypes.INTEGER,
+      lang: DataTypes.INTEGER
   }, {
     sequelize,
     modelName: 'User',

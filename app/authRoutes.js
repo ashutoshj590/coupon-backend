@@ -59,7 +59,7 @@ router.post('/login', [util.hasJsonParam(["email", "password", "device_type"])],
           sessionDetail.user_id = req.session.user_id;
           sessionDetail.email = req.session.email;
           sessionDetail.type = req.session.type;
-          sessionDetail.device_type = req.session.device_type;
+          sessionDetail.device_type = userObject.device_type;
           sessionDetail.is_registered = false;
           if(req.session.is_registered === true){
             sessionDetail.is_registered = true;

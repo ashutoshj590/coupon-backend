@@ -86,10 +86,26 @@ var updateStatusUsers = function(email){
     return deferred.promise;
 }
 
+var updateLocationUsers = function(email, lat, lang, device_type){
+    var deferred = Q.defer();
+    models.User.update({
+        lat: lat,
+        lang: lang,
+        device_type: device_type
+    }, {
+        where: {email: email}
+        }).then(function (loc) {
+            deferred.resolve(loc);
+        }, function (err) {
+            deferred.reject(err)
+        });
+    return deferred.promise;
+}
+
 
 
 module.exports.login = (user, session) => {
-    let { email, password } = user;
+    let { email, password, device_type, lat, lang } = user;
     return userDOA.findUserByEmail(email)
         .then((user) => {
             if (user == null) {
@@ -107,12 +123,15 @@ module.exports.login = (user, session) => {
                  
                 })
                 .then(() => {
+                    updateLocationUsers(email, lat, lang, device_type).then(function(data1){ 
                     updateStatusUsers(user.email).then(function(data){ 
-                        console.log(user.email);
                     return util.getResponseObject(constants.RESPONSE_SUCCESS, 'Logged in');
                 },function(err){
                     deferred.reject(err)
                 });
+            },function(err){
+                deferred.reject(err)
+            });
                 })
                 .catch((err) => {
                     return Promise.reject(err);
