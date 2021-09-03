@@ -31,6 +31,8 @@ module.exports.createNewUser = (user) => {
     user.type = "consumer";
     user.is_registered = 0;
     user.status = 0;
+    user.lat = "00.000000";
+    user.lang = "00.000000";
     return userDOA.findUserByEmail(email)
         .then((foundUser) => {
             if (foundUser == null || foundUser == undefined) {
@@ -1034,7 +1036,7 @@ exports.getAllMerchant = function(){
 
 
 
-exports.getAllConsumer = function(){
+exports.getAllConsumer = function(){ //axios
     var deferred = Q.defer();
     var replacements = null;
 
@@ -1042,11 +1044,47 @@ exports.getAllConsumer = function(){
 
     models.sequelize.query(query,
         { replacements: replacements, type: models.sequelize.QueryTypes.SELECT }
-    ).then(function(data) {
-        deferred.resolve(data);
-
-        }
-    );
+    ).then(function(dataConsumer) {
+        var output = [];
+        async.eachSeries(dataConsumer,function(data,callback){
+            axios.get('https://maps.googleapis.com/maps/api/geocode/json?latlng='+data.lat+','+data.lang+'&sensor=true&key='+key)
+  .then(function (response) {    
+      if (response.data.results[0] != null || undefined ){     
+       var strData = response.data.results[0].address_components
+       for (var i = 0; i < strData.length; i++) {
+           if (strData[i].types[0] == "administrative_area_level_1" ){
+               data.state_name = strData[i].long_name;
+           }
+           if (strData[i].types[0] == "postal_code" ){
+            data.zipcode_new = strData[i].long_name;
+            }
+       }
+       data.formatted_address = response.data.results[0].formatted_address
+      
+    } else {
+        data.country_name = '';
+        data.zipcode_new = ''; 
+        data.formatted_address = '';
+    }
+            output.push(data);
+            callback();
+  
+  })
+  
+  .catch(function (error) {
+    // handle error
+    console.log(error);
+  })
+  .then(function () {
+    // always executed
+  });
+      
+    }, function(err, detail) {
+            deferred.resolve(output);
+        
+    });
+    
+});
     return deferred.promise;
 };
 
