@@ -977,8 +977,8 @@ exports.getAllMerchant = function(){
       if (response.data.results[0] != null || undefined ){     
        var strData = response.data.results[0].address_components
        for (var i = 0; i < strData.length; i++) {
-           if (strData[i].types[0] == "country" ){
-               data.country_name = strData[i].long_name;
+           if (strData[i].types[0] == "administrative_area_level_1" ){
+               data.state_name = strData[i].long_name;
            }
            if (strData[i].types[0] == "postal_code" ){
             data.zipcode_new = strData[i].long_name;
