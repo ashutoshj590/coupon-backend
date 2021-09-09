@@ -85,13 +85,49 @@ var updateCouponForMerchant = exports.updateCouponForMerchant = function(consume
     }).then(function(couponUpdate) {
         if (coupon_type === "custom" && status != "reject") {
         acceptRequestFunction(consumer_id, user_id, request_id, 1).then(function(accept) {
-        deferred.resolve(couponUpdate);
+        userService.getTokenFromdb(consumer_id).then(function(newData){
+            if (newData){
+            admin.messaging().sendToDevice(newData.token, notificationConsts.NOTIFICATION__CONSTS.request_accept, notificationConsts.NOTIFICATION__CONSTS.options).then(function(response) {
+  
+                console.log("successfullee send message", response);
+                deferred.resolve(couponUpdate);
+
+
+            })
+            .catch(function(error) {
+                console.log("error send message", error);
+            })
+        } else {
+            console.log("without notifications");
+            deferred.resolve(couponUsed);
+        }
+        },function(err){
+            deferred.reject(err)
+        })
     
         },function(err){
             deferred.reject(err)
             });
         } else {
-            deferred.resolve(couponUpdate);
+            console.log("request rejected>>>>>>>>>");
+            userService.getTokenFromdb(consumer_id).then(function(newData){
+                if (newData){
+                admin.messaging().sendToDevice(newData.token, notificationConsts.NOTIFICATION__CONSTS.reject_request, notificationConsts.NOTIFICATION__CONSTS.options).then(function(response) {
+      
+                    console.log("successfullee send message", response);
+                    deferred.resolve(couponUpdate);
+
+                })
+                .catch(function(error) {
+                    console.log("error send message", error);
+                })
+            } else {
+                console.log("without notifications");
+                deferred.resolve(couponUsed);
+            }
+            },function(err){
+                deferred.reject(err)
+            })
         }
     },function(err){
         deferred.reject(err)
@@ -240,7 +276,8 @@ exports.addRequestForMerchant = function(consumer_id, sub_category_id, detail, d
             obj.detail = requestDetail;
             obj.coupon_id = result.id;
             addCouponIdtoRequest(requestDetail.id,result.id).then(function(update) {
-            deferred.resolve(obj);
+                deferred.resolve(obj);
+            
         },function(err){
             deferred.reject(err)
             });
@@ -250,6 +287,25 @@ exports.addRequestForMerchant = function(consumer_id, sub_category_id, detail, d
     },function(err){
         deferred.reject(err)
     });
+    return deferred.promise;
+};
+
+
+/* function for get merdahnt ids by su cate id  */
+var getMerchantIdsBySubCate = function(sub_category_id){
+    var deferred = Q.defer();
+    var replacements = {sub_category_id : sub_category_id }
+        var query = 'SELECT Registrations.*, MAX(UserSubCateMaps.createdAt) as sub_cat_created ' +
+                'FROM UserSubCateMaps LEFT JOIN Registrations ON Registrations.user_id = UserSubCateMaps.user_id ' +
+                 'WHERE Registrations.status=1 AND UserSubCateMaps.sub_category_id IN (:sub_category_id) GROUP BY Registrations.id';
+
+    models.sequelize.query(query,
+        { replacements: replacements, type: models.sequelize.QueryTypes.SELECT }
+    ).then(function(merchantids) {
+        deferred.resolve(merchantids);
+
+        }
+    );
     return deferred.promise;
 };
 
@@ -420,13 +476,13 @@ exports.getMerchantDetailbySubCateId = function(sub_category_id, consumer_id, la
         dist = distance;
     }
     if (merchant_id == null && sub_category_id != null){
-        var replacements = {sub_category_id : subCate }
+        var replacements = {sub_category_id : sub_category_id }
         var query = 'SELECT Registrations.*, MAX(UserSubCateMaps.createdAt) as sub_cat_created ' +
                 'FROM UserSubCateMaps LEFT JOIN Registrations ON Registrations.user_id = UserSubCateMaps.user_id ' +
                  'WHERE Registrations.status=1 AND UserSubCateMaps.sub_category_id IN (:sub_category_id) GROUP BY Registrations.id';
   
     } else if (merchant_id != null && sub_category_id != null) {
-    var replacements = {sub_category_id : subCate, merchant_id : merchant_id};
+    var replacements = {sub_category_id : sub_category_id, merchant_id : merchant_id};
     var query = 'SELECT Registrations.*, MAX(UserSubCateMaps.createdAt) as sub_cat_created ' +
     'FROM UserSubCateMaps LEFT JOIN Registrations ON Registrations.user_id = UserSubCateMaps.user_id ' +
      'WHERE Registrations.status=1 AND UserSubCateMaps.sub_category_id IN (1,2) AND Registrations.user_id=:merchant_id GROUP BY Registrations.id';
@@ -766,11 +822,9 @@ var acceptRequestFunction = exports.acceptRequestFunction = function(consumer_id
                 where: {
                     id: getdata.dataValues.id
                 }
-            }).then(function(added) {
-               
+            }).then(function(added) {    
                 deferred.resolve(added);
             },function(err){
-               
                 deferred.reject(err)
             });
 
@@ -1464,10 +1518,34 @@ exports.allowRequest = function(request_id){
                         id: request_id
                     }
                 }).then(function(added) {
+                    var output = [];
                     getUserDetailsFormReq(request_id).then(function(userDetail){
+                        getMerchantIdsBySubCate(userDetail.sub_category_id).then(function(ids) {   
+                            async.eachSeries(ids,function(data,callback){
+                                userService.getTokenFromdb(data.user_id).then(function(newData){
+                                    data = [];
+                                    data = newData.token;
+                                    output.push(data);
+                                    callback();
+                               
+                                    admin.messaging().sendToDevice(output, notificationConsts.NOTIFICATION__CONSTS.create_request, notificationConsts.NOTIFICATION__CONSTS.options).then(function(response) {
+                                        console.log("successfully send multiple message", response);
+                
+                                    })
+                                    .catch(function(error) {
+                                        console.log("error send message", error);
+                                    })
+                                },function(err){
+                                    deferred.reject(err)
+                                })
+                            }, function(err, detail) {
+                               // console.log(output);
+                               
+                            });
+                           
                         userService.getTokenFromdb(userDetail.consumer_id).then(function(newData){
                         admin.messaging().sendToDevice(newData.token, notificationConsts.NOTIFICATION__CONSTS.request_approved, notificationConsts.NOTIFICATION__CONSTS.options).then(function(response) {
-                            console.log("successfullee send message", response);
+                            console.log("successfully send single message", response);
                             deferred.resolve(added);
     
                         })
@@ -1477,6 +1555,10 @@ exports.allowRequest = function(request_id){
                     },function(err){
                         deferred.reject(err)
                     })
+                       
+                },function(err){
+                    deferred.reject(err)
+                    });
 
                 },function(err){
                     deferred.reject(err)
@@ -1488,6 +1570,22 @@ exports.allowRequest = function(request_id){
 
     return deferred.promise;
 };
+
+
+/*var output = [];
+async.eachSeries(allcoupons,function(data,callback){ 
+    getAllImgsMerchant(data.user_id).then(function(newData){
+        data.merchant_images = newData;
+        output.push(data);
+        callback();
+    }, function(err){
+       deferred.reject(err);
+    })
+
+}, function(err, detail) {
+     deferred.resolve(output);
+   
+}); */
 
 
 

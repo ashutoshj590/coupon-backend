@@ -29,7 +29,29 @@ exports.NOTIFICATION__CONSTS = {
                 title: "Password Reset",
                 body: "Dear <strong>PARAM_USER_EMAIL</strong> <br /> Your Password has been changed."
         }
-    } 
+    },
+    request_accept : {
+        notification : {
+            title: "Request Accepted!",
+            body :"Congratulations your new request has been Accepted by Merchant!"
+        }
+       
+    },
+    reject_request : {
+        notification : {
+            title: "Request Rejected!",
+            body :"Your request has been rejected by merchant !"
+        }
+       
+    },
+    create_request : {
+        notification : {
+            title: "New request created on your area!",
+            body :"New request created by consumer PARAM_CONSUMER_EMAIL near to your store. "
+        }
+       
+    }
+
 
 
 
