@@ -429,7 +429,7 @@ exports.getAllRequestForConsumer = function(consumer_id){
             deferred.reject(err);
          })
         } else {
-            response.send("Detail not found!");
+            deferred.reject("merchant not found");
         }
        }, function(err, detail) {
              deferred.resolve(output);
