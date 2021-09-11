@@ -389,7 +389,6 @@ exports.changeStatustoRequest = function(request_id){
 exports.getAllRequestForConsumer = function(consumer_id){
     var deferred = Q.defer();
     var replacements = {consumer_id : consumer_id};
-
      var query = 'select Requests.id as request_id,Requests.consumer_id,Requests.sub_category_id,Requests.detail,Requests.date,Requests.time,Requests.coupon_id,' +
                     'Requests.createdAt,Requests.updatedAt,SubCategories.name as sub_category_name,SubCategories.img_url,Categories.name as category_name,AcceptRequests.is_accepted,AcceptRequests.merchant_id' +
                 ' from Requests LEFT JOIN SubCategories ON Requests.sub_category_id=SubCategories.id LEFT JOIN Categories ON SubCategories.category_id=Categories.id' +
@@ -397,9 +396,12 @@ exports.getAllRequestForConsumer = function(consumer_id){
     
     models.sequelize.query(query,
         { replacements: replacements, type: models.sequelize.QueryTypes.SELECT }
-    ).then(function(result) {         
+    ).then(function(result) {    
         var output = [];
         async.eachSeries(result,function(data,callback){ //getCouponDetail
+            console.log(data.merchant_id);
+            if (data.merchant_id != null || undefined) {
+                console.log("1..");
             getMerchantDetailForReqCoupons(data.merchant_id, data.coupon_id).then(function(newData){
                 if (data.is_accepted != 1){
                 delete data.merchant_id;
@@ -427,6 +429,13 @@ exports.getAllRequestForConsumer = function(consumer_id){
         }, function(err){
             deferred.reject(err);
          })
+
+        } else {
+                delete data.merchant_id;
+                data.merchant_detail = [];
+                output.push(data);
+                callback();
+        }
       
        }, function(err, detail) {
              deferred.resolve(output);
@@ -1316,6 +1325,7 @@ var getAllImgsMerchant = function(merchant_id){
     models.sequelize.query(query,
         { replacements: replacements, type: models.sequelize.QueryTypes.SELECT }
     ).then(function(data) {
+        console.log("5");
         deferred.resolve(data);
 
         }
@@ -1364,11 +1374,10 @@ var getMerchantDetail = function(merchant_id){
 var getMerchantDetailForReqCoupons = function(merchant_id, coupon_id){
     var deferred = Q.defer();
     var replacements = {merchant_id : merchant_id};
-
     var query =  'SELECT Registrations.user_id as merchant_id,Registrations.address,Registrations.city,Registrations.state,Registrations.zipcode,'+
                 'Registrations.opening_time,Registrations.closing_time,Registrations.business_name,Registrations.tagline,Registrations.website,'+
                  'Registrations.phone_no,Registrations.business_license_no,Registrations.description,Registrations.createdAt,Registrations.updatedAt,'+
-                 'Registrations.lat,Registrations.lang where Registrations.user_id =:merchant_id';
+                 'Registrations.lat,Registrations.lang FROM Registrations where Registrations.user_id =:merchant_id';
 
     models.sequelize.query(query,
         { replacements: replacements, type: models.sequelize.QueryTypes.SELECT }
@@ -1436,7 +1445,7 @@ var getCouponDetail = exports.getCouponDetail = function(coupon_id){
     ).then(function (coupon) {
        // getAllImgsByCouponId
        var output = [];
-       async.eachSeries(merchantDetail,function(data,callback){ 
+       async.eachSeries(coupon,function(data,callback){ 
         getAllImgsByCouponId(coupon_id).then(function(imgAll){
             data.images = imgAll;
                output.push(data);
