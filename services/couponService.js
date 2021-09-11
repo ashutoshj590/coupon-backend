@@ -1136,7 +1136,7 @@ exports.getAllFavouriteCoupons = function(consumer_id, sub_category_id){
 
     var query = 'select Registrations.* FROM Registrations LEFT JOIN FavCoupons' +
                 ' ON Registrations.user_id=FavCoupons.merchant_id' + querySet + 
-                ' WHERE FavCoupons.is_fav=1 AND FavCoupons.consumer_id=:consumer_id'+querySet1+' GROUP BY Registrations.user_id';
+                ' WHERE FavCoupons.is_fav=1 AND FavCoupons.consumer_id=:consumer_id'+querySet1+' GROUP BY Registrations.id';
 
     models.sequelize.query(query,
         { replacements: replacements, type: models.sequelize.QueryTypes.SELECT }
