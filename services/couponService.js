@@ -393,15 +393,13 @@ exports.getAllRequestForConsumer = function(consumer_id){
      var query = 'select Requests.id as request_id,Requests.consumer_id,Requests.sub_category_id,Requests.detail,Requests.date,Requests.time,Requests.coupon_id,' +
                     'Requests.createdAt,Requests.updatedAt,SubCategories.name as sub_category_name,SubCategories.img_url,Categories.name as category_name,AcceptRequests.is_accepted,AcceptRequests.merchant_id' +
                 ' from Requests LEFT JOIN SubCategories ON Requests.sub_category_id=SubCategories.id LEFT JOIN Categories ON SubCategories.category_id=Categories.id' +
-                ' LEFT JOIN AcceptRequests ON AcceptRequests.request_id=Requests.id WHERE Requests.consumer_id=:consumer_id AND Requests.is_deleted=0';
+                ' LEFT JOIN AcceptRequests ON AcceptRequests.request_id=Requests.id WHERE Requests.consumer_id=:consumer_id AND Requests.is_deleted=0 AND is_allow=1';
     
     models.sequelize.query(query,
         { replacements: replacements, type: models.sequelize.QueryTypes.SELECT }
     ).then(function(result) {         
         var output = [];
         async.eachSeries(result,function(data,callback){ //getCouponDetail
-            console.log("get merchant id in data......>>>");
-            console.log(data);
             getMerchantDetailForReqCoupons(data.merchant_id, data.coupon_id).then(function(newData){
                 if (data.is_accepted != 1){
                 delete data.merchant_id;
