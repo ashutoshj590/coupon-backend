@@ -428,10 +428,7 @@ exports.getAllRequestForConsumer = function(consumer_id){
         }, function(err){
             deferred.reject(err);
          })
-        } else {
-            deferred.reject("merchant not found!");
-        }
-   
+        } 
        }, function(err, detail) {
              deferred.resolve(output);
            
@@ -1147,6 +1144,7 @@ exports.getAllFavouriteCoupons = function(consumer_id, sub_category_id){
     ).then(function(allcps) {
                 var output = [];
         async.eachSeries(allcps,function(data,callback){
+            if (data.user_id != null || undefined) {
             getAllImgsMerchant(data.user_id).then(function(allimgs){
             getAllFavCoupons(data.user_id).then(function(newData){
                 data.images = allimgs;
@@ -1159,6 +1157,7 @@ exports.getAllFavouriteCoupons = function(consumer_id, sub_category_id){
         }, function(err){
             deferred.reject(err);
          })
+        }
    
        }, function(err, detail) {
          deferred.resolve(output);
