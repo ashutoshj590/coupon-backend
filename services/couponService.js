@@ -400,7 +400,8 @@ exports.getAllRequestForConsumer = function(consumer_id){
     ).then(function(result) {         
         var output = [];
         async.eachSeries(result,function(data,callback){ //getCouponDetail
-            if(data.merchant_id != null || undefined){
+            console.log("get merchant id in data......>>>");
+            console.log(data);
             getMerchantDetailForReqCoupons(data.merchant_id, data.coupon_id).then(function(newData){
                 if (data.is_accepted != 1){
                 delete data.merchant_id;
@@ -428,9 +429,7 @@ exports.getAllRequestForConsumer = function(consumer_id){
         }, function(err){
             deferred.reject(err);
          })
-        } else {
-            deferred.reject("merchant not found");
-        }
+      
        }, function(err, detail) {
              deferred.resolve(output);
            
