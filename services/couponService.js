@@ -400,6 +400,7 @@ exports.getAllRequestForConsumer = function(consumer_id){
     ).then(function(result) {         
         var output = [];
         async.eachSeries(result,function(data,callback){ //getCouponDetail
+            if(data.merchant_id != null || undefined){
             getMerchantDetailForReqCoupons(data.merchant_id, data.coupon_id).then(function(newData){
                 if (data.is_accepted != 1){
                 delete data.merchant_id;
@@ -427,6 +428,9 @@ exports.getAllRequestForConsumer = function(consumer_id){
         }, function(err){
             deferred.reject(err);
          })
+        } else {
+            console.log("merchant not found!");
+        }
    
        }, function(err, detail) {
              deferred.resolve(output);
@@ -1135,7 +1139,7 @@ exports.getAllFavouriteCoupons = function(consumer_id, sub_category_id){
 
     var query = 'select Registrations.* FROM Registrations LEFT JOIN FavCoupons' +
                 ' ON Registrations.user_id=FavCoupons.merchant_id' + querySet + 
-                ' WHERE FavCoupons.is_fav=1 AND FavCoupons.consumer_id=:consumer_id'+querySet1+' GROUP BY Registrations.id';
+                ' WHERE FavCoupons.is_fav=1 AND FavCoupons.consumer_id=:consumer_id'+querySet1+' GROUP BY Registrations.user_id';
 
     models.sequelize.query(query,
         { replacements: replacements, type: models.sequelize.QueryTypes.SELECT }
