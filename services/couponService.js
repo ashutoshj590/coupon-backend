@@ -429,7 +429,7 @@ exports.getAllRequestForConsumer = function(consumer_id){
             deferred.reject(err);
          })
         } else {
-            deferred.resolve("Detail not found!");
+            response.send("Detail not found!");
         }
        }, function(err, detail) {
              deferred.resolve(output);
