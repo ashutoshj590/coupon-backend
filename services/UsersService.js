@@ -1183,9 +1183,10 @@ exports.addToBlock = function(consumer_id, coupon_id){
 
 exports.addTokenForNotifications = function(user_id,device_type, token){
     var deferred = Q.defer();
-    findToken(user_id, token).then(function(foundData) {
+    findToken(user_id).then(function(foundData) {
             if (foundData){
                 models.DeviceToken.update({
+                    device_type: device_type,
                     token: token
                 },{
                     where: {
@@ -1221,7 +1222,6 @@ exports.addTokenForNotifications = function(user_id,device_type, token){
 var findToken = function(user_id, token){
     var deferred = Q.defer();
     var cond={
-                "token": token,
                 "user_id": user_id
         };
     models.DeviceToken.findOne({
