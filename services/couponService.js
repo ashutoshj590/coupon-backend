@@ -1178,7 +1178,7 @@ var getAllFavCoupons = function(merchant_id){
 
     var query = 'select Coupons.id as coupon_id,Coupons.user_id as merchant_id,Coupons.coupon_type,Coupons.days,Coupons.start_time,Coupons.end_time,Coupons.expiry_date,' +
                 ' Coupons.flash_deal,Coupons.description,Coupons.restriction,Coupons.createdAt,Coupons.updatedAt,Coupons.short_name,Coupons.coupon_code' + 
-                ' FROM COupons LEFT JOIN FavCoupons ON FavCoupons.coupon_id=Coupons.id' +
+                ' FROM Coupons LEFT JOIN FavCoupons ON FavCoupons.coupon_id=Coupons.id' +
                 ' WHERE FavCoupons.is_fav=1 AND FavCoupons.merchant_id=:merchant_id';
 
     models.sequelize.query(query,
