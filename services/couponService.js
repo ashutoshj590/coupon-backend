@@ -1128,13 +1128,12 @@ exports.getAllFavouriteCoupons = function(consumer_id, sub_category_id){
     if (subCate == null || undefined){
        
     var replacements = {consumer_id : consumer_id};
-    var query = 'select Registrations.*,GROUP_CONCAT(UploadImgs.image ORDER BY UploadImgs.image) AS images FROM Registrations LEFT JOIN FavCoupons ON Registrations.user_id=FavCoupons.merchant_id'+
-                ' LEFT JOIN UploadImgs ON UploadImgs.user_id = Registrations.user_id WHERE FavCoupons.is_fav=1 AND FavCoupons.consumer_id=:consumer_id';
+    var query = 'select Registrations.* FROM Registrations LEFT JOIN FavCoupons ON Registrations.user_id=FavCoupons.merchant_id'+
+                ' WHERE FavCoupons.is_fav=1 AND FavCoupons.consumer_id=:consumer_id';
     } else {
     var replacements = {consumer_id : consumer_id, subCate: subCate};
-    var query = 'select Registrations.*,GROUP_CONCAT(UploadImgs.image ORDER BY UploadImgs.image) AS images FROM Registrations LEFT JOIN FavCoupons' +
+    var query = 'select Registrations.* FROM Registrations LEFT JOIN FavCoupons' +
                 ' ON Registrations.user_id=FavCoupons.merchant_id LEFT JOIN UserSubCateMaps ON UserSubCateMaps.user_id=Registrations.user_id '+
-                'LEFT JOIN UploadImgs ON UploadImgs.user_id = Registrations.user_id'+ 
                 ' WHERE FavCoupons.is_fav=1 AND FavCoupons.consumer_id=:consumer_id AND UserSubCateMaps.sub_category_id IN (:subCate) GROUP BY Registrations.id';
     }
     models.sequelize.query(query,
@@ -1143,13 +1142,18 @@ exports.getAllFavouriteCoupons = function(consumer_id, sub_category_id){
     ).then(function(allcps) {
                 var output = [];
         async.eachSeries(allcps,function(data,callback){
+                getAllImgsMerchant(data.user_id).then(function(imgAll){
             getAllFavCoupons(data.user_id).then(function(newData){
+                data.merchant_detail = imgAll;
                 data.couponDetail = newData;
                 output.push(data);
                 callback();
             }, function(err){
                deferred.reject(err);
             })
+        }, function(err){
+            deferred.reject(err);
+         })
        
    
        }, function(err, detail) {
