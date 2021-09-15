@@ -1364,6 +1364,11 @@ var getMerchantDetailForReqCoupons = function(merchant_id, coupon_id){
          //   getAllImgsMerchant(merchant_id).then(function(imgAll){
             getCouponDetail(coupon_id).then(function(newData){
                // data.images = imgAll;
+               if (newData[0].flash_deal == 0){
+                   newData[0].flash_deal = false;
+               } else if (newData[0].flash_deal == 1){
+                   newData[0].flash_deal = true;
+               }
                 data.coupon_detail = newData[0];
                 output.push(data);
                 callback();
