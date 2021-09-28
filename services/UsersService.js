@@ -88,6 +88,24 @@ var updateStatusUsers = function(email){
     return deferred.promise;
 }
 
+
+var foudUserForBarCode = function(user_id){
+    var deferred = Q.defer();
+    models.UploadBarCode.findOne({
+        where: {
+            user_id: user_id
+        }
+    }).then(function (userfound) {
+            deferred.resolve(userfound);
+        },function (err) {
+          deferred.reject(err);
+        }
+    );
+    return deferred.promise;
+};
+
+
+
 var updateLocationUsers = function(email, lat, lang, device_type){
     var deferred = Q.defer();
     models.User.update({
@@ -247,7 +265,7 @@ exports.createMerchantDetail = function(userId, address, city, state, zipcode, o
         notification_email: notification_email,
         lat: lat,
         lang: lang,
-        status: 1
+        status: 1,
     }).then(function(merchantDetail) {
         var cateArray = merchantDetail.sub_category_id.split(",");
         addSubCatetoMap(userId, cateArray, lat, lang).then(function(added){
@@ -487,6 +505,41 @@ var updateIsRegisterFalse = function(user_id){
             deferred.reject(err)
         });
  })
+    return deferred.promise;
+}
+
+
+exports.uploadBarCodeQRCode = function (user_id, qrValue, barValue) {
+    var deferred = Q.defer();
+    foudUserForBarCode(user_id).then(function(barCode) {
+        if (barCode){
+            models.UploadBarCode.update({
+                qr_code: qrValue[0].path,
+                bar_code: barValue[0].path,
+            },{
+                where: {
+                    user_id: user_id
+                }
+            }).then(function(added) {
+                deferred.resolve(added);
+            },function(err){
+                deferred.reject(err)
+            });
+        } else {
+        models.UploadBarCode.create({
+            user_id: user_id,
+            qr_code: qrValue[0].path,
+           bar_code: barValue[0].path,
+            is_deleted: 0
+        }).then(function (data) {
+            deferred.resolve(data);
+        }, function (err) {
+            deferred.reject(err)
+        });
+    }
+    }, function (err) {
+        deferred.reject(err)
+    });
     return deferred.promise;
 }
 

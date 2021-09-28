@@ -35,6 +35,19 @@ var upload = multer({
     }
 })
 
+var uploadbmp = multer({
+    storage: storage,
+    limits: {
+        fileSize: 2000000
+    },
+    fileFilter(req, file, cb) {
+        if (!file.originalname.match(/\.(bmp)$/)) {
+            cb(new Error('Please upload bmp images only!'))
+        }
+        cb(undefined, true)
+    }
+})
+
 
 
 
@@ -63,7 +76,7 @@ router.get('/logout', jsonParser, function (req, res) {
 
 
 
-router.post('/register-merchant', [jsonParser, util.hasJsonParam(["user_id","address","city","state","zipcode","opening_time","closing_time","business_name","tagline","website","phone_no","business_license_no","description","sub_category_id"])], function (req, res) {
+router.post('/register-merchant',[jsonParser, util.hasJsonParam(["user_id","address","city","state","zipcode","opening_time","closing_time","business_name","tagline","website","phone_no","business_license_no","description","sub_category_id"])], function (req, res) {
     var isEmail;
     if(req.body.notification_email === null){ 
         isEmail = false;
@@ -137,11 +150,27 @@ router.post('/uplaod-image',upload.array('images', 5), function (req, res) {
     );
 });
 
-/* API for  upload images for merchant registration.............*/
-/*router.post('/uplaod-image',upload.array('merchant_image', 5), function(req, res, next){
-    var fileinfo = req.files;
-    res.send(fileinfo);
-}) */
+/* API for  upload images for merchant registration.............*/ //uploadbmp.single('bar_code'),
+router.post('/upload-bar-qr-code',uploadbmp.fields([{name: 'qr_code', maxCount: 1 }, {name: 'bar_code', maxCount: 1 }]), function (req, res) {
+  if (req.body.user_id == null){
+      res.send("user_id is required");
+  } else {
+    userService.uploadBarCodeQRCode(req.body.user_id, req.files.qr_code, req.files.bar_code).then(function (result) {
+    var response = util.getResponseObject(consts.RESPONSE_SUCCESS);
+        res.send(response);
+    
+}, function (err) {
+    if(err.errors !== undefined && err.errors[0] !== undefined ){
+        var response = util.getResponseObject(consts.RESPONSE_ERROR, err.response);
+        res.send(response);
+    }else{
+        var response = util.getResponseObject(consts.RESPONSE_ERROR, err.response);
+    }
+    res.send(response);
+});
+  }
+
+});
 
 
 

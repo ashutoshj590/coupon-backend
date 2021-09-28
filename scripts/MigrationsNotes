@@ -16,7 +16,7 @@ sequelize model:create --name UserLoginData --attributes "email:string,user_data
 sequelize model:create --name DeviceToken --attributes "device_type:string,token:string"
 sequelize model:create --name BlockMerchants --attributes "consumer_id:integer,merchant_id:integer,is_blocked:boolean"
 
-
+sequelize model:create --name UploadBarCode --attributes "user_id:integer,qr_code:string,bar_code:string,is_deleted:boolean"
 
 
 
