@@ -41,9 +41,8 @@ module.exports = (sequelize, DataTypes) => {
       lang: DataTypes.INTEGER,
       status: {
         type :DataTypes.BOOLEAN
-        },
-        bar_code: DataTypes.STRING,
-        qr_code: DataTypes.STRING
+        }
+     
 
   },
    {
