@@ -1144,7 +1144,7 @@ exports.getAllFavouriteCoupons = function(consumer_id, sub_category_id){
         async.eachSeries(allcps,function(data,callback){
                 getAllImgsMerchant(data.user_id).then(function(imgAll){
             getAllFavCoupons(data.user_id).then(function(newData){
-                data.merchant_detail = imgAll;
+                data.images = imgAll;
                 data.couponDetail = newData;
                 output.push(data);
                 callback();
