@@ -120,7 +120,7 @@ app.use("/coupon", require('./app/couponRoutes.js'));
 var sslSever = https.createServer(
    {
        key: fs.readFileSync(path.join(__dirname, 'certs', 'mccpapp-new.key')),
-       cert: fs.readFileSync(path.join(__dirname, 'certs', 'e7018f498e740284.crt')),
+       cert: fs.readFileSync(path.join(__dirname, 'certs', '565f05f6e26cad.crt')),
        ca: fs.readFileSync(path.join(__dirname, 'certs', 'gd_bundle-g2-g1.crt'))
    } ,
    app
