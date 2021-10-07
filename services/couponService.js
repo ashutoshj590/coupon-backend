@@ -479,13 +479,13 @@ exports.getMerchantDetailbySubCateId = function(sub_category_id, consumer_id, la
         dist = distance;
     }
     if (merchant_id == null && sub_category_id != null){
-        var replacements = {sub_category_id : sub_category_id }
+        var replacements = {sub_category_id : subCate }
         var query = 'SELECT Registrations.*, MAX(UserSubCateMaps.createdAt) as sub_cat_created ' +
                 'FROM UserSubCateMaps LEFT JOIN Registrations ON Registrations.user_id = UserSubCateMaps.user_id ' +
                  'WHERE Registrations.status=1 AND UserSubCateMaps.sub_category_id IN (:sub_category_id) GROUP BY Registrations.id';
   
     } else if (merchant_id != null && sub_category_id != null) {
-    var replacements = {sub_category_id : sub_category_id, merchant_id : merchant_id};
+    var replacements = {sub_category_id : subCate, merchant_id : merchant_id};
     var query = 'SELECT Registrations.*, MAX(UserSubCateMaps.createdAt) as sub_cat_created ' +
     'FROM UserSubCateMaps LEFT JOIN Registrations ON Registrations.user_id = UserSubCateMaps.user_id ' +
      'WHERE Registrations.status=1 AND UserSubCateMaps.sub_category_id IN (1,2) AND Registrations.user_id=:merchant_id GROUP BY Registrations.id';
@@ -512,8 +512,8 @@ exports.getMerchantDetailbySubCateId = function(sub_category_id, consumer_id, la
             var output = [];    
            async.eachSeries(result,function(data,callback){
         getAllImgsMerchant(data.user_id).then(function(imgData){
-              data.images = imgData;
             getAllcouponByUserId(data.user_id, consumer_id).then(function(foundData){
+               data.images = imgData;
                data.couponDetail = foundData;
                output.push(data);
                callback();
@@ -552,37 +552,6 @@ exports.getMerchantDetailbySubCateId = function(sub_category_id, consumer_id, la
   
 
 
-/*exports.getAllmerchantBySerach = function(search_query, consumer_id){
-  var searchQuery = search_query+'%';
-var deferred = Q.defer();
-var replacements = {search_query : searchQuery};
-
-var query = 'SELECT Registrations.*, MAX(UserSubCateMaps.createdAt) as sub_cat_created , GROUP_CONCAT(UploadImgs.image ORDER BY UploadImgs.image) AS images ' +
-                'FROM UserSubCateMaps LEFT JOIN Registrations ON Registrations.user_id = UserSubCateMaps.user_id LEFT JOIN UploadImgs ON UploadImgs.user_id = Registrations.user_id ' +
-                'where Registrations.business_name like :search_query OR Registrations.address like :search_query GROUP BY Registrations.id';
-
-            
-models.sequelize.query(query,
-    { replacements: replacements, type: models.sequelize.QueryTypes.SELECT }
-    ).then(function(result) {
-        var output = [];    
-    async.eachSeries(result,function(data,callback){ 
-        getAllcouponByUserId(data.user_id, consumer_id).then(function(foundData){
-         data.couponDetail = foundData;
-            output.push(data);
-            callback();
-        }, function(err){
-           deferred.reject(err);
-        })
-
-   }, function(err, detail) {
-         deferred.resolve(output);
-       
-   });
-    
-});
-return deferred.promise;
-}; */
 
 
 exports.getCouponsBySerach = function(search_query, consumer_id){
@@ -722,7 +691,7 @@ var getAllcouponByUserId = exports.getAllcouponByUserId = function(merchant_id, 
                 'Coupons.expiry_date,Coupons.flash_deal,Coupons.description,Coupons.restriction,Coupons.coupon_code,GROUP_CONCAT(UploadImgs.image ORDER BY UploadImgs.image) AS images'+ 
                 ' FROM Coupons LEFT JOIN UploadImgs ON UploadImgs.coupon_id = Coupons.id WHERE NOT EXISTS' +
                 ' ( SELECT * FROM UsedCoupons WHERE Coupons.coupon_code=UsedCoupons.coupon_code AND ' +
-                'UsedCoupons.consumer_id=:consumer_id ) AND Coupons.user_id=:merchant_id AND NOT Coupons.coupon_type="custom" AND Coupons.is_deleted=0 ORDER BY Coupons.coupon_code ASC';
+                'UsedCoupons.consumer_id=:consumer_id ) AND Coupons.user_id=:merchant_id AND NOT Coupons.coupon_type="custom" AND Coupons.is_deleted=0 GROUP BY Coupons.id';
 
     models.sequelize.query(query,
         { replacements: replacements, type: models.sequelize.QueryTypes.SELECT }
