@@ -12,7 +12,7 @@ var notificationConsts = require('../constants/notificationConsts');
 /*
 *   Function for create coupon .................
 */
-var createCouponForMerchant = exports.createCouponForMerchant = function(user_id,sub_category_id,coupon_type,days,start_time,end_time,expiry_date,flash_deal,description,restriction, shortName, consumerId){
+var createCouponForMerchant = exports.createCouponForMerchant = function(user_id,sub_category_id,coupon_type,days,start_time,end_time,expiry_date,flash_deal,description,restriction,consumerId){
     var deferred = Q.defer();
     var couponCode = uniqid('COUPON','CODE')
     var consumerIdValue;
@@ -42,7 +42,6 @@ var createCouponForMerchant = exports.createCouponForMerchant = function(user_id
         description: description,
         restriction: restriction,
         is_deleted: 0,
-        short_name: shortName,
         coupon_code: couponCode,
         consumer_id: consumerIdValue,
         status: pendingValue,
@@ -58,7 +57,7 @@ var createCouponForMerchant = exports.createCouponForMerchant = function(user_id
 /*
 *   Function for Update coupon .................
 */
-var updateCouponForMerchant = exports.updateCouponForMerchant = function(consumer_id,request_id,user_id,sub_cate_id,coupon_id,coupon_type,days,start_time,end_time,expiry_date,flash_deal,description,restriction,shortName,status){
+var updateCouponForMerchant = exports.updateCouponForMerchant = function(consumer_id,request_id,user_id,sub_cate_id,coupon_id,coupon_type,days,start_time,end_time,expiry_date,flash_deal,description,restriction,status){
     var deferred = Q.defer();
     if (coupon_type != "custom"){
         var subCateId = sub_cate_id
@@ -74,7 +73,6 @@ var updateCouponForMerchant = exports.updateCouponForMerchant = function(consume
         flash_deal: flash_deal,
         description: description,
         restriction: restriction,
-        short_name: shortName,
         consumer_id: consumer_id,
         status: status 
      } ,  {
@@ -136,7 +134,7 @@ var updateCouponForMerchant = exports.updateCouponForMerchant = function(consume
 
 
 
-exports.updateCustomCouponForMerchant = function(user_id,coupon_id,days,start_time,end_time,expiry_date,flash_deal,description,restriction,shortName){
+exports.updateCustomCouponForMerchant = function(user_id,coupon_id,days,start_time,end_time,expiry_date,flash_deal,description,restriction){
     var deferred = Q.defer();
     models.Coupons.update({
         days: days,
@@ -145,8 +143,7 @@ exports.updateCustomCouponForMerchant = function(user_id,coupon_id,days,start_ti
         expiry_date: expiry_date,
         flash_deal: flash_deal,
         description: description,
-        restriction: restriction,
-        short_name: shortName,
+        restriction: restriction
      } ,  {
             where:{
                 id: coupon_id,
