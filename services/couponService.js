@@ -599,9 +599,9 @@ exports.getCouponsBySerach = function(search_query, consumer_id){
   }
   
     var query = 'SELECT Coupons.id as coupon_id,Coupons.user_id as merchant_id,Coupons.coupon_type,Coupons.days,Coupons.start_time,Coupons.end_time,' +
-                'Coupons.expiry_date,Coupons.flash_deal,Coupons.description,Coupons.restriction,Coupons.createdAt,Coupons.updatedAt,Coupons.short_name,Coupons.coupon_code,' +
+                'Coupons.expiry_date,Coupons.flash_deal,Coupons.description,Coupons.restriction,Coupons.createdAt,Coupons.updatedAt,Coupons.coupon_code,' +
                 'Registrations.business_name as merchant_name,Registrations.lat,Registrations.lang,SubCategories.name as category_name FROM Coupons LEFT JOIN Registrations ON Coupons.user_id=Registrations.user_id' +
-                ' LEFT JOIN SubCategories ON Coupons.sub_category_id=SubCategories.id where NOT Coupons.coupon_type="custom" AND Coupons.is_deleted=0 AND ( Coupons.short_name like :search_query OR Coupons.description like :search_query OR Coupons.coupon_type like :search_query' +
+                ' LEFT JOIN SubCategories ON Coupons.sub_category_id=SubCategories.id where NOT Coupons.coupon_type="custom" AND Coupons.is_deleted=0 AND ( Coupons.description like :search_query OR Coupons.coupon_type like :search_query' +
                 ' OR Registrations.business_name like :search_query OR SubCategories.name like :search_query )' + querySet;
               
   models.sequelize.query(query,
@@ -719,7 +719,7 @@ var getAllcouponByUserId = exports.getAllcouponByUserId = function(merchant_id, 
     var replacements = {merchant_id : merchant_id, consumer_id : consumer_id};
 
     var query = 'SELECT Coupons.id as coupon_id,Coupons.user_id as merchant_id,Coupons.coupon_type,Coupons.days,Coupons.start_time,Coupons.end_time,' +
-                'Coupons.expiry_date,Coupons.flash_deal,Coupons.description,Coupons.restriction,Coupons.short_name,Coupons.coupon_code,GROUP_CONCAT(UploadImgs.image ORDER BY UploadImgs.image) AS images'+ 
+                'Coupons.expiry_date,Coupons.flash_deal,Coupons.description,Coupons.restriction,Coupons.coupon_code,GROUP_CONCAT(UploadImgs.image ORDER BY UploadImgs.image) AS images'+ 
                 ' FROM Coupons LEFT JOIN UploadImgs ON UploadImgs.coupon_id = Coupons.id WHERE NOT EXISTS' +
                 ' ( SELECT * FROM UsedCoupons WHERE Coupons.coupon_code=UsedCoupons.coupon_code AND ' +
                 'UsedCoupons.consumer_id=:consumer_id ) AND Coupons.user_id=:merchant_id AND NOT Coupons.coupon_type="custom" AND Coupons.is_deleted=0 ORDER BY Coupons.coupon_code ASC';
@@ -1171,7 +1171,7 @@ var getAllFavCoupons = function(merchant_id){
     var replacements = {merchant_id : merchant_id};
 
     var query = 'select Coupons.id as coupon_id,Coupons.user_id as merchant_id,Coupons.coupon_type,Coupons.days,Coupons.start_time,Coupons.end_time,Coupons.expiry_date,' +
-                ' Coupons.flash_deal,Coupons.description,Coupons.restriction,Coupons.createdAt,Coupons.updatedAt,Coupons.short_name,Coupons.coupon_code,' + 
+                ' Coupons.flash_deal,Coupons.description,Coupons.restriction,Coupons.createdAt,Coupons.updatedAt,Coupons.coupon_code,' + 
                 ' GROUP_CONCAT(UploadImgs.image ORDER BY UploadImgs.image) AS images FROM Coupons LEFT JOIN FavCoupons ON FavCoupons.coupon_id=Coupons.id' +
                 ' LEFT JOIN UploadImgs ON UploadImgs.coupon_id=Coupons.id WHERE FavCoupons.is_fav=1 AND FavCoupons.merchant_id=:merchant_id';
 
@@ -1258,7 +1258,7 @@ exports.getAllUsedCoupons = function(consumer_id){
     var replacements = {consumer_id : consumer_id};
 
     var query = 'select Coupons.id as coupon_id,Coupons.user_id as merchant_id,Coupons.coupon_type,Coupons.days,Coupons.start_time,Coupons.end_time,' +
-                'Coupons.expiry_date,Coupons.description,Coupons.restriction,Coupons.short_name,Coupons.coupon_code,GROUP_CONCAT(UploadImgs.image ORDER BY UploadImgs.image) AS images' + 
+                'Coupons.expiry_date,Coupons.description,Coupons.restriction,Coupons.coupon_code,GROUP_CONCAT(UploadImgs.image ORDER BY UploadImgs.image) AS images' + 
                 ' left join UsedCoupons on Coupons.coupon_code=UsedCoupons.coupon_code LEFT JOIN UploadImgs ON UploadImgs.coupon_id=Coupons.id where UsedCoupons.consumer_id=:consumer_id';
     
 
