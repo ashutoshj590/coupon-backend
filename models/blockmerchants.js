@@ -15,7 +15,7 @@ module.exports = (sequelize, DataTypes) => {
   };
   BlockMerchants.init({
     consumer_id: DataTypes.INTEGER,
-    merchant_id: DataTypes.INTEGER,
+    coupon_id: DataTypes.INTEGER,
     is_blocked: DataTypes.BOOLEAN
   }, {
     sequelize,
