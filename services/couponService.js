@@ -1153,7 +1153,7 @@ var getAllFavCoupons = function(merchant_id){
         var output = [];
         async.eachSeries(favCou,function(data,callback){ 
             getAllImgsByCouponId(data.coupon_id).then(function(newData){
-                data.images = newData[0].images;
+                data.images = newData;
                 output.push(data);
                 callback();
             }, function(err){
@@ -1296,7 +1296,7 @@ var getAllImgsByCouponId = function(coupon_id){
     var deferred = Q.defer();
     var replacements = {coupon_id : coupon_id};
 
-    var query =  'select GROUP_CONCAT(UploadImgs.image ORDER BY UploadImgs.image) AS images FROM Coupons LEFT JOIN UploadImgs ON UploadImgs.coupon_id=Coupons.id where Coupons.id=:coupon_id';
+    var query =  'SELECT UploadImgs.image from UploadImgs where UploadImgs.coupon_id=:coupon_id';
 
     models.sequelize.query(query,
         { replacements: replacements, type: models.sequelize.QueryTypes.SELECT }
