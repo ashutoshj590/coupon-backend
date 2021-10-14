@@ -479,20 +479,20 @@ exports.getMerchantDetailbySubCateId = function(sub_category_id, consumer_id, la
         dist = distance;
     }
     if (merchant_id == null && sub_category_id != null){
-        var replacements = {sub_category_id : subCate }
+        var replacements = {subCate : subCate }
         var query = 'SELECT Registrations.*, MAX(UserSubCateMaps.createdAt) as sub_cat_created ' +
                 'FROM UserSubCateMaps LEFT JOIN Registrations ON Registrations.user_id = UserSubCateMaps.user_id ' +
-                 'WHERE Registrations.status=1 AND UserSubCateMaps.sub_category_id IN (:sub_category_id) GROUP BY Registrations.id';
+                 'WHERE Registrations.status=1 AND UserSubCateMaps.sub_category_id IN (:subCate) GROUP BY Registrations.id';
   
     } else if (merchant_id != null && sub_category_id != null) {
-    var replacements = {sub_category_id : subCate, merchant_id : merchant_id};
+    var replacements = {subCate : subCate, merchant_id : merchant_id};
     var query = 'SELECT Registrations.*, MAX(UserSubCateMaps.createdAt) as sub_cat_created ' +
     'FROM UserSubCateMaps LEFT JOIN Registrations ON Registrations.user_id = UserSubCateMaps.user_id ' +
-     'WHERE Registrations.status=1 AND UserSubCateMaps.sub_category_id IN (1,2) AND Registrations.user_id=:merchant_id GROUP BY Registrations.id';
+     'WHERE Registrations.status=1 AND UserSubCateMaps.sub_category_id IN (:subCate) AND Registrations.user_id=:merchant_id GROUP BY Registrations.id';
     }
     
 
-   else if (sub_category_id == null || undefined && merchant_id == null || undefined){
+   else if (subCate == null || undefined && merchant_id == null || undefined){
     var replacements = {};
         var query = 'SELECT Registrations.* ' +
                 'FROM UserSubCateMaps LEFT JOIN Registrations ON Registrations.user_id = UserSubCateMaps.user_id WHERE Registrations.status=1 ' +
@@ -1094,29 +1094,33 @@ exports.getAllFavouriteCoupons = function(consumer_id, sub_category_id){
     if (subCate == null || undefined){
        
     var replacements = {consumer_id : consumer_id};
-    var query = 'select Registrations.* FROM Registrations LEFT JOIN FavCoupons ON Registrations.user_id=FavCoupons.merchant_id'+
-                ' WHERE FavCoupons.is_fav=1 AND FavCoupons.consumer_id=:consumer_id';
+    var query = 'select Registrations.* FROM FavCoupons LEFT JOIN Registrations ON Registrations.user_id=FavCoupons.merchant_id'+
+                ' WHERE Registrations.status=1 AND FavCoupons.is_fav=1 AND FavCoupons.consumer_id=:consumer_id GROUP BY Registrations.id';
     } else {
     var replacements = {consumer_id : consumer_id, subCate: subCate};
-    var query = 'select Registrations.* FROM Registrations LEFT JOIN FavCoupons' +
-                ' ON Registrations.user_id=FavCoupons.merchant_id LEFT JOIN UserSubCateMaps ON UserSubCateMaps.user_id=Registrations.user_id '+
-                ' WHERE FavCoupons.is_fav=1 AND FavCoupons.consumer_id=:consumer_id AND UserSubCateMaps.sub_category_id IN (:subCate) GROUP BY Registrations.id';
+    var query = 'SELECT Registrations.* FROM UserSubCateMaps LEFT JOIN Registrations ON Registrations.user_id = UserSubCateMaps.user_id'+
+                ' WHERE EXISTS '+
+                 '(select Registrations.* FROM FavCoupons LEFT JOIN Registrations ON Registrations.user_id=FavCoupons.merchant_id'+
+                ' WHERE Registrations.status=1 AND FavCoupons.is_fav=1 AND FavCoupons.consumer_id=:consumer_id GROUP BY Registrations.id)'+
+                ' AND Registrations.status=1 AND UserSubCateMaps.sub_category_id IN (:subCate) GROUP BY Registrations.id';
+               
     }
     models.sequelize.query(query,
         { replacements: replacements, type: models.sequelize.QueryTypes.SELECT }
         
     ).then(function(allcps) {
-                var output = [];
+        var output = [];
         async.eachSeries(allcps,function(data,callback){
-                getAllImgsMerchant(data.user_id).then(function(imgAll){
-            getAllFavCoupons(data.user_id).then(function(newData){
+                getAllImgsMerchant(data.user_id).then(function(imgAll){   
+                getAllFavCoupons(data.user_id).then(function(newData){
                 data.images = imgAll;
-                data.couponDetail = newData;
+              data.couponDetail = newData;
                 output.push(data);
                 callback();
+               
             }, function(err){
                deferred.reject(err);
-            })
+            }) 
         }, function(err){
             deferred.reject(err);
          })
@@ -1128,8 +1132,7 @@ exports.getAllFavouriteCoupons = function(consumer_id, sub_category_id){
        });
         
     })
-
-    
+  
     return deferred.promise;
    
 };
@@ -1140,20 +1143,31 @@ var getAllFavCoupons = function(merchant_id){
     var replacements = {merchant_id : merchant_id};
 
     var query = 'select Coupons.id as coupon_id,Coupons.user_id as merchant_id,Coupons.coupon_type,Coupons.days,Coupons.start_time,Coupons.end_time,Coupons.expiry_date,' +
-                ' Coupons.flash_deal,Coupons.description,Coupons.restriction,Coupons.createdAt,Coupons.updatedAt,Coupons.coupon_code,' + 
-                ' GROUP_CONCAT(UploadImgs.image ORDER BY UploadImgs.image) AS images FROM Coupons LEFT JOIN FavCoupons ON FavCoupons.coupon_id=Coupons.id' +
-                ' LEFT JOIN UploadImgs ON UploadImgs.coupon_id=Coupons.id WHERE FavCoupons.is_fav=1 AND FavCoupons.merchant_id=:merchant_id';
+                ' Coupons.flash_deal,Coupons.description,Coupons.restriction,Coupons.createdAt,Coupons.updatedAt,Coupons.coupon_code' + 
+                ' FROM Coupons LEFT JOIN FavCoupons ON FavCoupons.coupon_id=Coupons.id' +
+                ' WHERE FavCoupons.is_fav=1 AND FavCoupons.merchant_id=:merchant_id';
 
     models.sequelize.query(query,
         { replacements: replacements, type: models.sequelize.QueryTypes.SELECT }
     ).then(function(favCou) {
-        deferred.resolve(favCou);
-
-    }
-);
-return deferred.promise;
+        var output = [];
+        async.eachSeries(favCou,function(data,callback){ 
+            getAllImgsByCouponId(data.coupon_id).then(function(newData){
+                data.images = newData[0].images;
+                output.push(data);
+                callback();
+            }, function(err){
+               deferred.reject(err);
+            })
+   
+       }, function(err, detail) {
+             deferred.resolve(output);
+           
+       });
+        
+    });
+    return deferred.promise;
 };
-
 
 
 
@@ -1228,7 +1242,7 @@ exports.getAllUsedCoupons = function(consumer_id){
 
     var query = 'select Coupons.id as coupon_id,Coupons.user_id as merchant_id,Coupons.coupon_type,Coupons.days,Coupons.start_time,Coupons.end_time,' +
                 'Coupons.expiry_date,Coupons.description,Coupons.restriction,Coupons.coupon_code,GROUP_CONCAT(UploadImgs.image ORDER BY UploadImgs.image) AS images' + 
-                ' left join UsedCoupons on Coupons.coupon_code=UsedCoupons.coupon_code LEFT JOIN UploadImgs ON UploadImgs.coupon_id=Coupons.id where UsedCoupons.consumer_id=:consumer_id';
+                ' FROM Coupons left join UsedCoupons on Coupons.coupon_code=UsedCoupons.coupon_code LEFT JOIN UploadImgs ON UploadImgs.coupon_id=Coupons.id where UsedCoupons.consumer_id=:consumer_id';
     
 
     models.sequelize.query(query,
@@ -1282,7 +1296,7 @@ var getAllImgsByCouponId = function(coupon_id){
     var deferred = Q.defer();
     var replacements = {coupon_id : coupon_id};
 
-    var query =  'SELECT UploadImgs.image from UploadImgs where UploadImgs.coupon_id =:coupon_id';
+    var query =  'select GROUP_CONCAT(UploadImgs.image ORDER BY UploadImgs.image) AS images FROM Coupons LEFT JOIN UploadImgs ON UploadImgs.coupon_id=Coupons.id where Coupons.id=:coupon_id';
 
     models.sequelize.query(query,
         { replacements: replacements, type: models.sequelize.QueryTypes.SELECT }

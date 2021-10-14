@@ -643,7 +643,7 @@ exports.getMerchantDetail = function(user_id){
         var output = [];
         async.eachSeries(result,function(data,callback){ 
             getAllcouponByMerchantId(data.user_id).then(function(newData){
-                data.coupons_detail = newData;
+                data.couponDetail = newData;
                 output.push(data);
                 callback();
         }, function(err){
