@@ -1150,7 +1150,13 @@ var getAllFavCoupons = function(merchant_id){
     models.sequelize.query(query,
         { replacements: replacements, type: models.sequelize.QueryTypes.SELECT }
     ).then(function(favCou) {
-        var output = [];
+        deferred.resolve(favCou);
+
+    }
+);
+return deferred.promise;
+};
+     /*   var output = [];
         async.eachSeries(favCou,function(data,callback){ 
             getAllImgsByCouponId(data.coupon_id).then(function(newData){
                 data.images = newData[0].images;
@@ -1167,7 +1173,7 @@ var getAllFavCoupons = function(merchant_id){
         
     });
     return deferred.promise;
-};
+}; */
 
 
 
