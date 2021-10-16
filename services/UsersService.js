@@ -11,7 +11,7 @@ const { response } = require('express');
 const nodemailer = require('nodemailer');
 require('dotenv').config();
 var async = require('async');
-
+var couponService = require('./couponService');
 const axios = require('axios');
 const key = process.env.GOOGLE_API_KEY
 
@@ -628,7 +628,7 @@ var deleteMerchantSubCate = function(user_id){
 
 
 
-exports.getMerchantDetail = function(user_id){
+exports.getMerchantDetail = function(user_id, consumer_id){
     var deferred = Q.defer();
     var replacements = {user_id : user_id};
     var query = 'select Registrations.user_id, Registrations.address,Registrations.city,Registrations.state,Registrations.zipcode,'+
@@ -642,7 +642,7 @@ exports.getMerchantDetail = function(user_id){
         console.log(result);
         var output = [];
         async.eachSeries(result,function(data,callback){ 
-            getAllcouponByMerchantId(data.user_id).then(function(newData){
+            getAllcouponByMerchantId(data.user_id, consumer_id).then(function(newData){
                 data.couponDetail = newData;
                 output.push(data);
                 callback();
@@ -676,7 +676,8 @@ exports.getMerchantDetailAdmin = function(user_id){
         var output = [];
         var count = ["A"];
         async.eachSeries(result,function(data,callback){ 
-            getAllcouponByMerchantId(data.user_id).then(function(newData){
+            var consumer_id = null;
+            getAllcouponByMerchantId(data.user_id, consumer_id).then(function(newData){
                 categoriesDetail(data.user_id).then(function(cateData){
                     getAllImages(data.user_id).then(function(imgData){
                         usedCouponDetail(data.user_id).then(function(countsUsed){
@@ -800,23 +801,47 @@ var communityCouponDetail = function(merchant_id){
 
 
 
-vat = getAllcouponByMerchantId = function(merchant_id){
+vat = getAllcouponByMerchantId = function(merchant_id, consumer_id){
     var deferred = Q.defer();
-    var cond={
-                "user_id": merchant_id,
-                "is_deleted": 0
-     };
-    models.Coupons.findAll({
-      where: cond
-    }).then(function (allCoupons) {
-            deferred.resolve(allCoupons);
-        },function (err) {
-          deferred.reject(err);
-        }
-    );
+    var replacements = {merchant_id : merchant_id};
+
+    var query =  'select * from Coupons where is_deleted=0 and user_id=:merchant_id';
+
+    models.sequelize.query(query,
+        { replacements: replacements, type: models.sequelize.QueryTypes.SELECT }
+    ).then(function(allCoupons) {
+        var output = [];
+        async.eachSeries(allCoupons,function(data2,callback){
+            data2.is_fav = false;
+            couponService.findFavCoupons(consumer_id, data2.user_id, data2.id).then(function(foundData){
+               if (foundData != null || undefined){
+                   if (foundData.consumer_id == consumer_id && foundData.merchant_id == data2.user_id && foundData.coupon_id == data2.id && foundData.is_fav == 1) {
+                       data2.is_fav = true;
+                      
+                   } else if (foundData.consumer_id == consumer_id && foundData.merchant_id == data2.user_id && foundData.coupon_id == data2.id && foundData.is_fav == 0) {
+                       data2.is_fav = false;
+                      
+                   }
+               }
+             if (data2.id == null || undefined){
+                output.push();
+             } else {
+                output.push(data2);
+             }
+
+               callback();
+            }, function(err){
+               deferred.reject(err);
+            })
+     
+       }, function(err, detail) {
+             deferred.resolve(output);
+           
+       });
+        
+    });
     return deferred.promise;
 };
-
 
 
 var getAllImages = exports.getAllImages = function(user_id){

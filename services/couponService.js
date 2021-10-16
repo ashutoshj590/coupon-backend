@@ -1114,7 +1114,7 @@ exports.getAllFavouriteCoupons = function(consumer_id, sub_category_id){
                 getAllImgsMerchant(data.user_id).then(function(imgAll){   
                 getAllFavCoupons(data.user_id).then(function(newData){
                 data.images = imgAll;
-              data.couponDetail = newData;
+                data.couponDetail = newData;
                 output.push(data);
                 callback();
                
@@ -1151,7 +1151,9 @@ var getAllFavCoupons = function(merchant_id){
         { replacements: replacements, type: models.sequelize.QueryTypes.SELECT }
     ).then(function(favCou) {
         var output = [];
-        async.eachSeries(favCou,function(data,callback){ 
+        async.eachSeries(favCou,function(data,callback){
+            console.log("///////======chcek data for double coupons err");
+            console.log(data.coupon_id); 
             getAllImgsByCouponId(data.coupon_id).then(function(newData){
                 data.images = newData[0].images;
                 output.push(data);
