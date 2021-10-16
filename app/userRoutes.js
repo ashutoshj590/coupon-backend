@@ -232,7 +232,13 @@ router.post('/delete-consumer',[jsonParser,util.hasJsonParam(["user_id"])], func
 
 
     router.post('/get-merchant-detail',[jsonParser,util.hasJsonParam(["user_id"])], function (req, res) {
-        userService.getMerchantDetail(req.body.user_id).then(function (detail) {
+        var consumerId;
+        if (req.body.consumer_id){
+            consumerId = req.body.consumer_id;
+        } else {
+            consumerId = null;
+        }
+        userService.getMerchantDetail(req.body.user_id, consumerId).then(function (detail) {
                     var response = util.getResponseObject(consts.RESPONSE_SUCCESS);
                    response.merchant_detail = detail[0];
                    if(response.merchant_detail.notification_email === null){
