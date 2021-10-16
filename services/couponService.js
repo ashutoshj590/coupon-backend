@@ -1145,15 +1145,13 @@ var getAllFavCoupons = function(merchant_id){
     var query = 'select Coupons.id as coupon_id,Coupons.user_id as merchant_id,Coupons.coupon_type,Coupons.days,Coupons.start_time,Coupons.end_time,Coupons.expiry_date,' +
                 ' Coupons.flash_deal,Coupons.description,Coupons.restriction,Coupons.createdAt,Coupons.updatedAt,Coupons.coupon_code' + 
                 ' FROM Coupons LEFT JOIN FavCoupons ON FavCoupons.coupon_id=Coupons.id' +
-                ' WHERE FavCoupons.is_fav=1 AND FavCoupons.merchant_id=:merchant_id';
+                ' WHERE FavCoupons.is_fav=1 AND FavCoupons.merchant_id=:merchant_id GROUP BY Coupons.id';
 
     models.sequelize.query(query,
         { replacements: replacements, type: models.sequelize.QueryTypes.SELECT }
     ).then(function(favCou) {
         var output = [];
         async.eachSeries(favCou,function(data,callback){
-            console.log("///////======chcek data for double coupons err");
-            console.log(data.coupon_id); 
             getAllImgsByCouponId(data.coupon_id).then(function(newData){
                 data.images = newData[0].images;
                 output.push(data);
