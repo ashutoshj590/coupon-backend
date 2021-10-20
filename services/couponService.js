@@ -1114,7 +1114,7 @@ exports.getAllFavouriteCoupons = function(consumer_id, sub_category_id){
         var output = [];
         async.eachSeries(allcps,function(data,callback){
                 getAllImgsMerchant(data.user_id).then(function(imgAll){   
-                getAllFavCoupons(data.user_id).then(function(newData){
+                getAllFavCoupons(data.user_id, consumer_id).then(function(newData){
                 data.images = imgAll;
                 data.couponDetail = newData;
                 output.push(data);
@@ -1140,13 +1140,13 @@ exports.getAllFavouriteCoupons = function(consumer_id, sub_category_id){
 };
 
 
-var getAllFavCoupons = function(merchant_id){
+var getAllFavCoupons = function(merchant_id, consumer_id){
     var deferred = Q.defer();
-    var replacements = {merchant_id : merchant_id};
+    var replacements = {merchant_id : merchant_id, consumer_id : consumer_id};
 
     var query = 'select FavCoupons.coupon_id,Coupons.user_id as merchant_id,Coupons.coupon_type,Coupons.days,Coupons.start_time,Coupons.end_time,Coupons.expiry_date,' +
                 ' Coupons.flash_deal,Coupons.description,Coupons.restriction,Coupons.createdAt,Coupons.updatedAt,Coupons.coupon_code' + 
-                ' FROM FavCoupons LEFT JOIN Coupons ON FavCoupons.coupon_id=Coupons.id WHERE FavCoupons.is_fav=1 AND Coupons.user_id=:merchant_id';
+                ' FROM FavCoupons LEFT JOIN Coupons ON FavCoupons.coupon_id=Coupons.id WHERE FavCoupons.consumer_id=:consumer_id AND FavCoupons.is_fav=1 AND Coupons.user_id=:merchant_id';
                
 
     models.sequelize.query(query,
