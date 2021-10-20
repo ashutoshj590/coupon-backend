@@ -639,7 +639,6 @@ exports.getMerchantDetail = function(user_id, consumer_id){
     models.sequelize.query(query,
         { replacements: replacements, type: models.sequelize.QueryTypes.SELECT }
     ).then(function(result) {
-        console.log(result);
         var output = [];
         async.eachSeries(result,function(data,callback){ 
             getAllcouponByMerchantId(data.user_id, consumer_id).then(function(newData){
@@ -801,7 +800,7 @@ var communityCouponDetail = function(merchant_id){
 
 
 
-vat = getAllcouponByMerchantId = function(merchant_id, consumer_id){
+var getAllcouponByMerchantId = function(merchant_id, consumer_id){
     var deferred = Q.defer();
     var replacements = {merchant_id : merchant_id};
 

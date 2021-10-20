@@ -653,6 +653,8 @@ var findFavCoupons = exports.findFavCoupons = function(consumer_id,merchant_id,c
     models.FavCoupon.findOne({
         where: cond
     }).then(function (result) {
+        console.log("find one>>>>>>>>>");
+        console.log(result);
             deferred.resolve(result);
         },function (err) {
             deferred.reject(err);
@@ -1142,10 +1144,10 @@ var getAllFavCoupons = function(merchant_id){
     var deferred = Q.defer();
     var replacements = {merchant_id : merchant_id};
 
-    var query = 'select Coupons.id as coupon_id,Coupons.user_id as merchant_id,Coupons.coupon_type,Coupons.days,Coupons.start_time,Coupons.end_time,Coupons.expiry_date,' +
+    var query = 'select FavCoupons.coupon_id,Coupons.user_id as merchant_id,Coupons.coupon_type,Coupons.days,Coupons.start_time,Coupons.end_time,Coupons.expiry_date,' +
                 ' Coupons.flash_deal,Coupons.description,Coupons.restriction,Coupons.createdAt,Coupons.updatedAt,Coupons.coupon_code' + 
-                ' FROM Coupons LEFT JOIN FavCoupons ON FavCoupons.coupon_id=Coupons.id' +
-                ' WHERE FavCoupons.is_fav=1 AND FavCoupons.merchant_id=:merchant_id GROUP BY Coupons.id';
+                ' FROM FavCoupons LEFT JOIN Coupons ON FavCoupons.coupon_id=Coupons.id WHERE FavCoupons.is_fav=1 AND Coupons.user_id=:merchant_id';
+               
 
     models.sequelize.query(query,
         { replacements: replacements, type: models.sequelize.QueryTypes.SELECT }
