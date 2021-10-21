@@ -61,9 +61,10 @@ var updateCouponForMerchant = exports.updateCouponForMerchant = function(consume
     var deferred = Q.defer();
     if (coupon_type != "custom"){
         var subCateId = sub_cate_id
-     } 
+     }
+     findCouponById(coupon_id,user_id).then(function(getcoupon) {
+ if(getcoupon){
     models.Coupons.update({
-        user_id: user_id,
         sub_category_id: subCateId,
         coupon_type: coupon_type,
         days: days,
@@ -77,8 +78,8 @@ var updateCouponForMerchant = exports.updateCouponForMerchant = function(consume
         status: status 
      } ,  {
             where:{
-                id: coupon_id
-               // user_id: user_id
+                id: coupon_id,
+                user_id: user_id
             }
     }).then(function(couponUpdate) {
         if (coupon_type === "custom" && status != "reject") {
@@ -120,7 +121,7 @@ var updateCouponForMerchant = exports.updateCouponForMerchant = function(consume
                 })
             } else {
                 console.log("without notifications");
-                deferred.resolve(couponUsed);
+                deferred.resolve(couponUpdate);
             }
             },function(err){
                 deferred.reject(err)
@@ -129,6 +130,13 @@ var updateCouponForMerchant = exports.updateCouponForMerchant = function(consume
     },function(err){
         deferred.reject(err)
     });
+} else {
+    deferred.reject("Coupon not found!");
+ }
+          
+}, function(err){
+deferred.reject(err);
+}) 
     return deferred.promise;
 };
 
@@ -453,6 +461,25 @@ var findAcceptReq = function(consumer_id,merchant_id,request_id){
                 "request_id": request_id
         };
     models.AcceptRequest.findOne({
+        where: cond
+    }).then(function (result) {
+            deferred.resolve(result);
+        },function (err) {
+            deferred.reject(err);
+        }
+    );
+    return deferred.promise;
+};
+
+
+
+var findCouponById = function(coupon_id, user_id){
+    var deferred = Q.defer();
+    var cond={
+                "id": coupon_id,
+                "user_id": user_id
+        };
+    models.Coupons.findOne({
         where: cond
     }).then(function (result) {
             deferred.resolve(result);

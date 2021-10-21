@@ -10,6 +10,8 @@ var models = require('../models/index.js');
 var fileExtension = require('file-extension')
 var multer = require('multer');
 const { response } = require('express');
+const nodemailer = require('nodemailer');
+var emailConsts = require('../constants/emailConsts');
 
 var storage = multer.diskStorage({
     destination: function (req, file, cb) {
@@ -19,6 +21,16 @@ var storage = multer.diskStorage({
         cb(null, file.fieldname + '-' + Date.now() + '.' + fileExtension(file.originalname))
     }
 })
+
+let transporter = nodemailer.createTransport({
+    service: 'gmail',
+    auth: {
+        user: process.env.EMAIL,
+        pass: process.env.PASSWORD
+    }
+
+});
+
 
 
 
@@ -90,6 +102,13 @@ router.post('/register-merchant',[jsonParser, util.hasJsonParam(["user_id","addr
     userService.createMerchantDetail(req.body.user_id,req.body.address,req.body.city,req.body.state,req.body.zipcode,req.body.opening_time,req.body.closing_time,req.body.business_name,req.body.tagline,req.body.website,req.body.phone_no,req.body.business_license_no,req.body.description,req.body.sub_category_id,isEmail,req.body.lat,req.body.lang).then(function (detail) {
             var response = util.getResponseObject(consts.RESPONSE_SUCCESS);
             response.detail = detail;
+            transporter.sendMail(emailConsts.EMAIL__CONSTS.new_merchant, function(err, data) {
+                if(err){
+                    deferred.reject(err);
+                } else {
+                    deferred.resolve(data);
+                }
+            })
             res.send(response);
         }, function (err) {
             if(err.errors !== undefined && err.errors[0] !== undefined ){
@@ -113,6 +132,13 @@ router.post('/update-register-merchant', [jsonParser, util.hasJsonParam(["user_i
     }
     userService.updateMerchantDetail(req.body.user_id,req.body.address,req.body.city,req.body.state,req.body.zipcode,req.body.opening_time,req.body.closing_time,req.body.business_name,req.body.tagline,req.body.website,req.body.phone_no,req.body.business_license_no,req.body.description,req.body.sub_category_id,isEmail,req.body.lat,req.body.lang).then(function (detail) {
             var response = util.getResponseObject(consts.RESPONSE_SUCCESS);
+            transporter.sendMail(emailConsts.EMAIL__CONSTS.update_merchant, function(err, data) {
+                if(err){
+                    deferred.reject(err);
+                } else {
+                    deferred.resolve(data);
+                }
+            })
             res.send(response);
         }, function (err) {
             if(err.errors !== undefined && err.errors[0] !== undefined ){

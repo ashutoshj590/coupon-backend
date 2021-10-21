@@ -905,7 +905,7 @@ exports.saveOTPForUser = function(email){
                 var otpcode = Math.floor((Math.random()*10000)+1);
                
         let mailOptions = {
-            from: "bdappashu123@gmail.com",
+            from: "mycustomcoupon@gmail.com",
             to: email,
             subject: "Forgot password",
             text: "Your OTP is:- " + otpcode,
