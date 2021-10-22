@@ -203,7 +203,7 @@ exports.getAllcoupon = function(merchant_id){
     var querySet = ' AND Coupons.user_id=:merchant_id'
     }
      var query = 'select Coupons.*,GROUP_CONCAT(UploadImgs.image ORDER BY UploadImgs.image) AS images'+
-                ' FROM Coupons LEFT JOIN UploadImgs ON UploadImgs.coupon_id = Coupons.id where Coupons.is_deleted=0 GROUP BY Coupons.id' + querySet;
+                ' FROM Coupons LEFT JOIN UploadImgs ON UploadImgs.coupon_id = Coupons.id where Coupons.is_deleted=0 ' + querySet + 'GROUP BY Coupons.id';
 
     models.sequelize.query(query,
         { replacements: replacements, type: models.sequelize.QueryTypes.SELECT }
