@@ -202,30 +202,19 @@ exports.getAllcoupon = function(merchant_id){
     var replacements = {merchant_id : merchant_id};
     var querySet = ' AND Coupons.user_id=:merchant_id'
     }
-     var query = 'select * FROM Coupons where Coupons.is_deleted=0' + querySet;
+     var query = 'select Coupons.*,GROUP_CONCAT(UploadImgs.image ORDER BY UploadImgs.image) AS images'+
+                ' FROM Coupons LEFT JOIN UploadImgs ON UploadImgs.coupon_id = Coupons.id where Coupons.is_deleted=0 GROUP BY Coupons.id' + querySet;
 
     models.sequelize.query(query,
         { replacements: replacements, type: models.sequelize.QueryTypes.SELECT }
     ).then(function(allcoupons) {
-        var output = [];
-        async.eachSeries(allcoupons,function(data,callback){ 
-            getAllImgsMerchant(data.user_id).then(function(newData){
-                data.merchant_images = newData;
-                output.push(data);
-                callback();
-            }, function(err){
-               deferred.reject(err);
-            })
-   
-       }, function(err, detail) {
-             deferred.resolve(output);
-           
-       });
-        
-    });
-    return deferred.promise;
-};
+        deferred.resolve(allcoupons);
 
+    }
+);
+return deferred.promise;
+};
+      
 /*
 * Fuction define for get All custom coupons for consumer
 */
