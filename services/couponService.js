@@ -1429,7 +1429,7 @@ var getCouponDetail = exports.getCouponDetail = function(coupon_id){
     var deferred = Q.defer();
     var replacements = {coupon_id : coupon_id};
 
-    var query =  'SELECT Coupons.*,GROUP_CONCAT(UploadImgs.image ORDER BY UploadImgs.image) AS images FROM Coupons LEFT JOIN UploadImgs ON UploadImgs.coupon_id=Coupons.id where Coupons.id=:coupon_id';
+    var query =  'SELECT Coupons.*,GROUP_CONCAT(UploadImgs.image ORDER BY UploadImgs.image) AS images FROM Coupons LEFT JOIN UploadImgs ON UploadImgs.coupon_id=Coupons.id where Coupons.id=:coupon_id AND Coupons.flash_deal=1';
 
     models.sequelize.query(query,
         { replacements: replacements, type: models.sequelize.QueryTypes.SELECT }

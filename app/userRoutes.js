@@ -104,9 +104,9 @@ router.post('/register-merchant',[jsonParser, util.hasJsonParam(["user_id","addr
             response.detail = detail;
             transporter.sendMail(emailConsts.EMAIL__CONSTS.new_merchant, function(err, data) {
                 if(err){
-                    deferred.reject(err);
+                   console.log(err);
                 } else {
-                    deferred.resolve(data);
+                    console.log(data);
                 }
             })
             res.send(response);
@@ -134,9 +134,9 @@ router.post('/update-register-merchant', [jsonParser, util.hasJsonParam(["user_i
             var response = util.getResponseObject(consts.RESPONSE_SUCCESS);
             transporter.sendMail(emailConsts.EMAIL__CONSTS.update_merchant, function(err, data) {
                 if(err){
-                    deferred.reject(err);
+                    console.log(err);
                 } else {
-                    deferred.resolve(data);
+                    console.log(data);
                 }
             })
             res.send(response);
@@ -155,7 +155,14 @@ router.post('/update-register-merchant', [jsonParser, util.hasJsonParam(["user_i
 
 /* API for  upload images for merchant registration.............*/
 router.post('/uplaod-image',upload.array('images', 5), function (req, res) {
-            userService.uploadImageToDatabase(req.body.user_id, req.files, req.body.is_flash_deal, req.body.coupon_id).then(function (result) {
+    if(req.body.coupon_id){
+        var userId = null;
+       req.body.is_flash_deal = 1;
+    } else {
+        var userId = req.body.user_id;
+        req.body.is_flash_deal = 0;
+    }
+            userService.uploadImageToDatabase(userId, req.files, req.body.is_flash_deal, req.body.coupon_id).then(function (result) {
             var response = util.getResponseObject(consts.RESPONSE_SUCCESS);
             userService.getAllImages(req.body.user_id).then(function(data){
                 response.imageData = data;
@@ -299,6 +306,13 @@ router.post('/delete-consumer',[jsonParser,util.hasJsonParam(["user_id"])], func
 router.post('/give-feedback',[jsonParser,util.hasJsonParam(["user_id","feedback"])], function (req, res) { 
     userService.addUserFeedback(req.body.user_id,req.body.feedback).then(function (feedback) {
                 var response = util.getResponseObject(consts.RESPONSE_SUCCESS);
+                transporter.sendMail(emailConsts.EMAIL__CONSTS.give_feedback, function(err, data) {
+                    if(err){
+                        console.log(err);
+                    } else {
+                        console.log(data);
+                    }
+                })
                 res.send(response);
             }, function (err) {
                 if(err.errors !== undefined && err.errors[0] !== undefined ){

@@ -10,6 +10,12 @@ exports.EMAIL__CONSTS = {
         to: "mycustomcoupon@gmail.com",
         subject: "Update Merhant",
         text: "Merchant Update Detail Successfully!"
+    },
+    give_feedback : {
+        from: "mycustomcoupon@gmail.com",
+        to: "mycustomcoupon@gmail.com",
+        subject: "User Feedback!",
+        text: "Merchant give feedback Successfully!"
     }
  
 }
