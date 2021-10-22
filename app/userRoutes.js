@@ -277,13 +277,14 @@ router.post('/delete-consumer',[jsonParser,util.hasJsonParam(["user_id"])], func
                    if(response.merchant_detail.notification_email === null){
                        response.merchant_detail.notification_email = false;
                    }
-                   userService.getAllImages(req.body.user_id).then(function(data){
+                   res.send(response);
+
+                  /* userService.getAllImages(req.body.user_id).then(function(data){
                     response.merchant_detail.imageData = data;
-                    res.send(response);
                 }, function(err){
                     var response = util.getResponseObject(consts.RESPONSE_ERROR, err);
                     res.send(response);
-                }); 
+                });  */
                 }, function (err) {
                     if(err.errors !== undefined && err.errors[0] !== undefined ){
                         var response = util.getResponseObject(consts.RESPONSE_ERROR, err.response);

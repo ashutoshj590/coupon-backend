@@ -641,10 +641,15 @@ exports.getMerchantDetail = function(user_id, consumer_id){
     ).then(function(result) {
         var output = [];
         async.eachSeries(result,function(data,callback){ 
-            getAllcouponByMerchantId(data.user_id, consumer_id).then(function(newData){
+            getAllImages(user_id).then(function(merchImgs){
+                couponService.getAllcouponByUserId(data.user_id, consumer_id).then(function(newData){
+                data.imageData = merchImgs;
                 data.couponDetail = newData;
                 output.push(data);
                 callback();
+        }, function(err){
+            deferred.reject(err);
+         })
         }, function(err){
             deferred.reject(err);
          })
