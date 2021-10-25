@@ -1075,6 +1075,10 @@ exports.getAllMerchant = function(){
     ).then(function(merchants) {
         var output = [];
         async.eachSeries(merchants,function(data,callback){
+            if(data.lat || data.lang == null){
+                data.lat = 0;
+                data.lang = 0;
+            }
             axios.get('https://maps.googleapis.com/maps/api/geocode/json?latlng='+data.lat+','+data.lang+'&sensor=true&key='+key)
   .then(function (response) {    
       if (response.data.results[0] != null || undefined ){     
@@ -1129,6 +1133,10 @@ exports.getAllConsumer = function(){ //axios
     ).then(function(dataConsumer) {
         var output = [];
         async.eachSeries(dataConsumer,function(data,callback){
+            if(data.lat || data.lang == null){
+                data.lat = 0;
+                data.lang = 0;
+            }
             axios.get('https://maps.googleapis.com/maps/api/geocode/json?latlng='+data.lat+','+data.lang+'&sensor=true&key='+key)
   .then(function (response) {    
       if (response.data.results[0] != null || undefined ){     
