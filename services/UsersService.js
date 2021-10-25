@@ -31,10 +31,6 @@ module.exports.createNewUser = (user) => {
     user.type = "consumer";
     user.is_registered = 0;
     user.status = 0;
-    if (user.lat || user.lang == null){
-    user.lat = "00.000000";
-    user.lang = "00.000000";
-    }
     return userDOA.findUserByEmail(email)
         .then((foundUser) => {
             if (foundUser == null || foundUser == undefined) {

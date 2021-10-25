@@ -14,8 +14,7 @@ const { response } = require('express');
 /* API funcation for crearte new user sign up..................*/
 
 router.post('/sign-up', [util.hasJsonParam(["email", "password", "device_type"])], function (req, res) {
-    var userObject = req.body;
-    userService.createNewUser(userObject, req).then(function (response) {
+    userService.createNewUser(req.body.email, req.body.password, req.body.device_type, req.body.lat, req.body.lang).then(function (response) {
         var response = util.getResponseObject(consts.RESPONSE_SUCCESS);
         res.send(response);
     }, function (err) {
