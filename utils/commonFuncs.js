@@ -1,5 +1,4 @@
 let bcrypt = require('bcrypt');
-let salt = "ashuRTHJ23jkl";
 module.exports.encrypt = function (password) {
     return new Promise((resolve, reject) => {
         bcrypt.hash(password, salt).then(function (hash) {
