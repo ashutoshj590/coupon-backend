@@ -1,7 +1,7 @@
 let bcrypt = require('bcrypt');
 module.exports.encrypt = function (password) {
     return new Promise((resolve, reject) => {
-        bcrypt.hash(password, salt).then(function (hash) {
+        bcrypt.hash(password, 10).then(function (hash) {
             resolve(hash);
         });
     });
