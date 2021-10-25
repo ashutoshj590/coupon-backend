@@ -90,12 +90,12 @@ router.get('/logout', jsonParser, function (req, res) {
 
 router.post('/register-merchant',[jsonParser, util.hasJsonParam(["user_id","address","city","state","zipcode","opening_time","closing_time","business_name","tagline","website","phone_no","business_license_no","description","sub_category_id"])], function (req, res) {
     var isEmail;
-    if(req.body.notification_email === null){ 
+    if(req.body.notification_email == null){ 
         isEmail = false;
     } else {
         isEmail = req.body.notification_email;
     }
-    if (req.body.lat === null && req.body.lang === null){
+    if (req.body.lat || req.body.lang == null){
         req.body.lat = "00.000000";
         req.body.lang = "00.000000";
     }
