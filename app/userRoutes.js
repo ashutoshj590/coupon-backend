@@ -88,7 +88,7 @@ router.get('/logout', jsonParser, function (req, res) {
 
 
 
-router.post('/register-merchant',[jsonParser, util.hasJsonParam(["user_id","address","city","state","zipcode","opening_time","closing_time","tagline","website","phone_no","business_license_no","description","sub_category_id"])], function (req, res) {
+router.post('/register-merchant',[jsonParser, util.hasJsonParam(["user_id","address","city","state","zipcode","opening_time","closing_time","business_name","tagline","website","phone_no","description","sub_category_id"])], function (req, res) {
     var isEmail;
     if(req.body.notification_email == null){ 
         isEmail = false;
