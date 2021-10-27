@@ -149,6 +149,8 @@ exports.getAllcategoryData = function(lat, lang, consumer_id, merchant_id){
              //   console.log(unique);
                for (var i = 0; i < unique.length; i++) {
                 countsForMerchant(unique[i], lat, lang, consumer_id).then(function(counts){
+                    console.log("check counts >>>>>>>>.");
+                    console.log(counts);
                    data.coupon_count = counts.length;
                     output.push(data);
                     callback();
