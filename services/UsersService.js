@@ -28,6 +28,7 @@ var notificationConsts = require('../constants/notificationConsts');
 module.exports.createNewUser = (user) => {
     let { User } = models;
     let { email, password } = user;
+    
     user.type = "consumer";
     user.is_registered = 0;
     user.status = 0;

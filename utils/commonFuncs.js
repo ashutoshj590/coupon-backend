@@ -1,12 +1,16 @@
-let bcrypt = require('bcrypt');
+var bcrypt = require('bcryptjs');
+
 module.exports.encrypt = function (password) {
     return new Promise((resolve, reject) => {
-      //  bcrypt.hash(password, 10).then(function (hash) {
-        bcrypt.hash(password, salt , (err, hash) => {
-            resolve(hash);
+        bcrypt.genSalt(10, function(err, salt) {
+            bcrypt.hash(password, salt, function(err, hash) {
+                resolve(hash);
+            });
         });
     });
 };
+
+
 
 module.exports.compare = function (str, compareStr) {
     return new Promise((resolve, reject) => {
