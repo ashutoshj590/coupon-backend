@@ -142,6 +142,12 @@ router.post('/change-password', [jsonParser, util.hasJsonParam(["email","new_pas
 
 router.post('/google-login', [util.hasJsonParam(["device_type","login_type","google_id"])], function (req, res) { 
     var userObject = req.body;
+    if (userObject.lat == null || undefined){
+        userObject.lat = "00.000000";
+     }
+     if (userObject.lang == null || undefined){
+         userObject.lang =  "00.000000";
+     }
     userService.googleLogin(userObject).then(function (data) {
       var response = util.getResponseObject(consts.RESPONSE_SUCCESS);
       jwt.sign({userObject}, 'secretkey', { expiresIn: '1d'}, (err, token) => {
@@ -174,6 +180,12 @@ router.post('/google-login', [util.hasJsonParam(["device_type","login_type","goo
 
 router.post('/facebook-login', [util.hasJsonParam(["device_type","login_type","fb_id"])], function (req, res) { 
     var userObject = req.body;
+    if (userObject.lat == null || undefined){
+        userObject.lat = "00.000000";
+     }
+     if (userObject.lang == null || undefined){
+         userObject.lang =  "00.000000";
+     }
     userService.facebookLogin(userObject).then(function (data) {
       var response = util.getResponseObject(consts.RESPONSE_SUCCESS);
       jwt.sign({userObject}, 'secretkey', { expiresIn: '1d'}, (err, token) => {
