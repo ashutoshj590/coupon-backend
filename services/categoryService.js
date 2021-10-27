@@ -133,21 +133,32 @@ exports.getAllcategoryData = function(lat, lang, consumer_id, merchant_id){
                 ' category_name from SubCategories LEFT JOIN Categories on SubCategories.category_id=Categories.id LEFT JOIN UserSubCateMaps' +
                 ' ON SubCategories.id=UserSubCateMaps.sub_category_id where SubCategories.is_deleted=0 AND SubCategories.status=1 AND UserSubCateMaps.user_id=:merchant_id';
     }
-
-   
-               
+             
     models.sequelize.query(query,
         { replacements: replacements, type: models.sequelize.QueryTypes.SELECT }
         ).then(function(result) {
             var output = [];
+            var merchantIds = [];
             async.eachSeries(result,function(data,callback){ 
-                countsForMerchant(data.id, lat, lang, consumer_id).then(function(counts){
+                firstGetMerchantForCounts(data.id).then(function(ids){
+                ids.forEach(function(obj, index) {
+                 merchantIds.push(obj.user_id);
+                })
+              //  console.log(merchantIds);
+                var unique = merchantIds.filter(onlyUnique);
+             //   console.log(unique);
+               for (var i = 0; i < unique.length; i++) {
+                countsForMerchant(unique[i], lat, lang, consumer_id).then(function(counts){
                    data.coupon_count = counts.length;
                     output.push(data);
                     callback();
                 }, function(err){
                    deferred.reject(err);
                 })
+            }
+            }, function(err){
+                deferred.reject(err);
+             })
             
        
            }, function(err, detail) {
@@ -162,21 +173,47 @@ exports.getAllcategoryData = function(lat, lang, consumer_id, merchant_id){
 
 
 
-var countsForMerchant = function(sub_category_id, lat1, lon1, consumer_id){
+    function onlyUnique(value, index, self) {
+        return self.indexOf(value) === index;
+      }
+      
+
+
+    var firstGetMerchantForCounts = function(sub_category_id){
+        var deferred = Q.defer();
+        var replacements = {sub_category_id : sub_category_id }
+        var query = 'SELECT Registrations.*, MAX(UserSubCateMaps.createdAt) as sub_cat_created ' +
+                'FROM UserSubCateMaps LEFT JOIN Registrations ON Registrations.user_id = UserSubCateMaps.user_id ' +
+                 'WHERE Registrations.status=1 AND UserSubCateMaps.sub_category_id=:sub_category_id GROUP BY Registrations.user_id';
+    
+        models.sequelize.query(query,
+            { replacements: replacements, type: models.sequelize.QueryTypes.SELECT }
+        ).then(function(ids) {
+            deferred.resolve(ids);
+    
+            }
+        );
+        return deferred.promise;
+    };
+    
+
+
+
+var countsForMerchant = function(merchant_id, lat1, lon1, consumer_id){
     var deferred = Q.defer();
     var consumerId = consumer_id;
     if(consumerId == null || undefined){
-        var replacements = {sub_category_id : sub_category_id};
+        var replacements = {merchant_id : merchant_id};
         var queryset = ''
     } else {
-      var replacements = {sub_category_id : sub_category_id, consumer_id : consumer_id};
+      var replacements = {merchant_id : merchant_id, consumer_id : consumer_id};
       var queryset =  ' and NOT EXISTS ( SELECT * FROM UsedCoupons WHERE Coupons.coupon_code=UsedCoupons.coupon_code AND UsedCoupons.consumer_id=:consumer_id )' +
                       ' and NOT EXISTS ( SELECT * FROM BlockMerchants WHERE BlockMerchants.is_blocked=1 AND BlockMerchants.consumer_id=:consumer_id )';
 
     }
 
-      var query = 'select Coupons.*,UserSubCateMaps.user_id,UserSubCateMaps.lat,UserSubCateMaps.lang from Coupons LEFT JOIN UserSubCateMaps' + 
-                  ' on Coupons.user_id=UserSubCateMaps.user_id where UserSubCateMaps.sub_category_id=:sub_category_id and Coupons.is_deleted=0 and NOT Coupons.coupon_type="custom" and STR_TO_DATE(Coupons.expiry_date,"%d%M%Y %h%i") >= current_date()' +
+      var query = 'select Coupons.* from Coupons where Coupons.user_id=:merchant_id and Coupons.is_deleted=0'+
+                  ' and NOT Coupons.coupon_type="custom" and STR_TO_DATE(Coupons.expiry_date,"%d%M%Y %h%i") >= current_date()' + 
                     queryset;
       
     models.sequelize.query(query,

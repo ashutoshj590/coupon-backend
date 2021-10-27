@@ -669,9 +669,6 @@ var findFavCoupons = exports.findFavCoupons = function(consumer_id,merchant_id,c
     models.FavCoupon.findOne({
         where: cond
     }).then(function (result) {
-        console.log("find one>>>>>>>>>");
-        console.log("8....");
-        console.log(result);
             deferred.resolve(result);
         },function (err) {
             deferred.reject(err);
