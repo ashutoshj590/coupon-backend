@@ -139,45 +139,24 @@ exports.getAllcategoryData = function(lat, lang, consumer_id, merchant_id){
         { replacements: replacements, type: models.sequelize.QueryTypes.SELECT }
         ).then(function(result) {
             var output = [];
-            var merchantIds = [];
-            var obj = [];
             async.eachSeries(result,function(data,callback){ 
-                firstGetMerchantForCounts(data.id, lat, lang).then(function(ids){
-                ids.forEach(function(obj, index) {
-                console.log(obj.user_id);
-                 merchantIds.push(obj.user_id);
-                })
-               //console.log(merchantIds);
-                var unique = merchantIds.filter(onlyUnique);
-               //console.log(unique);
-               const iterator = unique.values();
-               for (const value of iterator) {
-                console.log(value);
-                countsForMerchant(value, consumer_id).then(function(counts){
-                    obj.push(counts);
-                   data.coupon_count = obj[0].length;
+                countsForMerchant(data.id, consumer_id, lat, lang).then(function(allCoupons){
+                    data.coupon_count = allCoupons.length;
                     output.push(data);
                     callback();
-                }, function(err){
-                   deferred.reject(err);
-                })
-            }
-           
-           
             }, function(err){
                 deferred.reject(err);
              })
             
+             
+        }, function(err, detail) {
+            deferred.resolve(output);
+          
+      });
        
-           }, function(err, detail) {
-                 deferred.resolve(output);
-               
-           });
-        
-            
-        });
-        return deferred.promise;
-    };
+   });
+   return deferred.promise;
+};
 
 
 
@@ -187,25 +166,36 @@ exports.getAllcategoryData = function(lat, lang, consumer_id, merchant_id){
       
 
 
-    var firstGetMerchantForCounts = function(sub_category_id, lat1, lon1){ //lat1, lon1
-        var deferred = Q.defer();
-        var replacements = {sub_category_id : sub_category_id }
-        var query = 'SELECT Registrations.*, MAX(UserSubCateMaps.createdAt) as sub_cat_created ' +
-                'FROM UserSubCateMaps LEFT JOIN Registrations ON Registrations.user_id = UserSubCateMaps.user_id ' +
-                 'WHERE Registrations.status=1 AND UserSubCateMaps.sub_category_id=:sub_category_id GROUP BY Registrations.user_id';
-    
-        models.sequelize.query(query,
-            { replacements: replacements, type: models.sequelize.QueryTypes.SELECT }
-        ).then(function(ids) {
-          /*  deferred.resolve(ids);
-    
-        }
-    );
-    return deferred.promise;
-    }; */
-           
-           var output = [];
-        ids.forEach(function(obj, index) {
+
+
+
+
+var countsForMerchant = function(sub_category_id, consumer_id, lat1, lon1){
+    var deferred = Q.defer();
+    var consumerId = consumer_id;
+    if(consumerId == null || undefined){
+        var replacements = {sub_category_id : sub_category_id};
+        var queryset = ''
+    } else {
+      var replacements = {sub_category_id : merchant_id, consumer_id : consumer_id};
+      var queryset =  ' and NOT EXISTS ( SELECT * FROM UsedCoupons WHERE Coupons.coupon_code=UsedCoupons.coupon_code AND UsedCoupons.consumer_id=:consumer_id )' +
+                      ' and NOT EXISTS ( SELECT * FROM BlockMerchants WHERE BlockMerchants.is_blocked=1 AND BlockMerchants.consumer_id=:consumer_id )';
+
+    }
+
+      var query = 'select UserSubcateMaps.user_id as merchant_id,Coupons.id as coupon_id,UserSubCateMaps.lat,UserSubCateMaps.lang FROM UserSubCateMaps LEFT JOIN Coupons'+ 
+                    ' ON Coupons.user_id=UserSubCateMaps.user_id where UserSubCateMaps.sub_category_id=:sub_category_id and Coupons.is_deleted=0'+ 
+                    ' and NOT Coupons.coupon_type="custom" and STR_TO_DATE(Coupons.expiry_date,"%d%M%Y %h%i") >= current_date()'+
+                     queryset + ' GROUP BY Coupons.id';
+
+
+
+      
+    models.sequelize.query(query,
+        { replacements: replacements, type: models.sequelize.QueryTypes.SELECT }
+    ).then(function(data) {
+        var output = [];
+        data.forEach(function(obj, index) {
             var unit =  "M";       //commented when value need in miles
             var data = couponService.calculatedistance(lat1, lon1, obj.lat, obj.lang, unit);
            // obj.distance = data;
@@ -221,37 +211,6 @@ exports.getAllcategoryData = function(lat, lang, consumer_id, merchant_id){
          
 
  };
-    
-
-
-
-var countsForMerchant = function(merchant_id, consumer_id){
-    var deferred = Q.defer();
-    var consumerId = consumer_id;
-    if(consumerId == null || undefined){
-        var replacements = {merchant_id : merchant_id};
-        var queryset = ''
-    } else {
-      var replacements = {merchant_id : merchant_id, consumer_id : consumer_id};
-      var queryset =  ' and NOT EXISTS ( SELECT * FROM UsedCoupons WHERE Coupons.coupon_code=UsedCoupons.coupon_code AND UsedCoupons.consumer_id=:consumer_id )' +
-                      ' and NOT EXISTS ( SELECT * FROM BlockMerchants WHERE BlockMerchants.is_blocked=1 AND BlockMerchants.consumer_id=:consumer_id )';
-
-    }
-
-      var query = 'select Coupons.* from Coupons where Coupons.user_id=:merchant_id and Coupons.is_deleted=0'+
-                  ' and NOT Coupons.coupon_type="custom" and STR_TO_DATE(Coupons.expiry_date,"%d%M%Y %h%i") >= current_date()' + 
-                    queryset;
-      
-    models.sequelize.query(query,
-        { replacements: replacements, type: models.sequelize.QueryTypes.SELECT }
-    ).then(function(data) {
-        deferred.resolve(data);
-    
-    }
-);
-return deferred.promise;
-};
-       
 
 
 
