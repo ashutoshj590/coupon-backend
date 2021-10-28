@@ -5,6 +5,7 @@ var async = require('async');
 var couponService = require('./couponService');
 var notificationConsts = require('../constants/notificationConsts');
 var admin = require("firebase-admin");
+const { compareSync } = require('bcryptjs');
 
 
 /*
@@ -139,25 +140,30 @@ exports.getAllcategoryData = function(lat, lang, consumer_id, merchant_id){
         ).then(function(result) {
             var output = [];
             var merchantIds = [];
+            var obj = [];
             async.eachSeries(result,function(data,callback){ 
-                firstGetMerchantForCounts(data.id).then(function(ids){
+                firstGetMerchantForCounts(data.id, lat, lang).then(function(ids){
                 ids.forEach(function(obj, index) {
+                console.log(obj.user_id);
                  merchantIds.push(obj.user_id);
                 })
-              //  console.log(merchantIds);
+               //console.log(merchantIds);
                 var unique = merchantIds.filter(onlyUnique);
-             //   console.log(unique);
-               for (var i = 0; i < unique.length; i++) {
-                countsForMerchant(unique[i], lat, lang, consumer_id).then(function(counts){
-                    console.log("check counts >>>>>>>>.");
-                    console.log(counts);
-                   data.coupon_count = counts.length;
+               //console.log(unique);
+               const iterator = unique.values();
+               for (const value of iterator) {
+                console.log(value);
+                countsForMerchant(value, consumer_id).then(function(counts){
+                    obj.push(counts);
+                   data.coupon_count = obj[0].length;
                     output.push(data);
                     callback();
                 }, function(err){
                    deferred.reject(err);
                 })
             }
+           
+           
             }, function(err){
                 deferred.reject(err);
              })
@@ -181,7 +187,7 @@ exports.getAllcategoryData = function(lat, lang, consumer_id, merchant_id){
       
 
 
-    var firstGetMerchantForCounts = function(sub_category_id){
+    var firstGetMerchantForCounts = function(sub_category_id, lat1, lon1){ //lat1, lon1
         var deferred = Q.defer();
         var replacements = {sub_category_id : sub_category_id }
         var query = 'SELECT Registrations.*, MAX(UserSubCateMaps.createdAt) as sub_cat_created ' +
@@ -191,17 +197,35 @@ exports.getAllcategoryData = function(lat, lang, consumer_id, merchant_id){
         models.sequelize.query(query,
             { replacements: replacements, type: models.sequelize.QueryTypes.SELECT }
         ).then(function(ids) {
-            deferred.resolve(ids);
+          /*  deferred.resolve(ids);
     
+        }
+    );
+    return deferred.promise;
+    }; */
+           
+           var output = [];
+        ids.forEach(function(obj, index) {
+            var unit =  "M";       //commented when value need in miles
+            var data = couponService.calculatedistance(lat1, lon1, obj.lat, obj.lang, unit);
+           // obj.distance = data;
+            if (data <= 10){ 
+            output.push(obj);
             }
+        })
+          deferred.resolve(output);
+       
+    }
         );
         return deferred.promise;
-    };
+         
+
+ };
     
 
 
 
-var countsForMerchant = function(merchant_id, lat1, lon1, consumer_id){
+var countsForMerchant = function(merchant_id, consumer_id){
     var deferred = Q.defer();
     var consumerId = consumer_id;
     if(consumerId == null || undefined){
@@ -221,23 +245,13 @@ var countsForMerchant = function(merchant_id, lat1, lon1, consumer_id){
     models.sequelize.query(query,
         { replacements: replacements, type: models.sequelize.QueryTypes.SELECT }
     ).then(function(data) {
-        var output = [];
-        data.forEach(function(obj, index) {
-            var unit =  "M";       //commented when value need in miles
-            var data = couponService.calculatedistance(lat1, lon1, obj.lat, obj.lang, unit);
-           // obj.distance = data;
-            if (data <= 10){ 
-            output.push(obj);
-            }
-        })
-          deferred.resolve(output);
-       
+        deferred.resolve(data);
+    
     }
-        );
-        return deferred.promise;
-         
-
- };
+);
+return deferred.promise;
+};
+       
 
 
 
