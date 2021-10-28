@@ -183,10 +183,10 @@ var countsForMerchant = function(sub_category_id, consumer_id, lat1, lon1){
 
     }
 
-      var query = 'select UserSubCateMaps.user_id as merchant_id,Coupons.id as coupon_id,UserSubCateMaps.lat,UserSubCateMaps.lang FROM UserSubCateMaps LEFT JOIN Coupons'+ 
+      var query = 'select UserSubCateMaps.user_id as merchant_id,UserSubCateMaps.sub_Category_id,Coupons.id as coupon_id,UserSubCateMaps.lat,UserSubCateMaps.lang FROM UserSubCateMaps LEFT JOIN Coupons'+ 
                     ' ON Coupons.user_id=UserSubCateMaps.user_id where UserSubCateMaps.sub_category_id=:sub_category_id and Coupons.is_deleted=0'+ 
                     ' and NOT Coupons.coupon_type="custom" and STR_TO_DATE(Coupons.expiry_date,"%d%M%Y %h%i") >= current_date()'+
-                     queryset;
+                     queryset + ' GROUP BY UserSubCateMaps.sub_Category_id';
 
 
 
