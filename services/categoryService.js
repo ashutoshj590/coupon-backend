@@ -141,6 +141,8 @@ exports.getAllcategoryData = function(lat, lang, consumer_id, merchant_id){
             var output = [];
             async.eachSeries(result,function(data,callback){ 
                 countsForMerchant(data.id, consumer_id, lat, lang).then(function(allCoupons){
+                    console.log("/////////////");
+                    console.log(allCoupons);
                     data.coupon_count = allCoupons.length;
                     output.push(data);
                     callback();
@@ -182,11 +184,9 @@ var countsForMerchant = function(sub_category_id, consumer_id, lat1, lon1){
                       ' and NOT EXISTS ( SELECT * FROM BlockMerchants WHERE BlockMerchants.is_blocked=1 AND BlockMerchants.consumer_id=:consumer_id )';
 
     }
-
-      var query = 'select Coupons.id,UserSubCateMaps.user_id,UserSubCateMaps.lat,UserSubCateMaps.lang From Coupons LEFT JOIN UserSubCateMaps ON'+ 
-                    ' Coupons.user_id=UserSubCateMaps.user_id where UserSubCateMaps.sub_category_id=:sub_category_id and Coupons.is_deleted=0'+ 
+var query =        'select Coupons.*,Registrations.lat,Registrations.lang from Coupons LEFT JOIN Registrations ON Registrations.user_id=Coupons.user_id WHERE Coupons.sub_category_id=:sub_category_id and Coupons.is_deleted=0'+ 
                     ' and NOT Coupons.coupon_type="custom" and STR_TO_DATE(Coupons.expiry_date,"%d%M%Y %h%i") >= current_date()'+
-                     queryset + ' GROUP BY UserSubCateMaps.sub_category_id';
+                     queryset;
 
 
 
