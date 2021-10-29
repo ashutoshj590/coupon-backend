@@ -705,7 +705,7 @@ var getAllcouponByUserId = exports.getAllcouponByUserId = function(merchant_id, 
         var subCate = sub_category_id.split(",");
     
     }
-    var replacements = {merchant_id : merchant_id, consumer_id : consumer_id, sub_category_id : subCate};
+    var replacements = {merchant_id : merchant_id, consumer_id : consumer_id, subCate : subCate};
 
     var query = 'SELECT Coupons.id as coupon_id,Coupons.user_id as merchant_id,Coupons.coupon_type,Coupons.days,Coupons.start_time,Coupons.end_time,' +
                 'Coupons.expiry_date,Coupons.flash_deal,Coupons.description,Coupons.restriction,Coupons.coupon_code,Coupons.sub_category_id,GROUP_CONCAT(UploadImgs.image ORDER BY UploadImgs.image) AS images'+ 
