@@ -704,7 +704,10 @@ var getAllcouponByUserId = exports.getAllcouponByUserId = function(merchant_id, 
     if(sub_category_id != null || undefined){
         var subCate = sub_category_id.split(",");
     
+    } else {
+        var subCate = null 
     }
+
     var replacements = {merchant_id : merchant_id, consumer_id : consumer_id, subCate : subCate};
 
     var query = 'SELECT Coupons.id as coupon_id,Coupons.user_id as merchant_id,Coupons.coupon_type,Coupons.days,Coupons.start_time,Coupons.end_time,' +
