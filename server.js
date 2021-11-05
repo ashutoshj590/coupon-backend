@@ -120,13 +120,13 @@ app.use("/coupon", require('./app/couponRoutes.js'));
 var sslSever = https.createServer(
    {
        key: fs.readFileSync(path.join(__dirname, 'certs', 'mccpapp-new.key')),
-       cert: fs.readFileSync(path.join(__dirname, 'certs', '565f05f6e26cad.crt')),
+       cert: fs.readFileSync(path.join(__dirname, 'certs', '7dfdcf766bdb260a.crt')),
        ca: fs.readFileSync(path.join(__dirname, 'certs', 'gd_bundle-g2-g1.crt'))
    } ,
    app
 )
 
-sslSever.listen(8080, () => console.log("Secure server on port 8080"))
+sslSever.listen(8080, () => console.log("Secure server on port 8080")) 
 
 
 
