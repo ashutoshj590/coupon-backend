@@ -703,9 +703,11 @@ var getAllcouponByUserId = exports.getAllcouponByUserId = function(merchant_id, 
     var deferred = Q.defer();
     if(sub_category_id != null || undefined){
         var subCate = sub_category_id.split(",");
+        var querySet = ' AND Coupons.sub_category_id IN (:subCate)'
     
     } else {
-        var subCate = null 
+        var subCate = null
+        var querySet = '' 
     }
 
     var replacements = {merchant_id : merchant_id, consumer_id : consumer_id, subCate : subCate};
@@ -714,7 +716,7 @@ var getAllcouponByUserId = exports.getAllcouponByUserId = function(merchant_id, 
                 'Coupons.expiry_date,Coupons.flash_deal,Coupons.description,Coupons.restriction,Coupons.coupon_code,Coupons.sub_category_id,GROUP_CONCAT(UploadImgs.image ORDER BY UploadImgs.image) AS images'+ 
                 ' FROM Coupons LEFT JOIN UploadImgs ON UploadImgs.coupon_id = Coupons.id WHERE NOT EXISTS' +
                 ' ( SELECT * FROM UsedCoupons WHERE Coupons.coupon_code=UsedCoupons.coupon_code AND' +
-                ' UsedCoupons.consumer_id=:consumer_id ) AND NOT EXISTS ( SELECT * FROM BlockMerchants WHERE Coupons.id=BlockMerchants.coupon_id AND BlockMerchants.consumer_id=:consumer_id ) AND Coupons.sub_category_id IN (:subCate) AND Coupons.user_id=:merchant_id AND NOT Coupons.coupon_type="custom" AND STR_TO_DATE(Coupons.expiry_date,"%d%M%Y %h%i") >= current_date() AND Coupons.is_deleted=0 GROUP BY Coupons.id';
+                ' UsedCoupons.consumer_id=:consumer_id ) AND NOT EXISTS ( SELECT * FROM BlockMerchants WHERE Coupons.id=BlockMerchants.coupon_id AND BlockMerchants.consumer_id=:consumer_id )'+querySet+' AND Coupons.user_id=:merchant_id AND NOT Coupons.coupon_type="custom" AND STR_TO_DATE(Coupons.expiry_date,"%d%M%Y %h%i") >= current_date() AND Coupons.is_deleted=0 GROUP BY Coupons.id';
 
     models.sequelize.query(query,
         { replacements: replacements, type: models.sequelize.QueryTypes.SELECT }

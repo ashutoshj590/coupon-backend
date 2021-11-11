@@ -641,7 +641,7 @@ exports.getMerchantDetail = function(user_id, consumer_id){
         var output = [];
         async.eachSeries(result,function(data,callback){ 
             getAllImages(user_id).then(function(merchImgs){
-                couponService.getAllcouponByUserId(data.user_id, consumer_id).then(function(newData){
+                couponService.getAllcouponByUserId(user_id, consumer_id, null).then(function(newData){
                 data.imageData = merchImgs;
                 data.couponDetail = newData;
                 output.push(data);
