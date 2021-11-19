@@ -711,7 +711,7 @@ var getAllcouponByUserId = exports.getAllcouponByUserId = function(merchant_id, 
     }
 
     if (consumer_id != null || undefined){
-        var querySet1 = ' NOT EXISTS ( SELECT * FROM UsedCoupons WHERE Coupons.coupon_code=UsedCoupons.coupon_code AND UsedCoupons.consumer_id=:consumer_id ) AND NOT EXISTS ( SELECT * FROM BlockMerchants WHERE Coupons.id=BlockMerchants.coupon_id AND BlockMerchants.consumer_id=:consumer_id )'
+        var querySet1 = 'NOT EXISTS ( SELECT * FROM UsedCoupons WHERE Coupons.coupon_code=UsedCoupons.coupon_code AND UsedCoupons.consumer_id=:consumer_id ) AND NOT EXISTS ( SELECT * FROM BlockMerchants WHERE Coupons.id=BlockMerchants.coupon_id AND BlockMerchants.consumer_id=:consumer_id )'
     }
     else {
         var querySet1 = '' 
