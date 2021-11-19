@@ -710,13 +710,19 @@ var getAllcouponByUserId = exports.getAllcouponByUserId = function(merchant_id, 
         var querySet = '' 
     }
 
+    if (consumer_id != null || undefined){
+        var querySet1 = ' NOT EXISTS ( SELECT * FROM UsedCoupons WHERE Coupons.coupon_code=UsedCoupons.coupon_code AND UsedCoupons.consumer_id=:consumer_id ) AND NOT EXISTS ( SELECT * FROM BlockMerchants WHERE Coupons.id=BlockMerchants.coupon_id AND BlockMerchants.consumer_id=:consumer_id )'
+    }
+    else {
+        var querySet1 = '' 
+    }
+
     var replacements = {merchant_id : merchant_id, consumer_id : consumer_id, subCate : subCate};
 
     var query = 'SELECT Coupons.id as coupon_id,Coupons.user_id as merchant_id,Coupons.coupon_type,Coupons.days,Coupons.start_time,Coupons.end_time,' +
                 'Coupons.expiry_date,Coupons.flash_deal,Coupons.description,Coupons.restriction,Coupons.coupon_code,Coupons.sub_category_id,GROUP_CONCAT(UploadImgs.image ORDER BY UploadImgs.image) AS images'+ 
-                ' FROM Coupons LEFT JOIN UploadImgs ON UploadImgs.coupon_id = Coupons.id WHERE NOT EXISTS' +
-                ' ( SELECT * FROM UsedCoupons WHERE Coupons.coupon_code=UsedCoupons.coupon_code AND' +
-                ' UsedCoupons.consumer_id=:consumer_id ) AND NOT EXISTS ( SELECT * FROM BlockMerchants WHERE Coupons.id=BlockMerchants.coupon_id AND BlockMerchants.consumer_id=:consumer_id )'+querySet+' AND Coupons.user_id=:merchant_id AND NOT Coupons.coupon_type="custom" AND STR_TO_DATE(Coupons.expiry_date,"%d%M%Y %h%i") >= current_date() AND Coupons.is_deleted=0 GROUP BY Coupons.id';
+                ' FROM Coupons LEFT JOIN UploadImgs ON UploadImgs.coupon_id = Coupons.id WHERE '+querySet1+' ' +
+                ' '+querySet+' AND Coupons.user_id=:merchant_id AND NOT Coupons.coupon_type="custom" AND STR_TO_DATE(Coupons.expiry_date,"%d%M%Y %h%i") >= current_date() AND Coupons.is_deleted=0 GROUP BY Coupons.id';
 
     models.sequelize.query(query,
         { replacements: replacements, type: models.sequelize.QueryTypes.SELECT }
