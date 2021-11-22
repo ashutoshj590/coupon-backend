@@ -179,9 +179,9 @@ var countsForMerchant = function(sub_category_id, consumer_id, lat1, lon1){
         var replacements = {sub_category_id : sub_category_id};
         var queryset = ''
     } else {
-      var replacements = {sub_category_id : merchant_id, consumer_id : consumer_id};
+      var replacements = {sub_category_id : sub_category_id, consumer_id : consumer_id};
       var queryset =  ' and NOT EXISTS ( SELECT * FROM UsedCoupons WHERE Coupons.coupon_code=UsedCoupons.coupon_code AND UsedCoupons.consumer_id=:consumer_id )' +
-                      ' and NOT EXISTS ( SELECT * FROM BlockMerchants WHERE BlockMerchants.is_blocked=1 AND BlockMerchants.consumer_id=:consumer_id )';
+                      ' and NOT EXISTS ( SELECT * FROM BlockMerchants WHERE BlockMerchants.is_blocked=1 AND BlockMerchants.consumer_id=:consumer_id AND Coupons.id=BlockMerchants.coupon_id )';
 
     }
 var query =        'select Coupons.*,Registrations.lat,Registrations.lang from Coupons LEFT JOIN Registrations ON Registrations.user_id=Coupons.user_id WHERE Coupons.sub_category_id=:sub_category_id and Coupons.is_deleted=0'+ 
