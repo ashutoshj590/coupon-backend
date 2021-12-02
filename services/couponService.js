@@ -265,7 +265,7 @@ exports.addRequestForMerchant = function(consumer_id, sub_category_id, detail, d
         
     }).then(function(requestDetail) {
         var obj = {};
-        createCouponForMerchant(null,sub_category_id,"custom",null,null,null,null,null,null,null,null,consumer_id).then(function(result) {
+        createCouponForMerchant(null,sub_category_id,"custom",null,null,null,null,null,null,null,consumer_id).then(function(result) {
             obj.detail = requestDetail;
             obj.coupon_id = result.id;
             addCouponIdtoRequest(requestDetail.id,result.id).then(function(update) {
