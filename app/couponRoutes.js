@@ -335,8 +335,14 @@ router.post('/get-merchant-by-category',[jsonParser,util.hasJsonParam(["lat1","l
     }
     couponService.getMerchantDetailbySubCateId(subCateId, consumerId, req.body.lat1, req.body.lon1, merchantId, dist).then(function (detail) {
         var response = util.getResponseObject(consts.RESPONSE_SUCCESS);
-        response.merchant_detail = detail;
+        var arr = [];
+        detail.forEach(function(obj, index) {
+        if (obj.couponDetail.length != 0){
+            arr.push(obj);
+        }
        
+        })
+        response.merchant_detail = arr;
         res.send(response); 
                       
             }, function (err) {
