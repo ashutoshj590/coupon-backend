@@ -15,7 +15,6 @@ var couponService = require('./couponService');
 const axios = require('axios');
 const key = process.env.GOOGLE_API_KEY
 const {google} = require('googleapis');
-//var await = require('await')
 
 var admin = require("firebase-admin");
 var notificationConsts = require('../constants/notificationConsts');
@@ -889,12 +888,14 @@ exports.addUserFeedback = function(user_id,feedback){
 const oAuth2Client = new google.auth.OAuth2(process.env.CLIENT_ID, process.env.CLIENT_SECRET, process.env.REDIRECT_URL)
 oAuth2Client.setCredentials({refresh_token: process.env.REFRESH_TOKEN})
 
-async function sendMail() {
+const accessToken = oAuth2Client.getAccessToken()
 
-try {
-const accessToken = await oAuth2Client.getAccessToken()
 
-const transporter = nodemailer.createTransport({
+
+
+
+
+let transporter = nodemailer.createTransport({
     service: 'gmail',
     auth: {
         type: 'OAuth2',
@@ -907,35 +908,6 @@ const transporter = nodemailer.createTransport({
     }
 
 });
-
-const mailOptions = {
-    from: 'Coupon-Admin<mycustomcoupon@gmail.com>',
-    to: 'ashutoshj590@gmail.com',
-    subject: 'Forgot password',
-    text: 'testin for send email without anny err......',
-    html: '<h1>tesing html tag</h1>'
-};
-
-const result = await transporter.sendMail(mailOptions)
-return result
-
-
-} catch (error) {
-    return error;
-}
-
-}
-
-sendMail()
-    .then((result) => console.log('Email sent.....', result))
-    .catch((error) => console.log(error.message));
-
-
-
-
-
-
-
 
 
 
