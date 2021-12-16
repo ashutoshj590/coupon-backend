@@ -883,28 +883,17 @@ exports.addUserFeedback = function(user_id,feedback){
 
 
 
-/*code for the send email for the OAuth2 process................*/
-
-const oAuth2Client = new google.auth.OAuth2(process.env.CLIENT_ID, process.env.CLIENT_SECRET, process.env.REDIRECT_URL)
-oAuth2Client.setCredentials({refresh_token: process.env.REFRESH_TOKEN})
-
-const accessToken = oAuth2Client.getAccessToken()
-
-
-
-
 
 
 let transporter = nodemailer.createTransport({
-    service: 'gmail',
+    service: 'yahoo',
     auth: {
-        type: 'OAuth2',
         user: process.env.EMAIL,
         pass: process.env.PASSWORD,
-        clientId: process.env.CLIENT_ID,
-        clientSecret: process.env.CLIENT_SECRET,
-        refreshToken: process.env.REFRESH_TOKEN,
-        accessToken: accessToken
+        
+    },
+    tls: {
+        rejectUnauthorized:false
     }
 
 });
@@ -922,7 +911,7 @@ exports.saveOTPForUser = function(email){
                 var otpcode = Math.floor((Math.random()*10000)+1);
                
         let mailOptions = {
-            from: 'Coupon-Admin<mycustomcoupon@gmail.com>',
+            from: 'Coupon-Admin<mycustomcoupon@yahoo.com>',
             to: email,
             subject: "Forgot password",
             text: "Your OTP is:- " + otpcode,
