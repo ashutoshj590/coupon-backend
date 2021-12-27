@@ -23,10 +23,14 @@ var storage = multer.diskStorage({
 })
 
 let transporter = nodemailer.createTransport({
-    service: 'gmail',
+    service: 'yahoo',
     auth: {
         user: process.env.EMAIL,
-        pass: process.env.PASSWORD
+        pass: process.env.PASSWORD,
+        
+    },
+    tls: {
+        rejectUnauthorized:false
     }
 
 });

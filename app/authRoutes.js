@@ -14,13 +14,18 @@ const nodemailer = require('nodemailer');
 var emailConsts = require('../constants/emailConsts');
 
 let transporter = nodemailer.createTransport({
-    service: 'gmail',
+    service: 'yahoo',
     auth: {
         user: process.env.EMAIL,
-        pass: process.env.PASSWORD
+        pass: process.env.PASSWORD,
+        
+    },
+    tls: {
+        rejectUnauthorized:false
     }
 
 });
+
 
 /* API funcation for crearte new user sign up..................*/
 
