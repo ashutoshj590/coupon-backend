@@ -352,7 +352,7 @@ var countsForCustom = function(){
     var deferred = Q.defer();
     var replacements = null;
 
-    var query = 'select COUNT(*) as custom from Coupons WHERE coupon_type="custom"';
+    var query = 'select COUNT(*) as requests from Requests WHERE is_deleted=0 and is_allow=1';
 
     models.sequelize.query(query,
         { replacements: replacements, type: models.sequelize.QueryTypes.SELECT }
@@ -405,7 +405,7 @@ var countsForRequests = function(){
     var deferred = Q.defer();
     var replacements = null;
 
-    var query = 'select COUNT(*) as requests from Requests WHERE is_deleted=0';
+    var query = 'select COUNT(*) as requests from Requests WHERE is_deleted=0 and is_allow=2';
 
     models.sequelize.query(query,
         { replacements: replacements, type: models.sequelize.QueryTypes.SELECT }

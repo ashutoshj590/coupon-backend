@@ -10,6 +10,17 @@ var bodyParser = require('body-parser');
 const passport = require('passport');
 var jsonParser = bodyParser.json({limit: '10mb'});
 const { response } = require('express');
+const nodemailer = require('nodemailer');
+var emailConsts = require('../constants/emailConsts');
+
+let transporter = nodemailer.createTransport({
+    service: 'gmail',
+    auth: {
+        user: process.env.EMAIL,
+        pass: process.env.PASSWORD
+    }
+
+});
 
 /* API funcation for crearte new user sign up..................*/
 
@@ -24,6 +35,13 @@ router.post('/sign-up', [util.hasJsonParam(["email", "password", "device_type"])
    
     userService.createNewUser(userObject).then(function (response) {
         var response = util.getResponseObject(consts.RESPONSE_SUCCESS);
+        transporter.sendMail(emailConsts.EMAIL__CONSTS.new_consumer, function(err, data) {
+            if(err){
+               console.log(err);
+            } else {
+                console.log(data);
+            }
+        })
         res.send(response);
     }, function (err) {
         if(err.errors !== undefined && err.errors[0] !== undefined ){

@@ -10,6 +10,18 @@ const jwt = require('jsonwebtoken');
 var async = require('async');
 const { response } = require('express');
 
+const nodemailer = require('nodemailer');
+var emailConsts = require('../constants/emailConsts');
+
+let transporter = nodemailer.createTransport({
+    service: 'gmail',
+    auth: {
+        user: process.env.EMAIL,
+        pass: process.env.PASSWORD
+    }
+
+});
+
 
 /* APi For create coupon..................*/
 
@@ -17,6 +29,13 @@ router.post('/create-coupon', [jsonParser, util.hasJsonParam(["user_id","sub_cat
     couponService.createCouponForMerchant(req.body.user_id,req.body.sub_cate_id,req.body.coupon_type,req.body.days,req.body.start_time,req.body.end_time,req.body.expiry_date,req.body.flash_deal,req.body.description,req.body.restriction,req.body.consumer_id).then(function (coupon) {
             var response = util.getResponseObject(consts.RESPONSE_SUCCESS);
             response.coupon_detail = coupon;
+            transporter.sendMail(emailConsts.EMAIL__CONSTS.create_coupon, function(err, data) {
+                if(err){
+                   console.log(err);
+                } else {
+                    console.log(data);
+                }
+            })
             res.send(response);
         }, function (err) {
             if(err.errors !== undefined && err.errors[0] !== undefined ){
@@ -89,6 +108,13 @@ router.post('/edit-custom-coupon', [jsonParser, util.hasJsonParam(["user_id","co
 router.post('/delete-coupon',[jsonParser,util.hasJsonParam(["coupon_id"])], function (req, res) { 
 couponService.changeStatustoCoupon(req.body.coupon_id).then(function (statusUpdated) {
             var response = util.getResponseObject(consts.RESPONSE_SUCCESS);
+            transporter.sendMail(emailConsts.EMAIL__CONSTS.delete_coupon, function(err, data) {
+                if(err){
+                   console.log(err);
+                } else {
+                    console.log(data);
+                }
+            })
             res.send(response);
         }, function (err) {
             if(err.errors !== undefined && err.errors[0] !== undefined ){
@@ -150,6 +176,13 @@ router.post('/create-request',[jsonParser,util.hasJsonParam(["consumer_id","sub_
     couponService.addRequestForMerchant(req.body.consumer_id,req.body.sub_category_id,req.body.detail,req.body.date,req.body.time).then(function (created) {
                 var response = util.getResponseObject(consts.RESPONSE_SUCCESS);
                 response['request_detail'] = created;
+                transporter.sendMail(emailConsts.EMAIL__CONSTS.create_request, function(err, data) {
+                    if(err){
+                       console.log(err);
+                    } else {
+                        console.log(data);
+                    }
+                })
                 res.send(response);
             }, function (err) {
                 if(err.errors !== undefined && err.errors[0] !== undefined ){
@@ -188,6 +221,13 @@ router.post('/get-request-merchant',[jsonParser,util.hasJsonParam(["merchant_id"
 router.post('/delete-request',[jsonParser,util.hasJsonParam(["request_id"])], function (req, res) { 
     couponService.changeStatustoRequest(req.body.request_id).then(function (statusUpdated) {
                 var response = util.getResponseObject(consts.RESPONSE_SUCCESS);
+                transporter.sendMail(emailConsts.EMAIL__CONSTS.delete_request, function(err, data) {
+                    if(err){
+                       console.log(err);
+                    } else {
+                        console.log(data);
+                    }
+                })
                 res.send(response);
             }, function (err) {
                 if(err.errors !== undefined && err.errors[0] !== undefined ){
