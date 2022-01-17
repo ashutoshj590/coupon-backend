@@ -334,7 +334,7 @@ var countsForAllCoupons = function(){
     var deferred = Q.defer();
     var replacements = null;
 
-    var query = 'select COUNT(*) as coupons from Coupons';
+    var query = 'select COUNT(*) as coupons from Coupons where NOT user_id=0';
 
     models.sequelize.query(query,
         { replacements: replacements, type: models.sequelize.QueryTypes.SELECT }
