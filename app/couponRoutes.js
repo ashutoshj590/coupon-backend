@@ -132,7 +132,7 @@ couponService.changeStatustoCoupon(req.body.coupon_id).then(function (statusUpda
     );
 });
 
-/* API for get all category form database.............*/
+
 router.post('/get-all-coupons',jsonParser, function (req, res) {
     if(req.body.merchant_id == null || undefined){
        var merchantId = null;
@@ -627,6 +627,27 @@ router.post('/get-used-coupons',[jsonParser,util.hasJsonParam(["consumer_id"])],
 
 router.post('/get-coupon-detail',[jsonParser,util.hasJsonParam(["coupon_id"])], function (req, res) { 
     couponService.getCouponDetail(req.body.coupon_id).then(function (detail) {
+                var response = util.getResponseObject(consts.RESPONSE_SUCCESS);
+                response.coupon_detail = detail[0];
+                res.send(response);
+            
+            }, function (err) {
+                if(err.errors !== undefined && err.errors[0] !== undefined ){
+                    var response = util.getResponseObject(consts.RESPONSE_ERROR, err.response);
+                    res.send(response);
+                }else{
+                    var response = util.getResponseObject(consts.RESPONSE_ERROR, err.response);
+                }
+                res.send(response);
+            }
+        );
+});
+
+
+
+
+router.post('/get-coupon-detail-admin',[jsonParser,util.hasJsonParam(["coupon_id"])], function (req, res) { 
+    couponService.getCouponDetailAdmin(req.body.coupon_id).then(function (detail) {
                 var response = util.getResponseObject(consts.RESPONSE_SUCCESS);
                 response.coupon_detail = detail[0];
                 res.send(response);

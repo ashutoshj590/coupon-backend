@@ -1413,7 +1413,7 @@ exports.getAllcouponByMerchantId = function(merchant_id){
     var deferred = Q.defer();
     var replacements = {merchant_id : merchant_id};
 
-    var query =  'select * from Coupons where user_id=:merchant_id';
+    var query =  'select * from Coupons where user_id=:merchant_id and is_deleted=0';
 
     models.sequelize.query(query,
         { replacements: replacements, type: models.sequelize.QueryTypes.SELECT }
@@ -1445,11 +1445,29 @@ return deferred.promise;
 };
 
 
+
+
+
+
+exports.getCouponDetailAdmin = function(coupon_id){
+    var deferred = Q.defer();
+    var replacements = {coupon_id : coupon_id};
+
+    var query =  'SELECT Coupons.*,GROUP_CONCAT(UploadImgs.image ORDER BY UploadImgs.image) AS images FROM Coupons LEFT JOIN UploadImgs ON UploadImgs.coupon_id=Coupons.id where Coupons.id=:coupon_id';
+
+    models.sequelize.query(query,
+        { replacements: replacements, type: models.sequelize.QueryTypes.SELECT }
+    ).then(function (coupon) {
+        deferred.resolve(coupon);
+    },function (err) {
+      deferred.reject(err);
+    }
+);
+return deferred.promise;
+};
+
+
    
-
-
-
-
 
 
 
@@ -1459,7 +1477,7 @@ exports.getAllcouponByConsumerId = function(consumer_id){
     var replacements = {consumer_id : consumer_id};
 
     var query =  'select Coupons.* FROM Coupons LEFT JOIN UsedCoupons ON Coupons.coupon_code=UsedCoupons.coupon_code' +
-                ' WHERE Coupons.consumer_id=:consumer_id OR UsedCoupons.consumer_id=:consumer_id';
+                ' WHERE Coupons.is_deleted=0 and (Coupons.consumer_id=:consumer_id OR UsedCoupons.consumer_id=:consumer_id)';
 
     models.sequelize.query(query,
         { replacements: replacements, type: models.sequelize.QueryTypes.SELECT }
@@ -1484,7 +1502,7 @@ exports.getAllReq = function(){
    
     var query = 'SELECT Requests.id as request_id,Requests.detail,Requests.date,Requests.time,Requests.createdAt,Requests.updatedAt,' +
                 'Requests.coupon_id,Requests.is_allow,Users.email as consumer_email,SubCategories.name as sub_category_name FROM Requests LEFT JOIN Users' +
-                ' ON Requests.consumer_id=Users.id LEFT JOIN SubCategories ON Requests.sub_category_id=SubCategories.id WHERE Requests.is_allow=2 and Requests.is_deleted=0'; 
+                ' ON Requests.consumer_id=Users.id LEFT JOIN SubCategories ON Requests.sub_category_id=SubCategories.id WHERE Requests.is_deleted=0'; 
     
     models.sequelize.query(query,
         { replacements: replacements, type: models.sequelize.QueryTypes.SELECT }
