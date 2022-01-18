@@ -908,7 +908,7 @@ exports.saveOTPForUser = function(email){
                 deferred.reject("No user found with given email id.");
             }else {
            
-                var otpcode = Math.floor((Math.random()*10000)+1);
+                var otpcode = Math.floor(1000 + Math.random() * 9000);
                
         let mailOptions = {
             from: 'Coupon-Admin<mycustomcoupon@yahoo.com>',

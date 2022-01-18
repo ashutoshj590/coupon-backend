@@ -405,7 +405,7 @@ var countsForRequests = function(){
     var deferred = Q.defer();
     var replacements = null;
 
-    var query = 'select COUNT(*) as requests from Requests WHERE is_deleted=0 and is_allow=2';
+    var query = 'select COUNT(*) as requests from Requests WHERE is_deleted=0';
 
     models.sequelize.query(query,
         { replacements: replacements, type: models.sequelize.QueryTypes.SELECT }
