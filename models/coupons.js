@@ -30,6 +30,7 @@ module.exports = (sequelize, DataTypes) => {
     coupon_code: DataTypes.STRING,
     consumer_id: DataTypes.INTEGER,
     is_deleted: DataTypes.BOOLEAN,
+    email: DataTypes.STRING
     
   }, {
     sequelize,
