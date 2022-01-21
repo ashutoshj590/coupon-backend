@@ -214,6 +214,41 @@ exports.getAllcoupon = function(merchant_id){
 );
 return deferred.promise;
 };
+
+
+
+
+
+exports.getAllcouponAdmin = function(){
+    var deferred = Q.defer();
+    
+    var replacements = {};
+
+     var query = 'select Coupons.*,Users.email,SubCategories.name FROM Coupons LEFT JOIN Users ON Users.id = Coupons.user_id'+
+                ' LEFT JOIN SubCategories ON SubCategories.id = Coupons.sub_category_id where Coupons.is_deleted=0 GROUP BY Coupons.id';
+
+    models.sequelize.query(query,
+        { replacements: replacements, type: models.sequelize.QueryTypes.SELECT }
+    ).then(function(allcoupons) {
+        var output = [];
+        async.eachSeries(allcoupons,function(data,callback){ 
+            singleUsedCouponsAdmin(data.coupon_code).then(function(newData){
+                data.used_coupons = newData.length;
+                output.push(data);
+                callback();
+            }, function(err){
+               deferred.reject(err);
+            })
+   
+       }, function(err, detail) {
+             deferred.resolve(output);
+           
+       });
+        
+    });
+    return deferred.promise;
+};
+
       
 /*
 * Fuction define for get All custom coupons for consumer
@@ -934,6 +969,24 @@ var countsForUsedCoupons = function(merchant_id){
     var replacements = {merchant_id : merchant_id};
 
     var query = 'select COUNT(*) as used from UsedCoupons WHERE merchant_id=:merchant_id';
+
+    models.sequelize.query(query,
+        { replacements: replacements, type: models.sequelize.QueryTypes.SELECT }
+    ).then(function(usedCounts) {
+        deferred.resolve(usedCounts);
+
+        }
+    );
+    return deferred.promise;
+};
+
+
+
+var singleUsedCouponsAdmin = function(coupon_code){
+    var deferred = Q.defer();
+    var replacements = {coupon_code : coupon_code};
+
+    var query = 'select * from UsedCoupons WHERE coupon_code=:coupon_code';
 
     models.sequelize.query(query,
         { replacements: replacements, type: models.sequelize.QueryTypes.SELECT }

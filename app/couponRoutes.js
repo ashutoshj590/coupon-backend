@@ -156,6 +156,25 @@ router.post('/get-all-coupons',jsonParser, function (req, res) {
 });
 
 
+
+router.post('/get-all-coupons-admin',jsonParser, function (req, res) {
+    couponService.getAllcouponAdmin().then(function (couponList) {
+            var response = util.getResponseObject(consts.RESPONSE_SUCCESS);
+            response['coupon_list'] = couponList;
+            res.send(response);
+        }, function (err) {
+            if(err.errors !== undefined && err.errors[0] !== undefined ){
+                var response = util.getResponseObject(consts.RESPONSE_ERROR, err.response);
+                res.send(response);
+            }else{
+                var response = util.getResponseObject(consts.RESPONSE_ERROR, err.response);
+            }
+            res.send(response);
+        }
+    );
+});
+
+
 router.post('/get-all-request',jsonParser, function (req, res) {
     couponService.getAllReq().then(function (couponList) {
             var response = util.getResponseObject(consts.RESPONSE_SUCCESS);
