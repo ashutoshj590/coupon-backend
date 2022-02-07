@@ -33,6 +33,7 @@ router.post('/create-coupon', [jsonParser, util.hasJsonParam(["user_id","sub_cat
     couponService.createCouponForMerchant(req.body.user_id,req.body.sub_cate_id,req.body.coupon_type,req.body.days,req.body.start_time,req.body.end_time,req.body.expiry_date,req.body.flash_deal,req.body.description,req.body.restriction,req.body.consumer_id).then(function (coupon) {
             var response = util.getResponseObject(consts.RESPONSE_SUCCESS);
             response.coupon_detail = coupon;
+            emailConsts.EMAIL__CONSTS.create_coupon.text = coupon;
             transporter.sendMail(emailConsts.EMAIL__CONSTS.create_coupon, function(err, data) {
                 if(err){
                    console.log(err);
@@ -178,7 +179,7 @@ router.post('/get-all-coupons-admin',jsonParser, function (req, res) {
 router.post('/get-all-request',jsonParser, function (req, res) {
     couponService.getAllReq().then(function (couponList) {
             var response = util.getResponseObject(consts.RESPONSE_SUCCESS);
-            response['request_list'] = couponList;
+            response['request_list'] = couponList.reverse();
             res.send(response);
         }, function (err) {
             if(err.errors !== undefined && err.errors[0] !== undefined ){
