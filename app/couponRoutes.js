@@ -401,9 +401,9 @@ router.post('/get-merchant-by-category',[jsonParser,util.hasJsonParam(["lat1","l
         var response = util.getResponseObject(consts.RESPONSE_SUCCESS);
         var arr = [];
         detail.forEach(function(obj, index) {
-        if (obj.couponDetail.length != 0){
+      
             arr.push(obj);
-        }
+        
        
         })
         response.merchant_detail = arr;
